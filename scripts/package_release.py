@@ -7,9 +7,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / 'skills' / 'instagram-transcript-extractor'
 REQUIRED = ('SKILL.md', 'references/workflow.md', 'scripts/workflow.py',
-            'agents/openai.yaml', 'assets/icon.svg',
-            'assets/instagram-transcript-icon-400.png',
-            'assets/instagram-transcript-icon-1024.png')
+            'agents/openai.yaml', 'assets/instagram-transcript-extractor-icon.svg')
 PREFIX = 'instagram-transcript-extractor/'
 EXCLUDED_DIRS = {'__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache', '.git'}
 
