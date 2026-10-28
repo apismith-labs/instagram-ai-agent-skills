@@ -4,6 +4,12 @@ This record distinguishes observed results from earlier reports. It contains no 
 
 For host-by-host stages and interface-specific evidence, see the [platform support matrix](platform-support.md). Evidence from separate tests must not be combined into a single end-to-end result.
 
+## Recent tester reports
+
+- **Codex:** A tester reports installing a specified GitHub commit with the skill installer's Git method and found installation easy. On first use, the tester saw a message that Apify was not yet connected. After connecting Apify, the tester explicitly invoked the skill and obtained a transcript and Chinese translation. Installation, connection, run and result are distinct stages; the original trace and exact interface were not supplied for independent review here. This report does not establish Codex natural-language automatic selection or validate the new distribution package.
+- **ChatGPT chat:** A tester reports uploading the skill and observing it load during a natural-language task. A single-link task returned a matching transcript and summary; a separate two-link task returned two matching results, and the tester reports that the corresponding Apify Console MCP run showed two results. The report does not independently document the OAuth authorization steps, the exact uploaded package version, or validate the new release ZIP. The original trace was not supplied for independent review here.
+- **Release-candidate ZIP import:** The product owner reports uploading the ZIP with the reviewed SHA-256 to ChatGPT Skills and confirming that the Instagram icon appeared in the Skills list. This verifies package import and icon display only; no Apify task using that exact ZIP was reported. The GitHub Release asset and download flow are not yet tested.
+
 ## GitHub installation
 
 - The Git method of the skill installer installed the complete skill into an isolated directory with a specified commit as its ref. The installed files matched the corresponding locally available Git commit's source directory byte for byte; the installer did not independently print the checked-out SHA. This verified file installation, not personal discovery or use.
@@ -29,4 +35,4 @@ For host-by-host stages and interface-specific evidence, see the [platform suppo
 
 ## Still unverified
 
-Automatic selection from a natural-language request; the complete new-user journey from README installation through Apify connection to a transcript; ChatGPT chat installation, connection, and full use; cross-session recovery; real multi-page dataset reads; and host file upload and result export remain unverified. Simulated tests do not establish these platform behaviors.
+Codex automatic selection from a natural-language request; the exact README installation request; a transcript task using the release-candidate ZIP after upload and Apify connection; the GitHub Release asset and download flow; authorization recovery after expiry; failure and partial-failure handling on each host; cross-session recovery; real multi-page dataset reads; and host file input and result export remain unverified. The tester reported ChatGPT task results for a separate, unspecified upload; OAuth authorization steps were not independently documented. Simulated tests do not establish these platform behaviors.
