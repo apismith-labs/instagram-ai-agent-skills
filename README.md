@@ -10,6 +10,8 @@ Instagram AI Agent Skills is a collection of independent skills for creators, ma
 
 ## Getting started with Instagram Transcript Extractor
 
+You need your own Apify account to run the skill. Actor runs use the allowance and billing terms of your Apify account; check your Apify Console for current usage details. The Apify connection gives ChatGPT or Codex access to external Apify tools. The Skill itself supplies the transcript workflow instructions. Installing the Skill does not connect Apify, and connecting Apify does not install the Skill.
+
 ### Download the skill
 
 Download **`instagram-transcript-extractor.zip`** from the [v0.1.0 Release Assets](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.1.0/instagram-transcript-extractor.zip). On the Release page, use the file under **Assets**. Do not choose GitHub's automatically generated **Source code (zip)**. Keep the downloaded ZIP intact when uploading it to ChatGPT; do not unzip it first.
@@ -18,9 +20,9 @@ Optional SHA-256 check: `cb5173bf999cb54feb06f190736111afaccb91ceae0bd8453273912
 
 ### Use in ChatGPT
 
-1. Open **Plugins** in the sidebar, choose the **Skills** tab, select **Create**, then **Upload from your computer**. Select the intact `instagram-transcript-extractor.zip` file. Open the skill from the Skills list to confirm it appears. The owner reported that v0.1.0 initially displayed the Instagram icon. ChatGPT's editor may rewrite icon metadata when the skill is reloaded; see [known validation details](docs/test-status.md).
-2. **Connect Apify separately.** Use the [Apify ChatGPT guide](https://docs.apify.com/integrations/chatgpt) and the current ChatGPT interface's **Plugins**, **Apps**, or **Connectors** entry to connect with OAuth. OpenAI's [connected apps guide](https://help.openai.com/en/articles/11487775-connected-apps-in-chatgpt) explains app availability and account connections. Follow the controls shown in your account: the official guides describe different interface paths, and Developer mode is not a universal prerequisite for every existing connection flow. Skill upload and Apify authorization are separate steps.
-3. Start a new chat. If needed, select **+**, then **More** (or the equivalent app picker in your interface) and add the Apify connector to that conversation. A connection saved to your account may still need to be added to each new conversation.
+1. Open **Plugins** in the sidebar, choose the **Skills** tab, select **Create**, then **Upload from your computer**. Select the intact `instagram-transcript-extractor.zip` file. Wait for ChatGPT's upload scan. The Skill may become available immediately, show **Needs Review**, or show **Blocked**. For **Needs Review**, read and follow the displayed review prompt. A **Blocked** Skill cannot be used; the scan status alone does not mean the ZIP is damaged. Open the Skill from the Skills list to confirm it appears. The owner reported that v0.1.0 initially displayed the Instagram icon. ChatGPT's editor may rewrite icon metadata when the Skill is reloaded; see [known validation details](docs/test-status.md).
+2. **Connect Apify separately.** You need your own Apify account; create one in the [Apify Console](https://console.apify.com/) if needed. The [Apify ChatGPT guide](https://docs.apify.com/integrations/chatgpt) describes a custom connector path at **Settings → Apps & Connectors → Create** and says Developer mode is needed for that path. OpenAI's newer [custom MCP server guide](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt) describes a different current path: **Plugins → + → Add custom MCP server**, and says that path does not require enabling Developer mode first. Account plans, workspace permissions, and rollouts may determine which route is available. Follow the route shown in your account; these interfaces can change. In either route, select OAuth if offered, sign in to Apify, review permissions, and authorize the connection. For app availability and account connections, see OpenAI's [connected apps guide](https://help.openai.com/en/articles/11487775-connected-apps-in-chatgpt).
+3. Start a new chat. If needed, select **+**, then **More**, choose the Apify connector, and add it to the conversation. Apify must be connected and available in that chat; a saved connection may need to be added to each new conversation.
 4. Ask: `Use Instagram Transcript Extractor to get the transcript of this public Instagram Reel: https://www.instagram.com/reel/REPLACE_WITH_A_REAL_LINK/` Replace the example URL with a real public Instagram video link. Ask for a summary or translation if you want one.
 
 Skills are currently documented by OpenAI as available to eligible Business, Enterprise, Healthcare, and Edu users, subject to workspace settings and product availability ([OpenAI Skills guide](https://help.openai.com/en/articles/20001066-skills-in-chatgpt)). Access can vary by account and rollout: the project owner also reports seeing Skills on a Plus account. Check your own ChatGPT interface; Plus access is neither guaranteed nor ruled out here.
@@ -39,14 +41,15 @@ the installed skill should be ~/.agents/skills/instagram-transcript-extractor/.
 If that destination already exists, stop and tell me; do not overwrite it.
 ```
 
-The installer normally uses `$CODEX_HOME/skills` (usually `~/.codex/skills`) unless given another destination, and it stops when the destination already exists. If it reports that the folder exists, ask Codex to inspect it or choose a different empty destination; do not ask it to overwrite files. After installation, start a new Codex session and check discovery explicitly:
+The installer normally uses `$CODEX_HOME/skills` (usually `~/.codex/skills`) unless given another destination, and it stops when the destination already exists. If `~/.agents/skills/instagram-transcript-extractor/` already exists, inspect that installation first and stop before reinstalling or overwriting it. Do not delete it as part of troubleshooting. After installation, start a new Codex session and check discovery explicitly:
 
 ```text
-Use $instagram-transcript-extractor to confirm that the skill is available.
+Use $instagram-transcript-extractor and confirm that you found the
+instagram-transcript-extractor skill.
 Do not run an Actor yet.
 ```
 
-If Codex says the skill is unavailable, check the install location for a complete `SKILL.md` folder and start a fresh session. If it still is not discovered, [open an issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues). The exact README installation request and discovery flow for each Codex environment remain unverified.
+Success means a new session identifies the `instagram-transcript-extractor` skill by name. If Codex says it cannot find the skill, check `~/.agents/skills/instagram-transcript-extractor/` and confirm it contains `SKILL.md`; do not report the installation as complete until the new session finds it. If it still is not discovered, [open an issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues). The exact README installation request and discovery flow for each Codex environment remain unverified.
 
 ### Send a video and understand the result
 
@@ -97,7 +100,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## For maintainers
 
-The [project architecture](docs/project-architecture.md) describes how to add and maintain independent skills. `skills/instagram-transcript-extractor/` is the maintained distribution source. `.agents/skills/instagram-transcript-extractor/` is the project-level discovery copy; it does not update automatically. After changing the source, check the copy for independent changes and synchronize it. The installation example uses `main`, which can change; use a verified release ref when reproducibility matters. Before committing, run the offline tests, including the consistency check:
+The [project architecture](docs/project-architecture.md) describes how to add and maintain independent skills. `skills/instagram-transcript-extractor/` is the maintained distribution source. `.agents/skills/instagram-transcript-extractor/` is the project-level discovery copy; it does not update automatically. After changing the source, check the copy for independent changes and synchronize it. The installation example uses the `v0.1.0` ref; review the release ref when newer versions are published. Before committing, run the offline tests, including the consistency check:
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
