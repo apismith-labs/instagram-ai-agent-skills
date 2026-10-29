@@ -1,52 +1,47 @@
 # Instagram AI Agent Skills
 
-Instagram AI Agent Skills is a project for independent AI agent skills that help creators, marketers, researchers, and other users work with Instagram content. Each skill focuses on a separate task and can be installed on its own.
+Get spoken transcripts from public Instagram Reels and videos with AI agent skills. Start with **Instagram Transcript Extractor**: give it one or more links, then ask for a summary, translation, or analysis of the returned text.
 
-## Project overview
+## Available skill: Instagram Transcript Extractor
 
-The repository is the project catalog and documentation home. It is not itself an installable skill. A skill contains the workflow for a user-facing task; a platform such as Codex or ChatGPT hosts that skill and provides its own tools and permissions. Apify supplies the external tools used by the current skill.
+The Skill returns spoken words for accessible videos and may include timestamps when available. You can request a summary or translation alongside the transcript. Results are not guaranteed for every link.
 
-## Available skills
+Download the [v0.1.0 Skill ZIP](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.1.0/instagram-transcript-extractor.zip) for ChatGPT. SHA-256: `cb5173bf999cb54feb06f190736111afaccb91ceae0bd845327391208ffcb331`. Download this named Release asset, not GitHub's automatically generated **Source code (zip)**. Keep the ZIP intact when uploading it to ChatGPT.
 
-| Skill | What it does | Status |
-| --- | --- | --- |
-| [Instagram Transcript Extractor](skills/instagram-transcript-extractor/) | Gets spoken transcripts from public Instagram video links. You can request a summary, translation, or text-based analysis. | Available |
+## What you need
 
-Download the Skill from the official [v0.1.0 Release asset](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.1.0/instagram-transcript-extractor.zip) (SHA-256: `cb5173bf999cb54feb06f190736111afaccb91ceae0bd845327391208ffcb331`). Use this named Release asset, not GitHub's automatically generated **Source code (zip)**. See the [ChatGPT guide](docs/platforms/chatgpt.md) or [Codex guide](docs/platforms/codex.md) for platform-specific instructions.
-
-Reels analysis, competitor research, creator analysis, and comment analysis are possible future ideas, not available skills. Transcript-based analysis covers the returned text; it does not analyze video imagery, performance metrics, or audience response.
+Use your own [Apify account](https://console.apify.com/). Actor runs use that account's plan allowance; check Apify Console for current Runs and billing details. Connecting Apify and installing a Skill are separate steps: the connection provides external tools, while the Skill provides the task workflow.
 
 ## Choose your platform
 
-The skill uses your own Apify account. Runs use that account's plan allowance; check the [Apify Console](https://console.apify.com/) for current Runs and billing details. Connecting Apify provides external tool access. Installing the skill provides the task workflow. They are separate steps, and neither one completes the other.
+| Platform | Setup order |
+| --- | --- |
+| [ChatGPT](docs/platforms/chatgpt.md) | Connect Apify with the custom MCP/plugin OAuth flow → upload the named v0.1.0 ZIP → start a new conversation, select the Apify plugin with **@**, and request a transcript. Skill availability may depend on your account and workspace. |
+| [Codex](docs/platforms/codex.md) | Install the Apify plugin and authorize with OAuth → install the Skill using the documented Codex installer flow → start a new session, confirm discovery, then explicitly invoke it. The guide covers Codex desktop and CLI separately. |
+| [Manus](docs/platforms/manus.md) | Enable the existing Apify Connector and authorize with OAuth → import the Skill folder from GitHub → in chat select it with **/** and confirm the Apify Connector is enabled. Manus tasks using the Connector may consume Manus credits. |
 
-- [Use the skill in ChatGPT](docs/platforms/chatgpt.md) — connect Apify, then upload the Skill ZIP.
-- [Use the skill in Codex](docs/platforms/codex.md) — Codex desktop app and Codex CLI are separate environments with separate setup guidance.
-- [Use the skill in Manus](docs/platforms/manus.md) — enable the Apify Connector, then import the Skill from GitHub.
-- [Platform evidence matrix](docs/platform-support.md) — stage-by-stage project evidence. A published setup guide is not proof that a workflow passed testing.
+## Try a request
 
-Only this repository's Instagram Transcript Extractor is currently implemented. The owner reports one successful, single-account, single-Reel Manus task; it does not establish batch behavior, general success across Manus accounts, or support on other platforms. ChatGPT task reports, Codex installation/use reports, and earlier Actor tests are separate evidence and do not establish a complete new-user journey on those platforms. ChatGPT chat is a different product from Codex, and Codex evidence does not establish ChatGPT support. Read the [detailed test status](docs/test-status.md) for the evidence boundaries.
+Replace the example with a real public Instagram link:
 
-## Documentation
+First activate Instagram Transcript Extractor using the method in your platform guide. This example is the task request; it does not activate the Skill for you.
 
-- [User guide](docs/README.md)
-- [Instagram Transcript Extractor user guide](docs/skills/instagram-transcript-extractor.md)
-- [Project architecture](docs/project-architecture.md)
-- [Platform support evidence](docs/platform-support.md)
-- [Detailed test status](docs/test-status.md)
-- [Transcript Extractor design](docs/transcript-extractor-design.md)
-- [Acceptance test plan](docs/acceptance-test-plan.md)
-
-## Support and license
-
-For questions, problems, or ideas, [open a GitHub issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues). This project is licensed under the [MIT License](LICENSE).
-
-## For maintainers
-
-`skills/instagram-transcript-extractor/` is the maintained distribution source. `.agents/skills/instagram-transcript-extractor/` is the separate Codex project-discovery copy and does not synchronize automatically. Check it for independent edits before deliberately syncing changes from the source. The Codex installation example pins `v0.1.0`; review that ref when preparing a newer release. Before committing, run the offline tests, including the copy consistency check:
-
-```bash
-PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
+```text
+Get the transcript of this public Instagram Reel and give me a short summary:
+https://www.instagram.com/reel/REPLACE_WITH_A_REAL_LINK/
 ```
 
-The single-skill Release ZIP can be prepared with `python3 scripts/package_release.py --output /tmp/instagram-transcript-extractor.zip`; choose an output path outside the repository. See [project architecture](docs/project-architecture.md) for maintenance rules.
+## What to expect
+
+Some links may be private, deleted, restricted, or otherwise inaccessible; a video without detectable speech may not produce a transcript. A batch can have both successful and failed links. Missing timestamps alone do not mean transcription failed. Text-based analysis is based on the transcript, not video imagery, performance metrics, or audience response.
+
+Questions or problems? [Open a GitHub issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues). This project is licensed under the [MIT License](LICENSE).
+
+## Project documentation and maintenance
+
+- [User guide index](docs/README.md)
+- [Platform evidence matrix](docs/platform-support.md)
+- [Detailed test status](docs/test-status.md)
+- [Project architecture](docs/project-architecture.md)
+
+The project currently provides this one Skill; Reels analysis, competitor research, creator analysis, and comment analysis remain future ideas. For maintainers, `skills/instagram-transcript-extractor/` is the distribution source and `.agents/skills/instagram-transcript-extractor/` is a separate Codex project discovery copy that does not sync automatically. See the [architecture guide](docs/project-architecture.md) for maintenance details.
