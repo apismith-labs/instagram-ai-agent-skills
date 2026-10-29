@@ -22,9 +22,10 @@ The skill uses your own Apify account. Runs use that account's plan allowance; c
 
 - [Use the skill in ChatGPT](docs/platforms/chatgpt.md) — connect Apify, then upload the Skill ZIP.
 - [Use the skill in Codex](docs/platforms/codex.md) — Codex desktop app and Codex CLI are separate environments with separate setup guidance.
+- [Use the skill in Manus](docs/platforms/manus.md) — enable the Apify Connector, then import the Skill from GitHub.
 - [Platform evidence matrix](docs/platform-support.md) — stage-by-stage project evidence. A published setup guide is not proof that a workflow passed testing.
 
-Only this repository's Instagram Transcript Extractor is currently implemented. ChatGPT task reports, Codex installation/use reports, and earlier Actor tests come from separate sessions; they do not establish a complete new-user journey on either platform. ChatGPT chat is a different product from Codex, and Codex evidence does not establish ChatGPT support. Read the [detailed test status](docs/test-status.md) for the evidence boundaries.
+Only this repository's Instagram Transcript Extractor is currently implemented. The owner reports one successful, single-account, single-Reel Manus task; it does not establish batch behavior, general success across Manus accounts, or support on other platforms. ChatGPT task reports, Codex installation/use reports, and earlier Actor tests are separate evidence and do not establish a complete new-user journey on those platforms. ChatGPT chat is a different product from Codex, and Codex evidence does not establish ChatGPT support. Read the [detailed test status](docs/test-status.md) for the evidence boundaries.
 
 ## Documentation
 
