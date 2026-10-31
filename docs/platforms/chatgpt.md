@@ -1,7 +1,5 @@
 # Use Instagram Transcript Extractor in ChatGPT
 
-This guide describes the documented setup flow. It is not evidence that the full flow has passed project testing. Historical ChatGPT task reports used an upload whose version is unknown; a transcript task using the v0.1.0 Release ZIP together with Apify authorization remains unverified. See the [test status](../test-status.md).
-
 ## Before you start
 
 You need your own [Apify account](https://console.apify.com/). Actor runs use the allowance and billing terms of that account; the [Apify Console](https://console.apify.com/) shows current Runs and billing details.
@@ -34,11 +32,11 @@ Keep the downloaded ZIP intact; do not unzip it before upload. In ChatGPT, open 
 - **Needs Review:** read the displayed prompt and follow the review step before using it.
 - **Blocked:** the Skill cannot be used in that state. The scan status alone does not show that the ZIP is damaged. Avoid repeatedly uploading the same ZIP. Note the release version and scan message, then [open a GitHub issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues) for help. Do not include credentials or personal sensitive information.
 
-The project owner reported that the v0.1.0 ZIP initially appeared in the Skills list with its Instagram brand icon. After reloading the editor, the owner reported that the downloaded editor package had rewritten both icon references to a generic `assets/icon.svg`. This is an editor round-trip report, not a guarantee about later imports or edits; details are in the [test status](../test-status.md).
-
 ## 3. Use it in a new conversation
 
 Start a new conversation. In the message box, type **@** and select the installed Apify plugin. The connection may apply per message, so select it again in a later message if that message needs new Apify data.
+
+After uploading the Skill, name **Instagram Transcript Extractor** in your task request, as in the example below. This guide does not assume a separate Skill-selection control in ChatGPT.
 
 For example, replace the sample URL with a real public Instagram Reel or supported video post link:
 
@@ -47,4 +45,53 @@ Use Instagram Transcript Extractor to get the transcript of this public Instagra
 https://www.instagram.com/reel/REPLACE_WITH_A_REAL_LINK/
 ```
 
-The report of earlier ChatGPT transcript tasks came from a separately uploaded version that has not been identified as the v0.1.0 ZIP. Those reports do not verify this complete Release ZIP → Apify authorization → transcript journey.
+## Copyable requests
+
+Replace every placeholder shown, including each `PUBLIC_INSTAGRAM_URL` and `[TARGET_LANGUAGE]`, with an accessible public Instagram link or your target language. In a new conversation, select the Apify plugin with **@** and name Instagram Transcript Extractor in your request. These are request examples, not guarantees that every link will succeed.
+
+**Single transcript**
+
+```text
+Use Instagram Transcript Extractor to return the original-language transcript for this public Instagram video. Include only timestamp segments actually returned by the tool; do not invent timestamps.
+PUBLIC_INSTAGRAM_URL_1
+```
+
+**Batch transcripts**
+
+```text
+Use Instagram Transcript Extractor on exactly these public Instagram links:
+1. PUBLIC_INSTAGRAM_URL_1
+2. PUBLIC_INSTAGRAM_URL_2
+For each input, return its original URL, processing status, original-language transcript, and timestamp segments if available. Match results by URL, never by result order. Do not add links or retry automatically.
+```
+
+**Subtitle file (SRT/VTT)**
+
+```text
+Transcribe this video and create an SRT or VTT file only if you can export files and the tool returned valid timestamps. Otherwise give me copyable subtitle text using only valid timestamps, or explain that timed subtitles are unavailable. Do not invent timestamps.
+PUBLIC_INSTAGRAM_URL_1
+```
+
+**Translation**
+
+```text
+Return the original-language transcript for this video, then provide a separate [TARGET_LANGUAGE] translation. Preserve any timestamp segments actually returned; do not invent them.
+PUBLIC_INSTAGRAM_URL_1
+```
+
+**Summary**
+
+```text
+Transcribe each video and give each link its own short summary. Keep the videos separate and match every result to its original URL.
+1. PUBLIC_INSTAGRAM_URL_1
+2. PUBLIC_INSTAGRAM_URL_2
+```
+
+**Content analysis**
+
+```text
+Based only on the transcript of this video, identify its hook, core insight, CTA, and content cues. Include timestamps only where valid timestamp segments were returned. Do not analyze visuals, engagement metrics, or audience response.
+PUBLIC_INSTAGRAM_URL_1
+```
+
+The project has separate reports of Skill upload and ChatGPT transcript tasks; the task report's uploaded version is not confirmed as the v0.1.0 ZIP. A transcript task using that Release ZIP together with Apify authorization is not verified. See the [test status](../test-status.md) for the evidence boundaries.

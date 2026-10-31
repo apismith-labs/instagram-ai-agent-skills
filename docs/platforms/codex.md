@@ -1,6 +1,6 @@
 # Use Instagram Transcript Extractor in Codex
 
-Codex in the ChatGPT desktop app and Codex CLI are separate environments. This guide links their distinct Apify setup procedures and records the evidence limits for this project's Skill. The official setup guides are instructions, not proof that this Skill's complete workflow has passed in either environment. See the [platform evidence matrix](../platform-support.md) and [test status](../test-status.md).
+Codex in the ChatGPT desktop app and Codex CLI are separate environments. Follow the matching setup section below for your Codex version.
 
 You need your own [Apify account](https://console.apify.com/). Actor runs use the allowance and billing terms of that account; see the Apify Console for current Runs and billing details. Connect Apify before asking the Skill to run a transcript task.
 
@@ -50,4 +50,51 @@ Use $instagram-transcript-extractor to get the transcript of this public Instagr
 https://www.instagram.com/reel/REPLACE_WITH_A_REAL_LINK/
 ```
 
-Codex reports describe Git-based installation and explicit Skill use, and a separate report describes obtaining a transcript and Chinese translation after Apify was connected. Those reports do not establish that the exact request above, both Codex environments, or the complete post-installation journey has passed. Automatic selection from a natural-language request is not independently confirmed. File upload/export, authorization recovery, and cross-session recovery remain unverified.
+## Copyable requests
+
+Replace every placeholder shown, including each `PUBLIC_INSTAGRAM_URL` and `[TARGET_LANGUAGE]`, with an accessible public Instagram link or your target language. After confirming the Skill is discovered in a new session, invoke it with `$instagram-transcript-extractor` and add the task you need. These are request examples; they do not guarantee every link will succeed.
+
+**Single transcript**
+
+```text
+Use $instagram-transcript-extractor to return the original-language transcript for this public Instagram video. Include only timestamp segments actually returned by the tool; do not invent timestamps.
+PUBLIC_INSTAGRAM_URL_1
+```
+
+**Batch transcripts**
+
+```text
+Use $instagram-transcript-extractor on exactly these public Instagram links:
+1. PUBLIC_INSTAGRAM_URL_1
+2. PUBLIC_INSTAGRAM_URL_2
+For each input, return its original URL, processing status, original-language transcript, and timestamp segments if available. Match results by URL, never by result order. Do not add links or retry automatically.
+```
+
+**Subtitle file (SRT/VTT)**
+
+```text
+Use $instagram-transcript-extractor to transcribe this video and create an SRT or VTT file only if this host can export files and the tool returned valid timestamps. Otherwise give me copyable subtitle text using only valid timestamps, or explain that timed subtitles are unavailable. Do not invent timestamps.
+PUBLIC_INSTAGRAM_URL_1
+```
+
+**Translation**
+
+```text
+Use $instagram-transcript-extractor to return the original-language transcript for this video, then provide a separate [TARGET_LANGUAGE] translation. Preserve any timestamp segments actually returned; do not invent them.
+PUBLIC_INSTAGRAM_URL_1
+```
+
+**Summary**
+
+```text
+Use $instagram-transcript-extractor to transcribe each video and give each link its own short summary. Keep the videos separate and match every result to its original URL.
+1. PUBLIC_INSTAGRAM_URL_1
+2. PUBLIC_INSTAGRAM_URL_2
+```
+
+**Content analysis**
+
+```text
+Use $instagram-transcript-extractor to identify the hook, core insight, CTA, and content cues based only on this video's transcript. Include timestamps only where valid timestamp segments were returned. Do not analyze visuals, engagement metrics, or audience response.
+PUBLIC_INSTAGRAM_URL_1
+```

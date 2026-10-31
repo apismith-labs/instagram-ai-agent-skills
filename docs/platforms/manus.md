@@ -42,3 +42,52 @@ The Connector selection, OAuth, Skill import/enabled state, and one-Reel result 
 
 - [Apify integration with Manus](https://docs.apify.com/integrations/manus)
 - [Manus: share, import, and use Skills](https://help.manus.im/en/articles/14753565-how-to-share-and-use-skills-in-manus)
+
+## Copyable requests
+
+Replace every placeholder shown, including each `PUBLIC_INSTAGRAM_URL` and `[TARGET_LANGUAGE]`, with an accessible public Instagram link or your target language. In chat, type `/` and select `instagram-transcript-extractor`, and check that the Apify Connector is enabled below the input. Then add one of these task requests. They do not guarantee every link will succeed.
+
+**Single transcript**
+
+```text
+Return the original-language transcript for this public Instagram video. Include only timestamp segments actually returned by the tool; do not invent timestamps.
+PUBLIC_INSTAGRAM_URL_1
+```
+
+**Batch transcripts**
+
+```text
+Process exactly these public Instagram links:
+1. PUBLIC_INSTAGRAM_URL_1
+2. PUBLIC_INSTAGRAM_URL_2
+For each input, return its original URL, processing status, original-language transcript, and timestamp segments if available. Match results by URL, never by result order. Do not add links or retry automatically.
+```
+
+**Subtitle file (SRT/VTT)**
+
+```text
+Transcribe this video and create an SRT or VTT file only if Manus can export files and the tool returned valid timestamps. Otherwise give me copyable subtitle text using only valid timestamps, or explain that timed subtitles are unavailable. Do not invent timestamps.
+PUBLIC_INSTAGRAM_URL_1
+```
+
+**Translation**
+
+```text
+Return the original-language transcript for this video, then provide a separate [TARGET_LANGUAGE] translation. Preserve any timestamp segments actually returned; do not invent them.
+PUBLIC_INSTAGRAM_URL_1
+```
+
+**Summary**
+
+```text
+Transcribe each video and give each link its own short summary. Keep the videos separate and match every result to its original URL.
+1. PUBLIC_INSTAGRAM_URL_1
+2. PUBLIC_INSTAGRAM_URL_2
+```
+
+**Content analysis**
+
+```text
+Based only on the transcript of this video, identify its hook, core insight, CTA, and content cues. Include timestamps only where valid timestamp segments were returned. Do not analyze visuals, engagement metrics, or audience response.
+PUBLIC_INSTAGRAM_URL_1
+```

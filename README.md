@@ -6,7 +6,7 @@ Get spoken transcripts from public Instagram Reels and videos with AI agent skil
 
 The Skill returns spoken words for accessible videos and may include timestamps when available. You can request a summary or translation alongside the transcript. Results are not guaranteed for every link.
 
-Download the [v0.1.0 Skill ZIP](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.1.0/instagram-transcript-extractor.zip) for ChatGPT. SHA-256: `cb5173bf999cb54feb06f190736111afaccb91ceae0bd845327391208ffcb331`. Download this named Release asset, not GitHub's automatically generated **Source code (zip)**. Keep the ZIP intact when uploading it to ChatGPT.
+Download the [v0.1.0 Skill ZIP](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.1.0/instagram-transcript-extractor.zip) for ChatGPT or Claude web. SHA-256: `cb5173bf999cb54feb06f190736111afaccb91ceae0bd845327391208ffcb331`. Download this named Release asset, not GitHub's automatically generated **Source code (zip)**. Keep the ZIP intact when uploading it to either platform.
 
 ## What you need
 
@@ -19,6 +19,7 @@ Use your own [Apify account](https://console.apify.com/). Actor runs use that ac
 | [ChatGPT](docs/platforms/chatgpt.md) | Connect Apify with the custom MCP/plugin OAuth flow → upload the named v0.1.0 ZIP → start a new conversation, select the Apify plugin with **@**, and request a transcript. Skill availability may depend on your account and workspace. |
 | [Codex](docs/platforms/codex.md) | Install the Apify plugin and authorize with OAuth → install the Skill using the documented Codex installer flow → start a new session, confirm discovery, then explicitly invoke it. The guide covers Codex desktop and CLI separately. |
 | [Manus](docs/platforms/manus.md) | Enable the existing Apify Connector and authorize with OAuth → import the Skill folder from GitHub → in chat select it with **/** and confirm the Apify Connector is enabled. Manus tasks using the Connector may consume Manus credits. |
+| [Claude web](docs/platforms/claude-web.md) | Add the Apify Plugin and connect its Apify Connector with OAuth → upload and enable the named Skill ZIP → in chat select the Skill and enable the Apify Connector. |
 
 ## Try a request
 
