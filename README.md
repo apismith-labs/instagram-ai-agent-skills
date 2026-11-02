@@ -20,6 +20,7 @@ Use your own [Apify account](https://console.apify.com/). Actor runs use that ac
 | [Codex](docs/platforms/codex.md) | Install the Apify plugin and authorize with OAuth → install the Skill using the documented Codex installer flow → start a new session, confirm discovery, then explicitly invoke it. The guide covers Codex desktop and CLI separately. |
 | [Manus](docs/platforms/manus.md) | Enable the existing Apify Connector and authorize with OAuth → import the Skill folder from GitHub → in chat select it with **/** and confirm the Apify Connector is enabled. Manus tasks using the Connector may consume Manus credits. |
 | [Claude Web, Claude Desktop regular chat, and Claude Code](docs/platforms/claude-web.md) | Set up Apify and upload the Skill once in Claude Web → use the same account in Claude Desktop regular chat (one single-Reel call is reported successful). Claude Code has separate setup and remains untested for this project. |
+| [OpenClaw](docs/platforms/openclaw.md) | Install the Apify plugin and the existing Skill in OpenClaw → reported Gateway/plugin status and Actor discovery; actual transcript runs are not yet tested. |
 
 ## Try a request
 

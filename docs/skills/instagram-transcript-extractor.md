@@ -10,6 +10,7 @@ You need your own Apify account, and Apify must be connected in the platform whe
 - [Codex setup](../platforms/codex.md)
 - [Manus setup](../platforms/manus.md)
 - [Claude Web, Claude Desktop regular chat, and Claude Code setup](../platforms/claude-web.md)
+- [OpenClaw setup](../platforms/openclaw.md)
 
 Connecting Apify makes external Apify tools available to the platform. Installing this Skill provides the transcript workflow. They are separate steps.
 
