@@ -22,7 +22,36 @@ Use your own [Apify account](https://console.apify.com/). Actor runs use that ac
 | [Codex](docs/platforms/codex.md) | Install the Apify plugin and authorize with OAuth → install the Skill using the documented Codex installer flow → start a new session, confirm discovery, then explicitly invoke it. The guide covers Codex desktop and CLI separately. |
 | [Manus](docs/platforms/manus.md) | Enable the existing Apify Connector and authorize with OAuth → import the Skill folder from GitHub → in chat select it with **/** and confirm the Apify Connector is enabled. Manus tasks using the Connector may consume Manus credits. |
 | [Claude Web, Claude Desktop regular chat, and Claude Code](docs/platforms/claude-web.md) | Set up Apify and upload the Skill once in Claude Web → use the same account in Claude Desktop regular chat (one single-Reel call is reported successful). Claude Code has separate setup and remains untested for this project. |
-| [OpenClaw](docs/platforms/openclaw.md) | Recommended: search/add through the OpenClaw Control UI. The ClawHub CLI is an alternative; GitHub local-directory `--global` install is a backup route the project owner reports testing. Control UI and ClawHub-native CLI installs are untested on the owner's Gateway; Actor runs remain untested. |
+| [OpenClaw](docs/platforms/openclaw.md) | Recommended: search/add through the OpenClaw Control UI. Alternatives: the ClawHub CLI or Vercel Skills CLI installing directly from GitHub (Project-scope installation reported by the project owner). GitHub local-directory `--global` install remains a backup route the project owner reports testing. Control UI and ClawHub-native CLI installs are untested on the owner's Gateway; Actor runs remain untested. |
+
+### OpenClaw: install directly from GitHub with Skills CLI
+
+The [Vercel Skills CLI](https://skills.sh/docs/cli) can install this Skill directly from the GitHub repository. It requires [Node.js 22.20.0 or later](https://github.com/vercel-labs/skills#install-a-skill). Run it in the same environment as the OpenClaw Gateway, from that Gateway's active workspace; do not install from a separate client machine when the Gateway runs elsewhere.
+
+First check the workspace:
+
+```bash
+openclaw config get agents.defaults.workspace
+```
+
+The project owner reports that this returned the workspace path represented as `~/.openclaw/workspace` in the tested environment. OpenClaw's [config documentation](https://docs.openclaw.ai/cli/config) notes that an unset workspace setting may instead report that the runtime default applies, rather than print the resolved path. If the command prints a path, use it. If it reports that the runtime default applies or you use a custom workspace, confirm the effective workspace for your Gateway before continuing, then run the install command from that directory.
+
+```bash
+cd ~/.openclaw/workspace
+npx skills add apismith-labs/instagram-ai-agent-skills \
+  --skill instagram-transcript-extractor \
+  -a openclaw
+```
+
+When prompted for the installation scope, choose **Project**. The project owner reports that this installed the Skill under `~/.openclaw/workspace/skills/instagram-transcript-extractor`; Global scope has not been tested.
+
+The CLI may offer to install `find-skills`, an optional search helper; it is not required to install Instagram Transcript Extractor. After installation, check the Skill's state for the `main` agent:
+
+```bash
+openclaw skills check --agent main
+```
+
+The project owner reports that `openclaw skills check --agent main` listed `instagram-transcript-extractor` and the optional `find-skills` helper as eligible, visible, and available as a command. In a new session, select the Skill with `$instagram-transcript-extractor`. These checks establish installation and discoverability, not successful execution of every task. The project owner also reports that `npx skills find instagram-transcript-extractor --owner apismith-labs` returned no result in this check; that single search result does not establish whether the Skill is or will be listed in the skills.sh directory. Use OpenClaw's [platform guide](docs/platforms/openclaw.md) for the other installation options and Apify setup.
 
 ## Try a request
 

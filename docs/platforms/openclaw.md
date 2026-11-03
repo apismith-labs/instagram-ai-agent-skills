@@ -25,6 +25,37 @@ Without `--global`, OpenClaw installs into the current workspace's `skills/` dir
 
 Installing the Skill does not set up Apify. The Apify plugin and its API key are separate prerequisites; see [Set up the Apify plugin](#set-up-the-apify-plugin). Do not paste an API key into chat or documentation.
 
+## Install from GitHub with Vercel Skills CLI (alternative; owner-reported Project-scope tested)
+
+The [Vercel Skills CLI](https://skills.sh/docs/cli) installs directly from the GitHub repository. It requires [Node.js 22.20.0 or later](https://github.com/vercel-labs/skills#install-a-skill). Run the command in the same machine, container, or VM environment that runs the OpenClaw Gateway, from the Gateway's active workspace.
+
+Check the workspace before installing:
+
+```sh
+openclaw config get agents.defaults.workspace
+```
+
+The project owner reports that this returned the workspace path represented as `~/.openclaw/workspace` in the tested environment. OpenClaw's [config documentation](https://docs.openclaw.ai/cli/config) says a valid but unset workspace setting may report that the runtime default applies instead of printing the resolved path. If the command prints a path, use it. If it reports that the runtime default applies or you use a custom workspace, confirm the effective workspace for your Gateway before continuing. Do not assume the config command always prints the final path.
+
+For the project owner's reported test environment, run:
+
+```sh
+cd ~/.openclaw/workspace
+npx skills add apismith-labs/instagram-ai-agent-skills \
+  --skill instagram-transcript-extractor \
+  -a openclaw
+```
+
+When prompted, select **Project** scope. The project owner reports that the Skill was installed to `~/.openclaw/workspace/skills/instagram-transcript-extractor`. Global scope has not been tested. If the CLI offers to install `find-skills`, that is an optional search helper, not a prerequisite for this Skill.
+
+Then check the `main` Agent and select the Skill in a new session:
+
+```sh
+openclaw skills check --agent main
+```
+
+The project owner reports that the check listed `instagram-transcript-extractor` and `find-skills` as `eligible`, `visible`, and `available as command`; in a new session, the `$instagram-transcript-extractor` picker entry was available. This establishes installation and discoverability only, not successful execution of every task. The owner-scoped command `npx skills find instagram-transcript-extractor --owner apismith-labs` returned no result in this check. That result does not prevent direct GitHub installation and does not establish whether the Skill is or will be listed in the skills.sh search directory.
+
 ## Install from a GitHub local directory (backup; owner-reported tested route)
 
 The project owner reports cloning the GitHub repository and installing its local Skill directory with `openclaw skills install <local-path> --global`. The owner reports that `openclaw skills check --agent main` listed it as `eligible`, `visible`, and `available as command`, and that a new session's `$` picker could select it. This is evidence for the local-directory `--global` route only. The default workspace install (without `--global`) has not been tested. Do not install using both this route and ClawHub for the same setup.
