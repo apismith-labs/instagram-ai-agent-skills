@@ -28,11 +28,64 @@ Use your own [Apify account](https://console.apify.com/). Actor runs use that ac
 
 Replace the example with a real public Instagram link:
 
-First activate Instagram Transcript Extractor using the method in your platform guide. This example is the task request; it does not activate the Skill for you.
+This is a task request; activate the Skill using the method in your platform guide before sending it.
 
 ```text
 Get the transcript of this public Instagram Reel and give me a short summary:
 https://www.instagram.com/reel/REPLACE_WITH_A_REAL_LINK/
+```
+
+## Copy-ready prompts
+
+Before using a prompt, select or activate **Instagram Transcript Extractor** in your current host; the prompt is the task request and does not replace that step. OpenClaw and Codex use `$instagram-transcript-extractor` for explicit invocation; other hosts should follow their platform guides. The Skill also requires your own Apify connection, which installation does not configure. Replace every bracketed placeholder, and remove any unused URL list lines. Results are not guaranteed for every link.
+
+### Transcript and Chinese translation
+
+```text
+Use Instagram Transcript Extractor for this public Instagram Reel:
+[PUBLIC_INSTAGRAM_REEL_URL]
+
+Return the transcript in its original language, followed by a faithful, natural Chinese translation. Keep the original transcript and translation clearly separate. Include timestamps only if valid timestamps were actually returned. Do not invent missing words or timestamps.
+```
+
+### Subtitle file
+
+```text
+Use Instagram Transcript Extractor for this public Instagram Reel:
+[PUBLIC_INSTAGRAM_REEL_URL]
+
+Prepare subtitles in [SRT or VTT] format, in [SUBTITLE_LANGUAGE]. Use only the transcript actually returned and valid timestamps. If timestamps are unavailable or invalid, say so and do not make up timings. Create a downloadable file only if this platform supports file export; otherwise provide the complete subtitle text for me to copy. Label the subtitle language clearly. Do not claim the Actor returned a subtitle file.
+```
+
+### Single-video insight analysis
+
+```text
+Use Instagram Transcript Extractor for this public Instagram Reel:
+[PUBLIC_INSTAGRAM_REEL_URL]
+
+Base your analysis on the transcript actually returned. Identify the hook/opening, core idea, content structure and supporting points, call to action, likely target audience, and reusable presentation or topic angles. Separate transcript-supported facts from your interpretations. Do not infer views, likes, or other performance data that was not returned.
+```
+
+### Batch competitor-content comparison
+
+```text
+Use Instagram Transcript Extractor to process these URLs as a batch when allowed by the current Actor schema and account or host limits, and report each URL separately:
+- [PUBLIC_INSTAGRAM_URL_1]
+- [PUBLIC_INSTAGRAM_URL_2]
+- [ADD_MORE_PUBLIC_INSTAGRAM_URLS_AS_NEEDED]
+
+For each input, preserve the exact original URL and report its own processing status. Match results to URLs explicitly; do not infer a match from result order. In a table, compare each video's hook, topic, core idea, call to action, and reusable presentation choices, then summarize shared themes and differences. Clearly flag failures, uncertain URL matches, and incomplete transcripts. Do not invent views, likes, comments, or other data that was not returned. Do not add links or retry automatically.
+```
+
+### Batch translation and subtitles
+
+```text
+Use Instagram Transcript Extractor to process these URLs as a batch when allowed by the current Actor schema and account or host limits, and report each URL separately:
+- [PUBLIC_INSTAGRAM_URL_1]
+- [PUBLIC_INSTAGRAM_URL_2]
+- [ADD_MORE_PUBLIC_INSTAGRAM_URLS_AS_NEEDED]
+
+Translate each transcript into [TARGET_LANGUAGE] and prepare subtitles in [SRT or VTT] format. For every input, preserve the exact original URL and provide its own processing status, original-language transcript, translation, and subtitle text. Match results to URLs explicitly, never by result order. Use only validated timestamps; do not invent timings. If this platform supports file export, create a separate file for each video with a filename that identifies its URL. Otherwise provide copyable subtitle text. List failed or uncertain matches separately. Do not guess or retry automatically.
 ```
 
 ## What to expect
@@ -48,4 +101,4 @@ Questions or problems? [Open a GitHub issue](https://github.com/apismith-labs/in
 - [Detailed test status](docs/test-status.md)
 - [Project architecture](docs/project-architecture.md)
 
-The project currently provides this one Skill; Reels analysis, competitor research, creator analysis, and comment analysis remain future ideas. For maintainers, `skills/instagram-transcript-extractor/` is the distribution source and `.agents/skills/instagram-transcript-extractor/` is a separate Codex project discovery copy that does not sync automatically. See the [architecture guide](docs/project-architecture.md) for maintenance details.
+The project currently provides one Skill, Instagram Transcript Extractor, which supports summaries, translations, and analysis based on returned transcript text. Separate Skills for Reels analysis, competitor research, creator analysis, and comment analysis remain future ideas. For maintainers, `skills/instagram-transcript-extractor/` is the distribution source and `.agents/skills/instagram-transcript-extractor/` is a separate Codex project discovery copy that does not sync automatically. See the [architecture guide](docs/project-architecture.md) for maintenance details.
