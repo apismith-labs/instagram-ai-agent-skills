@@ -39,13 +39,13 @@ https://www.instagram.com/reel/REPLACE_WITH_A_REAL_LINK/
 
 Before using a prompt, select or activate **Instagram Transcript Extractor** in your current host; the prompt is the task request and does not replace that step. OpenClaw and Codex use `$instagram-transcript-extractor` for explicit invocation; other hosts should follow their platform guides. The Skill also requires your own Apify connection, which installation does not configure. Replace every bracketed placeholder, and remove any unused URL list lines. Results are not guaranteed for every link.
 
-### Transcript and Chinese translation
+### Transcript and translation
 
 ```text
 Use Instagram Transcript Extractor for this public Instagram Reel:
 [PUBLIC_INSTAGRAM_REEL_URL]
 
-Return the transcript in its original language, followed by a faithful, natural Chinese translation. Keep the original transcript and translation clearly separate. Include timestamps only if valid timestamps were actually returned. Do not invent missing words or timestamps.
+Return the transcript in the language actually returned, followed by a faithful, natural translation into [TARGET_LANGUAGE, e.g., Korean]. Keep the original transcript and translation clearly separate. Include timestamps only if valid timestamps were actually returned. Do not invent missing words or timestamps.
 ```
 
 ### Subtitle file
@@ -54,7 +54,7 @@ Return the transcript in its original language, followed by a faithful, natural 
 Use Instagram Transcript Extractor for this public Instagram Reel:
 [PUBLIC_INSTAGRAM_REEL_URL]
 
-Prepare subtitles in [SRT or VTT] format, in [SUBTITLE_LANGUAGE]. Use only the transcript actually returned and valid timestamps. If timestamps are unavailable or invalid, say so and do not make up timings. Create a downloadable file only if this platform supports file export; otherwise provide the complete subtitle text for me to copy. Label the subtitle language clearly. Do not claim the Actor returned a subtitle file.
+Prepare subtitles in [SRT or VTT] format, in [SUBTITLE_LANGUAGE, e.g., Korean]. The subtitle language is configurable. Use only the transcript actually returned and valid timestamps. If timestamps are unavailable or invalid, say so and do not make up timings. Create a downloadable file only if this platform supports file export; otherwise provide the complete subtitle text for me to copy. Label the subtitle language clearly. Do not claim the Actor returned a subtitle file.
 ```
 
 ### Single-video insight analysis
@@ -85,7 +85,7 @@ Use Instagram Transcript Extractor to process these URLs as a batch when allowed
 - [PUBLIC_INSTAGRAM_URL_2]
 - [ADD_MORE_PUBLIC_INSTAGRAM_URLS_AS_NEEDED]
 
-Translate each transcript into [TARGET_LANGUAGE] and prepare subtitles in [SRT or VTT] format. For every input, preserve the exact original URL and provide its own processing status, original-language transcript, translation, and subtitle text. Match results to URLs explicitly, never by result order. Use only validated timestamps; do not invent timings. If this platform supports file export, create a separate file for each video with a filename that identifies its URL. Otherwise provide copyable subtitle text. List failed or uncertain matches separately. Do not guess or retry automatically.
+Translate each transcript into [TARGET_LANGUAGE, e.g., Korean] and prepare subtitles in [SRT or VTT] format in that same target language. Use one target language for every URL in this batch. For every input, preserve the exact original URL and provide its own processing status, transcript in the language actually returned, translation, and subtitle text. Match results to URLs explicitly, never by result order. Use only validated timestamps; do not invent timings. If this platform supports file export, create a separate file for each video with a filename that identifies its URL. Otherwise provide copyable subtitle text. List failed or uncertain matches separately. Do not guess or retry automatically.
 ```
 
 ## What to expect
