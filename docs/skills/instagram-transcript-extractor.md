@@ -12,6 +12,8 @@ You need your own Apify account, and Apify must be connected in the platform whe
 - [Claude Web, Claude Desktop regular chat, and Claude Code setup](../platforms/claude-web.md)
 - [OpenClaw setup](../platforms/openclaw.md)
 
+For OpenClaw, the project owner reports that the Skill is published on [ClawHub](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) as `@apismith-labs/instagram-transcript-extractor`; see the platform guide for the recommended Control UI route, the ClawHub CLI alternative, and the project-owner-reported tested GitHub local-directory `--global` backup route.
+
 Connecting Apify makes external Apify tools available to the platform. Installing this Skill provides the transcript workflow. They are separate steps.
 
 ## What to ask

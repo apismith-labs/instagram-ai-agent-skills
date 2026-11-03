@@ -22,7 +22,7 @@ The Apify plugin/MCP connection provides access to external Apify tools and acco
 - [Codex](platforms/codex.md): separate instructions for the Codex desktop app and Codex CLI, followed by the Skill installation and discovery check.
 - [Manus](platforms/manus.md): enable the Apify Connector, import the Skill from GitHub, and select it in chat.
 - [Claude Web, Claude Desktop regular chat, and Claude Code](platforms/claude-web.md): set up Apify and upload the Skill in Claude Web, use the same account in Claude Desktop regular chat (one single-Reel call is reported successful), or follow the separate, untested Claude Code workflow.
-- [OpenClaw](platforms/openclaw.md): use the OpenClaw Apify plugin and the existing Skill; Gateway and discovery reports are separate from untested Actor runs.
+- [OpenClaw](platforms/openclaw.md): the Control UI search/add route is recommended, with ClawHub CLI as an alternative and the project-owner-reported GitHub local-directory `--global` install as a backup. UI and ClawHub-native CLI installs are untested on the owner's Gateway; Actor runs remain untested.
 - [Instagram Transcript Extractor](skills/instagram-transcript-extractor.md): what to request, what a result means, and common limitations.
 
 These guides distinguish published platform instructions from this project's test evidence. See the [platform evidence matrix](platform-support.md) and [detailed test status](test-status.md) for what has and has not been tested.

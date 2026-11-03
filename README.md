@@ -6,6 +6,8 @@ Get spoken transcripts from public Instagram Reels and videos with AI agent skil
 
 The Skill returns spoken words for accessible videos and may include timestamps when available. You can request a summary or translation alongside the transcript. Results are not guaranteed for every link.
 
+OpenClaw users can find [Instagram Transcript Extractor on ClawHub](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) as `@apismith-labs/instagram-transcript-extractor` (the project owner reports version 1.0.0). Before installing, review the linked [security audit](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor/security-audit) for its listed findings and separate static-analysis result.
+
 Download the [v0.1.0 Skill ZIP](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.1.0/instagram-transcript-extractor.zip) for ChatGPT or Claude Web. SHA-256: `cb5173bf999cb54feb06f190736111afaccb91ceae0bd845327391208ffcb331`. Download this named Release asset, not GitHub's automatically generated **Source code (zip)**. Keep the ZIP intact when uploading it in either web app. In the project owner's reported account, the Skill appeared in Claude Desktop regular chat after signing into that same account, without another upload.
 
 ## What you need
@@ -20,7 +22,7 @@ Use your own [Apify account](https://console.apify.com/). Actor runs use that ac
 | [Codex](docs/platforms/codex.md) | Install the Apify plugin and authorize with OAuth → install the Skill using the documented Codex installer flow → start a new session, confirm discovery, then explicitly invoke it. The guide covers Codex desktop and CLI separately. |
 | [Manus](docs/platforms/manus.md) | Enable the existing Apify Connector and authorize with OAuth → import the Skill folder from GitHub → in chat select it with **/** and confirm the Apify Connector is enabled. Manus tasks using the Connector may consume Manus credits. |
 | [Claude Web, Claude Desktop regular chat, and Claude Code](docs/platforms/claude-web.md) | Set up Apify and upload the Skill once in Claude Web → use the same account in Claude Desktop regular chat (one single-Reel call is reported successful). Claude Code has separate setup and remains untested for this project. |
-| [OpenClaw](docs/platforms/openclaw.md) | Install the Apify plugin and the existing Skill in OpenClaw → reported Gateway/plugin status and Actor discovery; actual transcript runs are not yet tested. |
+| [OpenClaw](docs/platforms/openclaw.md) | Recommended: search/add through the OpenClaw Control UI. The ClawHub CLI is an alternative; GitHub local-directory `--global` install is a backup route the project owner reports testing. Control UI and ClawHub-native CLI installs are untested on the owner's Gateway; Actor runs remain untested. |
 
 ## Try a request
 
