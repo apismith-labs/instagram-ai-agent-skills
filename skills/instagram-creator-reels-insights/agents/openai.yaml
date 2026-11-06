@@ -1,0 +1,9 @@
+interface:
+  display_name: "Instagram Creator Reels Insights"
+  short_description: "Analyze recent creator Reels transcripts"
+  icon_small: "./assets/instagram-creator-reels-insights-icon.svg"
+  icon_large: "./assets/instagram-creator-reels-insights-icon.svg"
+  default_prompt: "Scan these public Instagram creators and analyze recent Reels transcripts as a Daily Scan."
+
+policy:
+  allow_implicit_invocation: true

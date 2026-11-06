@@ -5,10 +5,7 @@ from pathlib import Path
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-SKILL = ROOT / 'skills' / 'instagram-transcript-extractor'
-REQUIRED = ('SKILL.md', 'references/workflow.md', 'scripts/workflow.py',
-            'agents/openai.yaml', 'assets/instagram-transcript-extractor-icon.svg')
-PREFIX = 'instagram-transcript-extractor/'
+DEFAULT_SKILL = 'instagram-transcript-extractor'
 EXCLUDED_DIRS = {'__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache', '.git'}
 
 
@@ -16,29 +13,37 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True,
                         help='New ZIP path outside the repository')
+    parser.add_argument('--skill', default=DEFAULT_SKILL,
+                        help='Skill slug under skills/ (default: instagram-transcript-extractor)')
     args = parser.parse_args()
+    if not args.skill or '/' in args.skill or args.skill in {'.', '..'}:
+        parser.error('--skill must be a skill slug')
+    skill = ROOT / 'skills' / args.skill
+    required = ('SKILL.md', 'references/workflow.md', 'scripts/workflow.py',
+                'agents/openai.yaml', f'assets/{args.skill}-icon.svg')
+    prefix = args.skill + '/'
     output = args.output.resolve()
     if output == ROOT.resolve() or ROOT.resolve() in output.parents:
         parser.error('Output must be outside the repository')
     if output.exists():
         parser.error('Output already exists; choose a new path')
-    for name in REQUIRED:
-        if not (SKILL / name).is_file():
+    for name in required:
+        if not (skill / name).is_file():
             parser.error(f'Missing required skill file: {name}')
-    if any(p.is_symlink() for p in SKILL.rglob('*')):
+    if any(p.is_symlink() for p in skill.rglob('*')):
         parser.error('Skill source must not contain symbolic links')
     files = set()
-    for p in SKILL.rglob('*'):
-        rel = p.relative_to(SKILL)
+    for p in skill.rglob('*'):
+        rel = p.relative_to(skill)
         if (any(part in EXCLUDED_DIRS for part in rel.parts)
                 or p.name == '.DS_Store' or p.suffix in ('.pyc', '.pyo')):
             continue
         if p.is_file():
             files.add(rel.as_posix())
-    if files != set(REQUIRED):
+    if files != set(required):
         parser.error('Skill file list differs from the release manifest; review it before packaging')
-    entries = {PREFIX + name: (SKILL / name).read_bytes() for name in REQUIRED}
-    entries[PREFIX + 'LICENSE'] = (ROOT / 'LICENSE').read_bytes()
+    entries = {prefix + name: (skill / name).read_bytes() for name in required}
+    entries[prefix + 'LICENSE'] = (ROOT / 'LICENSE').read_bytes()
     with output.open('xb') as stream:
         with zipfile.ZipFile(stream, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
             for name, data in sorted(entries.items()):

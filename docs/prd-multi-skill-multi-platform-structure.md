@@ -14,11 +14,13 @@ This PRD defines repository organization and user-facing project documentation. 
 
 ## 2. Product context
 
-The repository currently contains one implemented skill, `instagram-transcript-extractor`. It accepts public Instagram video links and supports transcript retrieval, with optional summaries, translations, or analysis based on the returned text. The longer-term project is a set of focused skills that may use one or more Apify Actors each.
+**Status note (2026-11-05):** This structure PRD records the repository state and sequencing decision as of 2026-10-28. The project owner has since approved development of Instagram Creator Reels Insights under [its v0.6 PRD](instagram-creator-reels-insights-prd-v0.6.md). The second Skill now has an in-development source and Codex mirror, but its hard-budget execution path and Profile Posts output contract remain blocked/unverified; it is not a validated or publishable capability. This note supersedes the former sequencing prohibition below without changing this document's repository-structure requirements.
+
+When this document was drafted, the repository contained one implemented skill, `instagram-transcript-extractor`. It accepts public Instagram video links and supports transcript retrieval, with optional summaries, translations, or analysis based on the returned text. The longer-term project is a set of focused skills that may use one or more Apify Actors each.
 
 Potential future skills discussed so far include Instagram Reels Analyzer, Creator Analysis, Competitor Monitor, and comment analysis. These are roadmap candidates only. Their scope, data inputs, and implementation have not been approved as current features.
 
-The first priority remains the independent user journey underway: a non-developer follows the public README, installs the skill, connects Apify, and obtains a transcript. Do not begin a second installable skill before that journey is reviewed.
+The sequencing rule above described the project decision at this document's original date. The owner has since authorized a second Skill's development; that does not establish its implementation, host integration, or release readiness as verified.
 
 ## 3. Problem statement
 

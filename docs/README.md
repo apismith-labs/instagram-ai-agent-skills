@@ -1,6 +1,6 @@
 # User guide
 
-This guide helps you choose a platform and start with the available [Instagram Transcript Extractor](skills/instagram-transcript-extractor.md). The project currently has one available skill; future ideas are listed in the [project README](../README.md), not as installable features.
+This guide helps you choose a platform and start with the available [Instagram Transcript Extractor](skills/instagram-transcript-extractor.md). It remains the only validated, available skill. Instagram Creator Reels Insights has an in-development source, but its Actor output contract and hard-budget host integration are not verified; do not install or run it as a supported feature. Other ideas are listed in the [project README](../README.md), not as installable features.
 
 ## The common setup flow
 
