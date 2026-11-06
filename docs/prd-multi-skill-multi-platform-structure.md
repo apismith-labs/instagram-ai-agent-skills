@@ -14,7 +14,7 @@ This PRD defines repository organization and user-facing project documentation. 
 
 ## 2. Product context
 
-**Status note (2026-11-05):** This structure PRD records the repository state and sequencing decision as of 2026-10-28. The project owner has since approved development of Instagram Creator Reels Insights under [its v0.6 PRD](instagram-creator-reels-insights-prd-v0.6.md). The second Skill now has an in-development source and Codex mirror, but its hard-budget execution path and Profile Posts output contract remain blocked/unverified; it is not a validated or publishable capability. This note supersedes the former sequencing prohibition below without changing this document's repository-structure requirements.
+**Status note (2026-11-06):** This structure PRD records the repository state and sequencing decision as of 2026-10-28. The project owner has since approved development of Instagram Creator Reels Insights under the current [v0.8 PRD](instagram-creator-reels-insights-prd-v0.8.md). The second Skill has an in-development source and Codex mirror, but its Actor output contract and host integration remain unverified; it is not a validated or publishable capability. This note supersedes the former sequencing prohibition below without changing this document's repository-structure requirements.
 
 When this document was drafted, the repository contained one implemented skill, `instagram-transcript-extractor`. It accepts public Instagram video links and supports transcript retrieval, with optional summaries, translations, or analysis based on the returned text. The longer-term project is a set of focused skills that may use one or more Apify Actors each.
 

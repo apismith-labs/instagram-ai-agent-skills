@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Deterministic offline planning and reconciliation; no network or persistence."""
+"""Deterministic offline selection and transcript reconciliation; no network or persistence."""
 import json
 import re
 import sys
 from datetime import datetime, timedelta, timezone
-from decimal import Decimal, InvalidOperation, ROUND_CEILING
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 class ContractError(ValueError):
@@ -12,36 +11,9 @@ class ContractError(ValueError):
 
 TRACKING = {"igsh", "igshid", "fbclid", "gclid"}
 
-def money_cents(value, name, allow_zero=False):
-    if isinstance(value, bool) or not isinstance(value, (int, float, str)):
-        raise ContractError(f"{name} must be a USD amount with at most two decimal places")
-    try:
-        amount = Decimal(str(value))
-    except InvalidOperation:
-        raise ContractError(f"{name} is not a valid USD amount")
-    if not amount.is_finite() or amount < 0 or (amount == 0 and not allow_zero):
-        raise ContractError(f"{name} must be finite and greater than zero")
-    if amount.as_tuple().exponent < -2:
-        raise ContractError(f"{name} supports at most two decimal places")
-    return int(amount * 100)
-
-def usd_decimal(value, name, allow_zero=False):
-    if isinstance(value, bool) or not isinstance(value, (int, float, str)):
-        raise ContractError(f"{name} must be a USD amount")
-    try:
-        amount = Decimal(str(value))
-    except InvalidOperation:
-        raise ContractError(f"{name} is not a valid USD amount")
-    if not amount.is_finite() or amount < 0 or (amount == 0 and not allow_zero):
-        raise ContractError(f"{name} must be finite and {'non-negative' if allow_zero else 'greater than zero'}")
-    if amount.as_tuple().exponent < -9:
-        raise ContractError(f"{name} supports at most nine decimal places")
-    return amount
-
 def validate_settings(settings):
     if not isinstance(settings, dict):
         raise ContractError("settings must be an object")
-    cents = money_cents(settings.get("report_budget_usd"), "report_budget_usd")
     cap = settings.get("per_creator_limit")
     if type(cap) is not int or cap <= 0:
         raise ContractError("per_creator_limit must be a positive integer")
@@ -69,7 +41,7 @@ def validate_settings(settings):
         normalized.append(value.lower())
     if len(set(normalized)) != len(normalized):
         raise ContractError("duplicate accounts after normalization")
-    return {"report_budget_cents": cents, "report_budget_usd": f"{Decimal(cents)/100:.2f}", "per_creator_limit": cap, "accounts": normalized,
+    return {"per_creator_limit": cap, "accounts": normalized,
             "save_consent": settings.get("save_consent") is True}
 
 def parse_time(value):
@@ -151,7 +123,9 @@ def _selection_metadata_error(accounts, code, missing, detail):
     return {"status": "partial_interface_error", "coverage_status": "unknown", "selected": [],
             "counts": counts, "unresolved": [], "run_coverage": [],
             "interface_errors": [{"code": code, "missing": missing, "detail": detail}],
-            "row_interface_error_count": 0, "possible_results_limit_reached": None}
+            "row_interface_error_count": 0, "identity_conflict_count": 0,
+            "run_failures": [], "unattributed_issue_count": 0,
+            "possible_results_limit_reached": None}
 
 def select_posts(runs, accounts, cap, start, end, contract):
     """Select posts from per-run bundles; limit checks always use pre-filter run rows."""
@@ -180,6 +154,37 @@ def select_posts(runs, accounts, cap, start, end, contract):
                            "row_issue_count": 0}
                        for a in wanted}
     normalized_runs, missing_run_fields, used_run_ids, run_failures = [], [], set(), []
+    row_identity_fallback_run_ids = set()
+
+    def preserve_unattributable_bundle_rows(bundle, run_index, missing_fields):
+        nonlocal row_error_count, unattributed_issue_count
+        posts = bundle.get("posts") if isinstance(bundle, dict) else None
+        if not isinstance(posts, list):
+            return
+        run_id = bundle.get("run_id")
+        for row_index, row in enumerate(posts):
+            unresolved.append({"row": row, "run_id": run_id, "run_index": run_index,
+                               "row_index": row_index, "status": "interface_error",
+                               "reason": "discovery bundle metadata is incomplete; row cannot be safely assigned",
+                               "missing_run_fields": missing_fields})
+            row_error_count += 1
+            unattributed_issue_count += 1
+
+    def record_row_attributed_fallback_run(run_record, creator):
+        if run_record["run_id"] not in row_identity_fallback_run_ids:
+            return
+        attributed = run_record["row_attributed_usernames"]
+        if creator not in attributed:
+            attributed.append(creator)
+            classifications[creator]["run_coverage"].append({
+                "run_id": run_record["run_id"],
+                "status": "run_username_mapping_missing",
+                "run_status": run_record["run_status"],
+                "attributed_via": "row_creator_field"})
+        classifications[creator]["additional_candidates_unknown"] = True
+        classifications[creator]["results_limit_scope_unknown"] = True
+        classifications[creator]["possible_results_limit_reached"] = None
+
     for index, bundle in enumerate(runs):
         if not isinstance(bundle, dict):
             missing_run_fields.append({"run_index": index, "missing": ["run_id", "usernames", "results_limit", "posts", "retrieval_complete"]})
@@ -188,6 +193,41 @@ def select_posts(runs, accounts, cap, start, end, contract):
         missing = [field for field in required_run_fields if field not in bundle]
         if missing:
             missing_run_fields.append({"run_index": index, "missing": missing})
+            run_id = bundle.get("run_id")
+            usernames_missing_only = missing == ["usernames"]
+            valid_remaining_metadata = (
+                isinstance(run_id, str) and bool(run_id) and run_id not in used_run_ids
+                and type(bundle.get("results_limit")) is int and bundle["results_limit"] > 0
+                and isinstance(bundle.get("posts"), list)
+                and type(bundle.get("retrieval_complete")) is bool
+            )
+            if usernames_missing_only and valid_remaining_metadata:
+                raw_posts = bundle["posts"]
+                normalized_status = (bundle.get("run_status").upper().replace("_", "-")
+                                     if isinstance(bundle.get("run_status"), str) else None)
+                run_record = {"run_id": run_id, "usernames": [],
+                              "results_limit": bundle["results_limit"],
+                              "raw_returned_rows": len(raw_posts),
+                              "possible_results_limit_reached": len(raw_posts) >= bundle["results_limit"],
+                              "coverage_status": "run_username_mapping_missing",
+                              "retrieval_complete": bundle["retrieval_complete"],
+                              "limit_scope_unknown": True,
+                              "run_status": normalized_status,
+                              "status_message": bundle.get("status_message"),
+                              "error": bundle.get("run_error"), "run_index": index,
+                              "row_attributed_usernames": []}
+                normalized_runs.append((run_record, set(), raw_posts))
+                row_identity_fallback_run_ids.add(run_id)
+                used_run_ids.add(run_id)
+                if normalized_status in {"FAILED", "ABORTED", "TIMED-OUT"}:
+                    run_failures.append({"run_id": run_id, "usernames": [],
+                                         "row_attributed_usernames": run_record["row_attributed_usernames"],
+                                         "run_status": normalized_status,
+                                         "error": bundle.get("run_error"),
+                                         "status_message": bundle.get("status_message"),
+                                         "coverage_status": "run_username_mapping_missing"})
+            else:
+                preserve_unattributable_bundle_rows(bundle, index, missing)
             continue
         run_id, usernames = bundle["run_id"], bundle["usernames"]
         limit, raw_posts, retrieval_complete = bundle["results_limit"], bundle["posts"], bundle["retrieval_complete"]
@@ -197,11 +237,14 @@ def select_posts(runs, accounts, cap, start, end, contract):
                 or type(limit) is not int or limit <= 0 or not isinstance(raw_posts, list)
                 or type(retrieval_complete) is not bool):
             missing_run_fields.append({"run_index": index, "missing": ["valid unique run_id, usernames, positive results_limit, posts array, or retrieval_complete"]})
+            preserve_unattributable_bundle_rows(bundle, index,
+                                                ["valid unique run_id, usernames, positive results_limit, posts array, or retrieval_complete"])
             continue
         mapped = {name.lower() for name in usernames}
         if not mapped.issubset(wanted):
             missing_run_fields.append({"run_index": index, "missing": ["requested-account mapping"],
                                         "unexpected_usernames": sorted(mapped - wanted)})
+            preserve_unattributable_bundle_rows(bundle, index, ["requested-account mapping"])
             continue
         used_run_ids.add(run_id)
         raw_status = bundle.get("run_status")
@@ -234,7 +277,7 @@ def select_posts(runs, accounts, cap, start, end, contract):
                       "coverage_status": coverage, "retrieval_complete": retrieval_complete,
                       "limit_scope_unknown": multi_scope_unknown, "run_status": normalized_status,
                       "status_message": bundle.get("status_message"),
-                      "error": bundle.get("run_error")}
+                      "error": bundle.get("run_error"), "run_index": index}
         normalized_runs.append((run_record, mapped, raw_posts))
         if not run_succeeded:
             run_failures.append({"run_id": run_id, "usernames": sorted(mapped),
@@ -270,9 +313,10 @@ def select_posts(runs, accounts, cap, start, end, contract):
     if missing_run_fields:
         result = _selection_metadata_error(accounts, "invalid_or_missing_run_metadata", missing_run_fields,
                                            "Cannot determine run-local resultsLimit coverage or creator mapping")
-        # Malformed envelopes cannot safely establish a candidate set. Retain
-        # any valid run rows only when their run boundary and author map exist.
         result["run_coverage"] = [record for record, _, _ in normalized_runs]
+        result["unresolved"] = unresolved
+        result["row_interface_error_count"] = row_error_count
+        result["unattributed_issue_count"] = unattributed_issue_count
         if not normalized_runs:
             return result
         # Continue processing identifiable bundles, while preserving the
@@ -283,8 +327,19 @@ def select_posts(runs, accounts, cap, start, end, contract):
     required = [contract[k] for k in ("creator", "url", "timestamp", "type", "id")]
     raw_index = 0
     for run_record, run_usernames, raw_posts in normalized_runs:
-        for row in raw_posts:
+        row_identity_fallback = run_record["run_id"] in row_identity_fallback_run_ids
+        for row_index, row in enumerate(raw_posts):
+            row_source = {"run_id": run_record["run_id"], "run_index": run_record["run_index"],
+                          "row_index": row_index}
             if not isinstance(row, dict) or any(key not in row for key in required):
+                if row_identity_fallback:
+                    unresolved.append({"row": row, **row_source,
+                                       "status": "interface_error",
+                                       "reason": "row lacks a required contracted field; creator cannot be verified"})
+                    row_error_count += 1
+                    unattributed_issue_count += 1
+                    raw_index += 1
+                    continue
                 raise ContractError(f"interface_error: Profile Posts row {raw_index} lacks a required contracted field")
             creator = row[contract["creator"]]
             url = row[contract["url"]]
@@ -292,13 +347,23 @@ def select_posts(runs, accounts, cap, start, end, contract):
             kind = row[contract["type"]]
             stable_id = row[contract["id"]]
             if not isinstance(creator, str) or not isinstance(url, str) or not isinstance(kind, str):
+                if row_identity_fallback:
+                    unresolved.append({"row": row, **row_source,
+                                       "status": "interface_error",
+                                       "reason": "creator, URL, or media type has an invalid contracted type"})
+                    row_error_count += 1
+                    unattributed_issue_count += 1
+                    raw_index += 1
+                    continue
                 raise ContractError(f"interface_error: Profile Posts row {raw_index} has invalid contracted field types")
             creator = creator.lower()
             canon = canonical_post_url(url)
             ident = str(stable_id) if stable_id not in (None, "") else None
-            if creator not in run_usernames or canon is None:
-                unresolved.append({"row": row, "run_id": run_record["run_id"], "status": "interface_error",
-                                   "reason": "creator mapping or public post URL does not match the run contract"})
+            creator_matches_request = creator in wanted
+            creator_matches_run = creator in run_usernames
+            if (not creator_matches_run and not (row_identity_fallback and creator_matches_request)) or canon is None:
+                unresolved.append({"row": row, **row_source, "status": "interface_error",
+                                   "reason": "creator cannot be verified against the missing run mapping or public post URL is invalid"})
                 row_error_count += 1
                 if creator in classifications:
                     classifications[creator]["row_issue_count"] += 1
@@ -313,7 +378,7 @@ def select_posts(runs, accounts, cap, start, end, contract):
                 if (prior["creator"] != creator or prior["stable_id"] and ident and prior["stable_id"] != ident
                         or prior["timestamp"] != stamp):
                     reason = ("same canonical URL has conflicting creator, stable ID, or timestamp evidence")
-                    unresolved.append({"row": row, "run_id": run_record["run_id"], "status": "identity_conflict",
+                    unresolved.append({"row": row, **row_source, "status": "identity_conflict",
                                        "reason": reason, "conflicts_with": prior["index"]})
                     identity_conflict_count += 1
                     classifications[creator]["row_issue_count"] += 1
@@ -321,11 +386,14 @@ def select_posts(runs, accounts, cap, start, end, contract):
                     if prior_creator in classifications:
                         classifications[prior_creator]["row_issue_count"] += 1
                 else:
-                    unresolved.append({"row": row, "run_id": run_record["run_id"], "status": "duplicate_candidate", "duplicate_of": prior["index"]})
+                    if (row_identity_fallback and creator_matches_request and stamp is not None
+                            and lo <= stamp < hi and kind.casefold() in video_values):
+                        record_row_attributed_fallback_run(run_record, creator)
+                    unresolved.append({"row": row, **row_source, "status": "duplicate_candidate", "duplicate_of": prior["index"]})
                 raw_index += 1
                 continue
             if ident and ident in seen_ids and seen_ids[ident]["url"] != canon:
-                unresolved.append({"row": row, "run_id": run_record["run_id"], "status": "identity_conflict",
+                unresolved.append({"row": row, **row_source, "status": "identity_conflict",
                                    "reason": "same stable ID maps to a different canonical URL",
                                    "conflicts_with": seen_ids[ident]["index"]})
                 identity_conflict_count += 1
@@ -336,25 +404,29 @@ def select_posts(runs, accounts, cap, start, end, contract):
                     classifications[prior_creator]["row_issue_count"] += 1
                 raw_index += 1
                 continue
+            if (row_identity_fallback and creator_matches_request and stamp is not None
+                    and lo <= stamp < hi and kind.casefold() in video_values):
+                record_row_attributed_fallback_run(run_record, creator)
             seen[key] = {"creator": creator, "stable_id": ident, "timestamp": stamp, "index": raw_index}
             if ident:
                 seen_ids[ident] = {"url": canon, "index": raw_index, "creator": creator}
             if stamp is None:
                 classifications[creator]["missing_timestamp"] += 1
-                unresolved.append({"row": row, "run_id": run_record["run_id"], "status": "missing_timestamp"})
+                unresolved.append({"row": row, **row_source, "status": "missing_timestamp"})
             elif not lo <= stamp < hi:
                 classifications[creator]["out_of_window"] += 1
-                unresolved.append({"row": row, "run_id": run_record["run_id"], "status": "out_of_window"})
+                unresolved.append({"row": row, **row_source, "status": "out_of_window"})
             elif kind.casefold() in non_video_values:
                 classifications[creator]["non_video"] += 1
-                unresolved.append({"row": row, "run_id": run_record["run_id"], "status": "non_video"})
+                unresolved.append({"row": row, **row_source, "status": "non_video"})
             elif kind.casefold() in video_values:
                 by_creator[creator].append({"row": row, "creator": creator, "url": canon, "stable_id": ident,
                                            "stable_id_kind": contract["id_kind"], "timestamp": stamp,
-                                           "source_run_id": run_record["run_id"]})
+                                           "source_run_id": run_record["run_id"],
+                                           "source_run_index": run_record["run_index"]})
             else:
                 classifications[creator]["unknown_media_type"] += 1
-                unresolved.append({"row": row, "run_id": run_record["run_id"], "status": "unknown_media_type", "value": kind})
+                unresolved.append({"row": row, **row_source, "status": "unknown_media_type", "value": kind})
                 row_error_count += 1
                 classifications[creator]["row_issue_count"] += 1
             raw_index += 1
@@ -542,220 +614,6 @@ def reconcile_transcripts(submitted, rows, run_status, dataset_complete, post_co
         results[post["url"]] = {"post": post, "row": row, "transcript": transcript, "status": status}
     return list(results.values())
 
-WAIT_SECS_MAX = 45
-
-def require_mcp_run_contract(contract):
-    required_call = {"actor", "input", "waitSecs", "callOptions"}
-    required_options = {"maxItems", "maxTotalChargeUsd"}
-    if (not isinstance(contract, dict) or contract.get("verified") is not True
-            or contract.get("call_tool") != "call-actor"
-            or not isinstance(contract.get("call_actor_fields"), list)
-            or not required_call.issubset(set(contract["call_actor_fields"]))
-            or not isinstance(contract.get("call_options_fields"), list)
-            or not required_options.issubset(set(contract["call_options_fields"]))
-            or type(contract.get("max_wait_secs")) is not int
-            or not 0 <= contract["max_wait_secs"] <= WAIT_SECS_MAX):
-        raise ContractError("budget_blocked: live call-actor tool contract is missing or unverified")
-    readback = contract.get("run_readback")
-    common = {"run_id_field", "options_field", "options_fields"}
-    if (not isinstance(readback, dict) or readback.get("verified") is not True
-            or readback.get("tool") not in {"get-actor-run", "get-actor-run-list"}
-            or not common.issubset(readback)
-            or not isinstance(readback.get("options_fields"), list)
-            or not required_options.issubset(set(readback["options_fields"]))):
-        raise ContractError("budget_blocked: no verified live readback tool contract exposes run options")
-    if readback["tool"] == "get-actor-run-list" and not isinstance(readback.get("items_field"), str):
-        raise ContractError("budget_blocked: get-actor-run-list item path is not verified")
-    if type(contract["max_wait_secs"]) is int and contract["max_wait_secs"] > WAIT_SECS_MAX:
-        raise ContractError("interface_error: waitSecs maximum exceeds the documented 45-second contract")
-    return readback
-
-def require_pricing_contract(pricing):
-    if not isinstance(pricing, dict) or pricing.get("verified") is not True:
-        raise ContractError("pricing_unverified: fetch the current Actor pricing contract before planning a paid run")
-    if pricing.get("currency") != "USD" or not isinstance(pricing.get("source"), str) or not pricing["source"]:
-        raise ContractError("pricing_contract_invalid: currency and traceable pricing source are required")
-    if not isinstance(pricing.get("checked_at"), str) or not pricing["checked_at"]:
-        raise ContractError("pricing_contract_invalid: pricing check date is required")
-    model = pricing.get("model")
-    minimum = money_cents(pricing.get("minimum_run_charge_usd"), "minimum_run_charge_usd", allow_zero=True)
-    if model == "pay_per_result":
-        unit = usd_decimal(pricing.get("max_total_cost_per_result_usd"), "max_total_cost_per_result_usd")
-        fixed = usd_decimal(pricing.get("max_fixed_run_cost_usd"), "max_fixed_run_cost_usd", allow_zero=True)
-        if pricing.get("all_billable_components_bounded_by_max_items") is not True:
-            raise ContractError("pricing_unbounded: maxItems does not bound every billable component")
-        if fixed * 100 > minimum:
-            raise ContractError("pricing_contract_invalid: minimum_run_charge_usd must cover fixed run charges")
-        return {"model": model, "minimum_run_charge_cents": minimum,
-                "unit_cost_usd": unit, "fixed_cost_usd": fixed}
-    if model == "pay_per_event":
-        if pricing.get("all_billable_components_bounded_by_max_total_charge_usd") is not True:
-            raise ContractError("pricing_unbounded: maxTotalChargeUsd does not cover every billable component")
-        return {"model": model, "minimum_run_charge_cents": minimum}
-    raise ContractError("pricing_unverified: billing model must be pay_per_result or pay_per_event")
-
-def _required_ppr_cents(pricing, billable_items):
-    charge = pricing["fixed_cost_usd"] + pricing["unit_cost_usd"] * billable_items
-    return int((charge * 100).to_integral_value(rounding=ROUND_CEILING))
-
-def _read_ledger(settings, ledger, stage):
-    config = validate_settings(settings)
-    total = config["report_budget_cents"]
-    if ledger is None:
-        if stage != "discovery":
-            raise ContractError("budget_blocked: transcript planning requires a completed discovery ledger")
-        return config, {"report_budget_cents": total, "reserved_cents": 0, "stages": []}
-    if (not isinstance(ledger, dict) or ledger.get("report_budget_cents") != total
-            or type(ledger.get("reserved_cents")) is not int or ledger["reserved_cents"] < 0
-            or not isinstance(ledger.get("stages"), list)):
-        raise ContractError("budget_blocked: prior stage ledger is invalid or does not match the report budget")
-    stage_names = [item.get("name") for item in ledger["stages"] if isinstance(item, dict)]
-    if stage == "discovery" and stage_names:
-        raise ContractError("budget_blocked: discovery stage was already planned")
-    if stage == "transcription" and stage_names != ["discovery"]:
-        raise ContractError("budget_blocked: transcript replanning requires exactly one discovery stage")
-    if stage not in {"discovery", "transcription"}:
-        raise ContractError("stage must be discovery or transcription")
-    if ledger["reserved_cents"] > total:
-        raise ContractError("budget_blocked: prior stage reservations exceed the report budget")
-    return config, ledger
-
-def plan_budget_stage(settings, stage, runs, host_contract, ledger=None):
-    """Plan only the currently known stage; reserve every prior run's full cap."""
-    config, ledger = _read_ledger(settings, ledger, stage)
-    readback_contract = require_mcp_run_contract(host_contract)
-    if not isinstance(runs, list):
-        raise ContractError("runs must be an array")
-    total = config["report_budget_cents"]
-    available = total - ledger["reserved_cents"]
-    if not runs:
-        if stage != "transcription":
-            raise ContractError("discovery stage requires at least one run")
-        next_ledger = {**ledger, "stages": ledger["stages"] + [{"name": stage, "reserved_cents": 0, "calls": []}]}
-        return {"state": "no_transcript_runs_needed", "available_cents": available,
-                "reserved_cents": next_ledger["reserved_cents"], "ledger": next_ledger, "calls": []}
-
-    prepared, ppe_indices, allocated = [], [], 0
-    for index, run in enumerate(runs):
-        if not isinstance(run, dict) or not isinstance(run.get("actor"), str) or not run["actor"] or not isinstance(run.get("input"), dict):
-            raise ContractError("run plan entries require actor and input")
-        wait_secs = run.get("wait_secs")
-        if type(wait_secs) is not int or not 0 <= wait_secs <= min(host_contract["max_wait_secs"], WAIT_SECS_MAX):
-            raise ContractError("wait_secs is outside the verified call-actor range")
-        pricing = require_pricing_contract(run.get("pricing"))
-        if pricing["minimum_run_charge_cents"] <= 0:
-            raise ContractError("pricing_contract_invalid: each paid run requires a positive minimum run charge")
-        if pricing["model"] == "pay_per_result":
-            items = run.get("billable_items_requested")
-            if type(items) is not int or items <= 0:
-                raise ContractError("billable_items_requested must be a positive integer for pay-per-result runs")
-            cost_cents = _required_ppr_cents(pricing, items)
-            if cost_cents < pricing["minimum_run_charge_cents"]:
-                cost_cents = pricing["minimum_run_charge_cents"]
-            prepared.append({"run": run, "pricing": pricing, "allocation_cents": cost_cents,
-                             "call_options": {"maxItems": items}})
-            allocated += cost_cents
-        else:
-            prepared.append({"run": run, "pricing": pricing, "allocation_cents": 0, "call_options": None})
-            ppe_indices.append(index)
-
-    ppe_minima = sum(prepared[i]["pricing"]["minimum_run_charge_cents"] for i in ppe_indices)
-    remaining = available - allocated - ppe_minima
-    if remaining < 0:
-        raise ContractError("budget_blocked: this stage's safe run limits exceed the unreserved report budget; preserve prior results and mark this stage unprocessed")
-    if ppe_indices:
-        # Discovery keeps all non-minimum budget available for the still-unknown
-        # transcript batch plan. Transcription is the final stage and may use it.
-        distributable = remaining if stage == "transcription" else 0
-        base_share, remainder = divmod(distributable, len(ppe_indices))
-        for position, index in enumerate(ppe_indices):
-            allocation = prepared[index]["pricing"]["minimum_run_charge_cents"] + base_share + (1 if position < remainder else 0)
-            prepared[index]["allocation_cents"] = allocation
-            prepared[index]["call_options"] = {"maxTotalChargeUsd": f"{Decimal(allocation)/100:.2f}"}
-            allocated += allocation
-    else:
-        allocated = sum(item["allocation_cents"] for item in prepared)
-    if allocated > available:
-        raise ContractError("budget_blocked: current-stage run allocations exceed the unreserved report budget")
-
-    calls = []
-    for item in prepared:
-        run = item["run"]
-        options = item["call_options"]
-        if options is None:
-            raise ContractError("budget_blocked: run has no verified pricing cap")
-        arguments = {"actor": run["actor"], "input": run["input"], "waitSecs": run["wait_secs"], "callOptions": options}
-        reserve = item["allocation_cents"]
-        calls.append({"tool_call": {"name": host_contract["call_tool"], "arguments": arguments},
-                      "planning": {"billing_model": item["pricing"]["model"],
-                          "allocation_cents": reserve, "reservation_cents": reserve,
-                          "calculation": ("verified maxItems × conservative unit price" if item["pricing"]["model"] == "pay_per_result"
-                                          else "run maxTotalChargeUsd cap"),
-                          "readback_tool": readback_contract["tool"], "execution_status": "offline_plan_not_executed"}})
-    next_ledger = {"report_budget_cents": total, "reserved_cents": ledger["reserved_cents"] + allocated,
-                   "stages": ledger["stages"] + [{"name": stage, "reserved_cents": allocated,
-                       "calls": [{"allocation_cents": c["planning"]["reservation_cents"]} for c in calls]}]}
-    if next_ledger["reserved_cents"] > total:
-        raise ContractError("budget_blocked: cumulative stage reservations exceed the report budget")
-    return {"state": "offline_plan_not_executed", "stage": stage,
-            "stage_reserved_cents": allocated, "available_before_stage_cents": available,
-            "available_after_stage_cents": available-allocated,
-            "reserved_cents": next_ledger["reserved_cents"], "report_budget_cents": total,
-            "calls": calls, "ledger": next_ledger}
-
-def _path_value(obj, path):
-    value = obj
-    for part in path.split("."):
-        if not isinstance(value, dict) or part not in value:
-            return None
-        value = value[part]
-    return value
-
-def verify_run_limit(planned_call, response, run_id, host_contract):
-    readback = require_mcp_run_contract(host_contract)
-    if not isinstance(planned_call, dict) or not isinstance(response, dict) or not isinstance(run_id, str) or not run_id:
-        raise ContractError("interface_error: planned call, readback response, and run ID are required")
-    tool_call = planned_call.get("tool_call")
-    args = tool_call.get("arguments") if isinstance(tool_call, dict) else None
-    expected = args.get("callOptions") if isinstance(args, dict) else None
-    if not isinstance(expected, dict):
-        raise ContractError("interface_error: planned MCP callOptions are missing")
-    if readback["tool"] == "get-actor-run-list":
-        items = _path_value(response, readback["items_field"])
-        records = [r for r in items if isinstance(r, dict) and r.get(readback["run_id_field"]) == run_id] if isinstance(items, list) else []
-    else:
-        records = [response] if response.get(readback["run_id_field"]) == run_id else []
-    if len(records) != 1:
-        return {"state": "budget_readback_unverified", "stop_subsequent_runs": True,
-                "reason": "the configured readback response did not identify exactly one matching run"}
-    actual = records[0].get(readback["options_field"])
-    if not isinstance(actual, dict):
-        return {"state": "budget_readback_unverified", "stop_subsequent_runs": True,
-                "reason": "the configured readback response did not include the declared run options field"}
-    for key, expected_value in expected.items():
-        if key not in actual:
-            return {"state": "budget_readback_unverified", "stop_subsequent_runs": True,
-                    "reason": f"readback run options field {key} was not returned"}
-        try:
-            matches = Decimal(str(actual[key])) == Decimal(str(expected_value))
-        except InvalidOperation:
-            matches = actual[key] == expected_value
-        if not matches:
-            return {"state": "budget_readback_mismatch", "stop_subsequent_runs": True,
-                    "reason": f"readback run options field {key} does not match the requested cap"}
-    return {"state": "budget_readback_verified", "stop_subsequent_runs": False}
-
-def remaining_budget(report_budget, actual_spend):
-    total = money_cents(report_budget, "report_budget_usd")
-    try:
-        spend = Decimal(str(actual_spend))
-    except InvalidOperation:
-        raise ContractError("actual_spend must be a finite non-negative amount")
-    if not spend.is_finite() or spend < 0:
-        raise ContractError("actual_spend must be a finite non-negative amount")
-    spent_cents = int((spend * 100).to_integral_value(rounding=ROUND_CEILING))
-    return max(0, total - spent_cents)
-
 def split_batches(urls, batch_size):
     if not isinstance(urls, list) or any(not isinstance(url, str) or not url for url in urls):
         raise ContractError("urls must be a list of non-empty strings")
@@ -770,9 +628,6 @@ def main():
         if op == "settings": result = validate_settings(req.get("settings"))
         elif op == "window": result = window(req.get("now"), req.get("mode"))
         elif op == "select": result = select_posts(req.get("runs"), req.get("accounts"), req.get("per_creator_limit"), req.get("start"), req.get("end_exclusive"), req.get("post_contract"))
-        elif op == "plan_stage": result = plan_budget_stage(req.get("settings"), req.get("stage"), req.get("runs"), req.get("host_contract"), req.get("ledger"))
-        elif op == "verify_run": result = verify_run_limit(req.get("planned_call"), req.get("response"), req.get("run_id"), req.get("host_contract"))
-        elif op == "remaining": result = {"remaining_cents": remaining_budget(req.get("report_budget_usd"), req.get("actual_spend_usd"))}
         elif op == "split": result = {"batches": split_batches(req.get("urls"), req.get("batch_size"))}
         elif op == "reconcile":
             result = {"results": reconcile_transcripts(req.get("submitted"), req.get("rows"), req.get("run_status"), req.get("dataset_complete"), req.get("post_contract"), req.get("transcript_contract"))}

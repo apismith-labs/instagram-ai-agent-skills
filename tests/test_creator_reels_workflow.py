@@ -15,26 +15,6 @@ POST_CONTRACT = {"creator":"creator","url":"url","timestamp":"created","type":"k
 TRANSCRIPT_CONTRACT = {"url":"url","code":"code","pk":"pk","creator":"userName","text":"text","segments":"segments","error":"errMsg","segment_text":"text","post_id_kind":"pk"}
 START, END = "2026-11-05T00:00:00Z", "2026-11-06T00:00:00Z"
 
-# Synthetic contracts for offline planner tests only. These do not assert that
-# the current Codex host exposes or forwards these options.
-OFFLINE_HOST_CONTRACT = {"verified":True,
-    "call_tool":"call-actor",
-    "call_actor_fields":["actor","input","waitSecs","callOptions"],
-    "call_options_fields":["maxItems","maxTotalChargeUsd"],
-    "run_readback":{"verified":True,"tool":"get-actor-run-list","items_field":"items",
-        "run_id_field":"id","options_field":"options","options_fields":["maxItems","maxTotalChargeUsd"]},
-    "max_wait_secs":45}
-
-def pricing(model, unit=None, minimum="0.01"):
-    result = {"verified":True,"currency":"USD","source":"synthetic offline fixture",
-              "checked_at":"test-only","model":model,"minimum_run_charge_usd":minimum}
-    if model == "pay_per_result":
-        result.update({"max_total_cost_per_result_usd":unit,"max_fixed_run_cost_usd":"0.00",
-                       "all_billable_components_bounded_by_max_items":True})
-    else:
-        result["all_billable_components_bounded_by_max_total_charge_usd"] = True
-    return result
-
 def post(code, creator="a", created=START, url=None, stable=None):
     return {"creator":creator,"url":url or f"https://www.instagram.com/reel/{code}/",
             "created":created,"kind":"reel","stable":stable or code}
@@ -56,20 +36,28 @@ class CreatorWorkflowTests(unittest.TestCase):
                          {"start_utc":"2026-11-04T04:00:00Z","end_utc_exclusive":"2026-11-05T04:00:00Z"})
         self.assertEqual(wf.window("2026-11-05T12:00:00+08:00", "weekly")["start_utc"], "2026-10-29T04:00:00Z")
 
-    def test_settings_reject_zero_bad_precision_and_dot_path(self):
-        for amount in (0, -1, float("nan"), float("inf"), "bad", "1.001"):
+    def test_settings_reject_invalid_creator_cap_and_dot_path(self):
+        for amount in (0, -1, True, 1.5, "2", None):
             with self.subTest(amount=amount), self.assertRaises(wf.ContractError):
-                wf.validate_settings({"report_budget_usd":amount,"per_creator_limit":2,"accounts":["a"]})
+                wf.validate_settings({"per_creator_limit":amount,"accounts":["a"]})
         for account in ("https://www.instagram.com/./", "https://www.instagram.com/p/short/"):
             with self.subTest(account=account), self.assertRaises(wf.ContractError):
-                wf.validate_settings({"report_budget_usd":"1.00","per_creator_limit":2,"accounts":[account]})
+                wf.validate_settings({"per_creator_limit":2,"accounts":[account]})
 
     def test_settings_normalize_and_dedupe_accounts(self):
-        got = wf.validate_settings({"report_budget_usd":"3.25","per_creator_limit":2,
+        got = wf.validate_settings({"per_creator_limit":2,
                                     "accounts":["@Creator.Name","https://www.instagram.com/other/"],"save_consent":False})
         self.assertEqual(got["accounts"], ["creator.name","other"])
+        self.assertEqual(got["per_creator_limit"], 2)
+        self.assertFalse(got["save_consent"])
+        self.assertNotIn("report_budget_usd", got)
         with self.assertRaises(wf.ContractError):
-            wf.validate_settings({"report_budget_usd":3,"per_creator_limit":2,"accounts":["x","@X"]})
+            wf.validate_settings({"per_creator_limit":2,"accounts":["x","@X"]})
+
+    def test_legacy_budget_field_is_ignored_and_never_returned_as_a_setting(self):
+        got = wf.validate_settings({"report_budget_usd":"not a valid amount",
+                                    "per_creator_limit":3,"accounts":["a"]})
+        self.assertEqual(got, {"per_creator_limit":3,"accounts":["a"],"save_consent":False})
 
     def test_missing_profile_schema_is_interface_error_not_empty(self):
         with self.assertRaisesRegex(wf.ContractError, "interface_error"):
@@ -150,6 +138,12 @@ class CreatorWorkflowTests(unittest.TestCase):
         self.assertEqual(got["status"], "complete")
         self.assertEqual(got["coverage_status"], "complete")
         self.assertEqual(got["counts"]["a"]["coverage_status"], "complete")
+        self.assertEqual(got["run_failures"], [])
+        self.assertEqual(got["identity_conflict_count"], 0)
+        self.assertIsInstance(got["run_failures"], list)
+        self.assertIsInstance(got["identity_conflict_count"], int)
+        self.assertEqual(got["unattributed_issue_count"], 0)
+        self.assertIsInstance(got["unattributed_issue_count"], int)
 
     def test_requested_creator_without_discovery_run_is_unknown_not_complete(self):
         run_a = synthetic_run("synthetic-a", ["a"], [], 3)
@@ -167,6 +161,12 @@ class CreatorWorkflowTests(unittest.TestCase):
         got = wf.select_posts([], ["a", "b"], 2, START, END, POST_CONTRACT)
         self.assertEqual(got["status"], "partial_interface_error")
         self.assertEqual(got["coverage_status"], "unknown")
+        self.assertEqual(got["run_failures"], [])
+        self.assertEqual(got["identity_conflict_count"], 0)
+        self.assertIsInstance(got["run_failures"], list)
+        self.assertIsInstance(got["identity_conflict_count"], int)
+        self.assertEqual(got["unattributed_issue_count"], 0)
+        self.assertIsInstance(got["unattributed_issue_count"], int)
         self.assertEqual(set(got["counts"]), {"a", "b"})
         for creator in ("a", "b"):
             with self.subTest(creator=creator):
@@ -228,6 +228,27 @@ class CreatorWorkflowTests(unittest.TestCase):
         self.assertEqual(got["coverage_status"], "partial")
         self.assertEqual(got["run_failures"][0]["run_id"], "synthetic-bad")
 
+    def test_failed_discovery_run_keeps_valid_rows_transcribable_but_partial(self):
+        valid = post("failed-run-valid", creator="a")
+        unknown_media = post("failed-run-unknown", creator="a")
+        unknown_media["kind"] = "unverified_kind"
+        wrong_author = post("failed-run-wrong-author", creator="not-requested")
+        failed = synthetic_run("synthetic-failed-with-rows", ["a"],
+            [valid, unknown_media, wrong_author], 5, True,
+            run_status="FAILED", run_error="synthetic partial failure")
+
+        got = wf.select_posts([failed], ["a"], 3, START, END, POST_CONTRACT)
+
+        self.assertEqual(got["status"], "partial_interface_error")
+        self.assertIn(got["coverage_status"], {"partial", "unknown"})
+        self.assertIn(got["counts"]["a"]["coverage_status"], {"partial", "unknown"})
+        self.assertEqual(len(got["selected"]), 1)
+        self.assertEqual(got["selected"][0]["row"], valid)
+        self.assertEqual(got["selected"][0]["source_run_id"], "synthetic-failed-with-rows")
+        self.assertEqual(got["selected"][0]["source_run_index"], 0)
+        self.assertEqual({item["status"] for item in got["unresolved"]},
+                         {"unknown_media_type", "interface_error"})
+
     def test_results_limit_boundary_is_possible_truncation_not_a_claim(self):
         rows=[post("a")]
         got=select(rows,["a"],2,results_limit=1)
@@ -288,14 +309,29 @@ class CreatorWorkflowTests(unittest.TestCase):
         self.assertEqual(result["status"],"partial_interface_error")
         self.assertEqual(result["coverage_status"],"unknown")
         self.assertEqual(result["interface_errors"][0]["code"],"invalid_or_missing_run_metadata")
+        self.assertEqual(result["run_failures"], [])
+        self.assertEqual(result["identity_conflict_count"], 0)
+        self.assertIsInstance(result["run_failures"], list)
+        self.assertIsInstance(result["identity_conflict_count"], int)
+        self.assertEqual(result["unattributed_issue_count"], 1)
+        self.assertIsInstance(result["unattributed_issue_count"], int)
         self.assertIn("results_limit",result["interface_errors"][0]["missing"][0]["missing"])
         self.assertTrue(result["counts"]["a"]["additional_candidates_unknown"])
+        self.assertEqual(result["unresolved"][0]["row"], run["posts"][0])
+        self.assertEqual(result["unresolved"][0]["run_id"], "synthetic-run")
+        self.assertEqual(result["unresolved"][0]["run_index"], 0)
+        self.assertTrue(result["unresolved"][0]["reason"])
+        self.assertEqual(result["unattributed_issue_count"], 1)
 
         run = synthetic_run("synthetic-run",["a"],[post("a")],2)
         del run["run_id"]
         result = wf.select_posts([run],["a"],2,START,END,POST_CONTRACT)
         self.assertEqual(result["interface_errors"][0]["code"],"invalid_or_missing_run_metadata")
         self.assertIn("run_id",result["interface_errors"][0]["missing"][0]["missing"])
+        self.assertEqual(result["unresolved"][0]["row"], run["posts"][0])
+        self.assertIsNone(result["unresolved"][0]["run_id"])
+        self.assertEqual(result["unresolved"][0]["run_index"], 0)
+        self.assertTrue(result["unresolved"][0]["reason"])
 
     def test_missing_run_to_creator_mapping_never_reports_complete(self):
         result = wf.select_posts([synthetic_run("synthetic-run",["a"],[post("a")],2)],
@@ -303,6 +339,121 @@ class CreatorWorkflowTests(unittest.TestCase):
         self.assertEqual(result["status"],"partial_interface_error")
         self.assertEqual(result["coverage_status"],"unknown")
         self.assertEqual(result["interface_errors"][0]["missing"][0]["usernames"],["b"])
+
+    def test_missing_bundle_usernames_uses_row_contract_or_preserves_unattributable_rows(self):
+        bundle = synthetic_run("synthetic-missing-usernames", ["a"],
+            [post("owned", creator="a"), post("outside", creator="not-requested"),
+             {"url":"https://www.instagram.com/reel/no-owner/","created":START,
+              "kind":"reel","stable":"no-owner"}], 5)
+        del bundle["usernames"]
+        got = wf.select_posts([bundle], ["a"], 3, START, END, POST_CONTRACT)
+
+        self.assertEqual(got["status"], "partial_interface_error")
+        self.assertEqual(got["coverage_status"], "unknown")
+        self.assertEqual([item["row"]["stable"] for item in got["selected"]], ["owned"])
+        self.assertEqual(got["selected"][0]["creator"], "a")
+        self.assertEqual(got["selected"][0]["source_run_id"], "synthetic-missing-usernames")
+        self.assertEqual(got["selected"][0]["source_run_index"], 0)
+        self.assertEqual(got["counts"]["a"]["coverage_status"], "unknown")
+        self.assertTrue(got["counts"]["a"]["additional_candidates_unknown"])
+        self.assertEqual(len(got["unresolved"]), 2)
+        self.assertEqual({item["row_index"] for item in got["unresolved"]}, {1, 2})
+        self.assertTrue(all(item["run_id"] == "synthetic-missing-usernames" and
+                            item["run_index"] == 0 and item["reason"]
+                            for item in got["unresolved"]))
+
+    def test_fallback_run_is_included_in_only_its_row_attributed_creator_coverage(self):
+        run_a = synthetic_run("r-ok", ["a"], [post("a-ok")], 5)
+        run_b = synthetic_run("r-b", ["b"], [post("b-ok", creator="b")], 5)
+        fallback = synthetic_run("r-fb", ["a"],
+            [post("a-fb-1"), post("a-fb-2", created="2026-11-05T23:00:00Z")], 5)
+        del fallback["usernames"]
+
+        got = wf.select_posts([run_a, run_b, fallback], ["a", "b"], 5,
+                              START, END, POST_CONTRACT)
+
+        self.assertEqual(got["status"], "partial_interface_error")
+        self.assertEqual(got["coverage_status"], "unknown")
+        self.assertEqual(got["counts"]["a"]["coverage_status"], "unknown")
+        self.assertTrue(got["counts"]["a"]["additional_candidates_unknown"])
+        self.assertEqual([run["run_id"] for run in got["counts"]["a"]["run_coverage"]],
+                         ["r-ok", "r-fb"])
+        self.assertEqual(got["counts"]["a"]["run_coverage"][1], {
+            "run_id":"r-fb", "status":"run_username_mapping_missing",
+            "run_status":"SUCCEEDED", "attributed_via":"row_creator_field"})
+        self.assertEqual(got["counts"]["b"]["coverage_status"], "complete")
+        self.assertFalse(got["counts"]["b"]["additional_candidates_unknown"])
+        self.assertEqual([run["run_id"] for run in got["counts"]["b"]["run_coverage"]], ["r-b"])
+        fallback_record = next(run for run in got["run_coverage"] if run["run_id"] == "r-fb")
+        self.assertEqual(fallback_record["usernames"], [])
+        self.assertEqual(fallback_record["row_attributed_usernames"], ["a"])
+        self.assertEqual(fallback_record["coverage_status"], "run_username_mapping_missing")
+        selected_from_fallback = [item for item in got["selected"]
+                                  if item["source_run_id"] == "r-fb"]
+        self.assertEqual(len(selected_from_fallback), 2)
+        self.assertTrue(all(item["source_run_index"] == 2 for item in selected_from_fallback))
+
+    def test_fallback_invalid_url_does_not_create_creator_run_coverage(self):
+        invalid = post("invalid-url")
+        invalid["url"] = "https://example.com/not-an-instagram-post"
+        fallback = synthetic_run("r-fb-invalid", ["a"], [invalid], 5)
+        del fallback["usernames"]
+
+        got = wf.select_posts([fallback], ["a"], 3, START, END, POST_CONTRACT)
+
+        self.assertEqual(got["coverage_status"], "unknown")
+        self.assertNotEqual(got["status"], "complete")
+        self.assertEqual(got["selected"], [])
+        self.assertEqual(got["counts"]["a"]["run_coverage"], [])
+        self.assertEqual(got["counts"]["a"]["coverage_status"], "unknown")
+        self.assertEqual(len(got["unresolved"]), 1)
+        self.assertEqual(got["unresolved"][0]["row"], invalid)
+        self.assertEqual(got["unresolved"][0]["run_id"], "r-fb-invalid")
+        self.assertEqual(got["unresolved"][0]["row_index"], 0)
+        self.assertIn("invalid", got["unresolved"][0]["reason"])
+
+    def test_fallback_invalid_and_valid_rows_attribute_run_once_for_valid_candidate(self):
+        invalid = post("invalid-url")
+        invalid["url"] = "https://example.com/not-an-instagram-post"
+        valid = post("valid-fallback")
+        fallback = synthetic_run("r-fb-mixed", ["a"], [invalid, valid], 5)
+        del fallback["usernames"]
+
+        got = wf.select_posts([fallback], ["a"], 3, START, END, POST_CONTRACT)
+
+        self.assertEqual(got["coverage_status"], "unknown")
+        self.assertNotEqual(got["status"], "complete")
+        self.assertEqual(len(got["selected"]), 1)
+        self.assertEqual(got["selected"][0]["row"]["stable"], "valid-fallback")
+        self.assertEqual(got["selected"][0]["source_run_id"], "r-fb-mixed")
+        self.assertEqual(got["selected"][0]["source_run_index"], 0)
+        self.assertEqual(len(got["unresolved"]), 1)
+        self.assertEqual(got["unresolved"][0]["row"], invalid)
+        self.assertEqual(got["unresolved"][0]["row_index"], 0)
+        self.assertEqual(len(got["counts"]["a"]["run_coverage"]), 1)
+        self.assertEqual(got["counts"]["a"]["run_coverage"][0]["run_id"], "r-fb-mixed")
+        fallback_record = next(r for r in got["run_coverage"] if r["run_id"] == "r-fb-mixed")
+        self.assertEqual(fallback_record["row_attributed_usernames"], ["a"])
+
+    def test_failed_fallback_run_is_reported_once_with_error_and_row_author(self):
+        failed = synthetic_run("r-failed-fallback", ["a"], [post("failed-row")], 5,
+                               True, run_status="FAILED", run_error="synthetic failure")
+        del failed["usernames"]
+
+        got = wf.select_posts([failed], ["a"], 3, START, END, POST_CONTRACT)
+
+        self.assertEqual(got["status"], "partial_interface_error")
+        self.assertEqual(got["coverage_status"], "unknown")
+        self.assertNotIn(got["status"], {"complete", "no_candidates"})
+        self.assertEqual(len(got["run_failures"]), 1)
+        self.assertEqual(got["run_failures"][0]["run_id"], "r-failed-fallback")
+        self.assertEqual(got["run_failures"][0]["run_status"], "FAILED")
+        self.assertEqual(got["run_failures"][0]["error"], "synthetic failure")
+        self.assertEqual(got["run_failures"][0]["row_attributed_usernames"], ["a"])
+        self.assertEqual(got["counts"]["a"]["coverage_status"], "unknown")
+        self.assertEqual(len(got["selected"]), 1)
+        self.assertEqual(got["selected"][0]["source_run_id"], "r-failed-fallback")
+        self.assertEqual(got["selected"][0]["source_run_index"], 0)
 
     def test_duplicate_candidates_do_not_consume_cap_and_conflict_visible(self):
         rows = [post("same"), post("same", url="https://instagram.com/reels/same/?igshid=tracking"),
@@ -376,96 +527,8 @@ class CreatorWorkflowTests(unittest.TestCase):
         self.assertEqual(len(got[0]["rows"]), 2)
         self.assertEqual(got[1]["status"], "unmatched")
 
-    def test_zero_budget_is_never_an_actor_option(self):
-        with self.assertRaises(wf.ContractError):
-            wf.plan_budget_stage({"report_budget_usd":"0.00","per_creator_limit":1,"accounts":["a"]},
-                                 "discovery", [{"actor":"a/b","input":{},"wait_secs":1,
-                                 "pricing":pricing("pay_per_event")}], OFFLINE_HOST_CONTRACT)
-
-    def test_budget_is_planned_in_two_stages_and_reservations_accumulate(self):
-        settings = {"report_budget_usd":"1.00","per_creator_limit":2,"accounts":["a"],"save_consent":False}
-        discovery = wf.plan_budget_stage(settings,"discovery",[
-            {"actor":"owner/profile","input":{"usernames":["a"],"resultsLimit":4},"wait_secs":45,
-             "pricing":pricing("pay_per_result","0.10"),"billable_items_requested":4}],OFFLINE_HOST_CONTRACT)
-        self.assertEqual(discovery["stage_reserved_cents"],40)
-        planned = discovery["calls"][0]
-        self.assertEqual(planned["tool_call"]["name"],"call-actor")
-        self.assertEqual(set(planned["tool_call"]["arguments"]),{"actor","input","waitSecs","callOptions"})
-        self.assertEqual(planned["tool_call"]["arguments"]["callOptions"],{"maxItems":4})
-        self.assertEqual(planned["tool_call"]["arguments"]["input"]["resultsLimit"],4)
-        self.assertEqual(planned["planning"]["billing_model"],"pay_per_result")
-        self.assertNotIn("planning",planned["tool_call"]["arguments"])
-
-        # Transcript batches are planned only after discovery provides the URLs.
-        transcript_urls = ["https://instagram.com/reel/one/","https://instagram.com/reel/two/"]
-        transcript_runs = [{"actor":"owner/transcript","input":{"bulkUrls":[url]},"wait_secs":0,
-                            "pricing":pricing("pay_per_event")} for url in transcript_urls]
-        transcript = wf.plan_budget_stage(settings,"transcription",transcript_runs,OFFLINE_HOST_CONTRACT,discovery["ledger"])
-        self.assertEqual([c["tool_call"]["arguments"]["callOptions"] for c in transcript["calls"]],
-                         [{"maxTotalChargeUsd":"0.30"},{"maxTotalChargeUsd":"0.30"}])
-        self.assertEqual(transcript["reserved_cents"],100)
-        self.assertEqual(sum(stage["reserved_cents"] for stage in transcript["ledger"]["stages"]),100)
-        self.assertEqual(transcript["state"],"offline_plan_not_executed")
-
-    def test_stage_budget_shortfall_fails_without_expanding_prior_reservation(self):
-        settings = {"report_budget_usd":"0.05","per_creator_limit":2,"accounts":["a"]}
-        discovery = wf.plan_budget_stage(settings,"discovery",[
-            {"actor":"owner/profile","input":{"usernames":["a"]},"wait_secs":1,
-             "pricing":pricing("pay_per_event","0.01")}],OFFLINE_HOST_CONTRACT)
-        self.assertEqual(discovery["reserved_cents"],1)
-        # One observed transcript candidate still cannot fit its minimum run reserve.
-        transcript_runs = [{"actor":"owner/transcript","input":{"bulkUrls":["url"]},"wait_secs":1,
-                            "pricing":pricing("pay_per_event",minimum="0.10")}]
-        with self.assertRaisesRegex(wf.ContractError,"budget_blocked"):
-            wf.plan_budget_stage(settings,"transcription",transcript_runs,OFFLINE_HOST_CONTRACT,discovery["ledger"])
-
-    def test_missing_live_host_or_readback_contract_fails_closed(self):
-        settings = {"report_budget_usd":"1.00","per_creator_limit":1,"accounts":["a"]}
-        run = [{"actor":"owner/profile","input":{},"wait_secs":1,"pricing":pricing("pay_per_event")}]
-        for contract in ({}, {**OFFLINE_HOST_CONTRACT,"run_readback":None},
-                         {**OFFLINE_HOST_CONTRACT,"run_readback":{**OFFLINE_HOST_CONTRACT["run_readback"],"verified":False}}):
-            with self.subTest(contract=contract), self.assertRaisesRegex(wf.ContractError,"budget_blocked"):
-                wf.plan_budget_stage(settings,"discovery",run,contract)
-
-    def test_run_readback_uses_only_a_verified_declared_tool_and_exact_run(self):
-        # The host contract and options-bearing response below are synthetic mocks only.
-        settings = {"report_budget_usd":"1.00","per_creator_limit":1,"accounts":["a"]}
-        plan = wf.plan_budget_stage(settings,"discovery",[
-            {"actor":"owner/profile","input":{},"wait_secs":1,"pricing":pricing("pay_per_event")}],OFFLINE_HOST_CONTRACT)
-        call = plan["calls"][0]
-        expected = call["tool_call"]["arguments"]["callOptions"]
-        response = {"items":[{"id":"run-1","options":expected}]}
-        self.assertEqual(wf.verify_run_limit(call,response,"run-1",OFFLINE_HOST_CONTRACT)["state"],"budget_readback_verified")
-        self.assertTrue(wf.verify_run_limit(call,{"items":[]},"run-1",OFFLINE_HOST_CONTRACT)["stop_subsequent_runs"])
-        wrong = {"items":[{"id":"run-1","options":{"maxTotalChargeUsd":"0.99"}}]}
-        self.assertEqual(wf.verify_run_limit(call,wrong,"run-1",OFFLINE_HOST_CONTRACT)["state"],"budget_readback_mismatch")
-
-    def test_waitsecs_contract_accepts_only_zero_through_45(self):
-        settings = {"report_budget_usd":"1.00","per_creator_limit":1,"accounts":["a"]}
-        for value in (0,45):
-            run = [{"actor":"owner/profile","input":{},"wait_secs":value,"pricing":pricing("pay_per_event")}]
-            self.assertEqual(wf.plan_budget_stage(settings,"discovery",run,OFFLINE_HOST_CONTRACT)["calls"][0]
-                             ["tool_call"]["arguments"]["waitSecs"],value)
-        for value in (-1,46):
-            run = [{"actor":"owner/profile","input":{},"wait_secs":value,"pricing":pricing("pay_per_event")}]
-            with self.subTest(wait_secs=value), self.assertRaisesRegex(wf.ContractError,"wait_secs"):
-                wf.plan_budget_stage(settings,"discovery",run,OFFLINE_HOST_CONTRACT)
-
-    def test_unknown_pricing_fails_closed_and_maxitems_is_distinct_from_resultslimit(self):
-        run = {"actor":"owner/profile","input":{"resultsLimit":10},"wait_secs":30,
-               "pricing":pricing("pay_per_result","0.01"),"billable_items_requested":2}
-        plan = wf.plan_budget_stage({"report_budget_usd":"1.00","per_creator_limit":2,"accounts":["a"]},
-                                   "discovery",[run],OFFLINE_HOST_CONTRACT)
-        self.assertEqual(plan["calls"][0]["tool_call"]["arguments"]["input"]["resultsLimit"],10)
-        self.assertEqual(plan["calls"][0]["tool_call"]["arguments"]["callOptions"],{"maxItems":2})
-        run["pricing"]["verified"] = False
-        with self.assertRaisesRegex(wf.ContractError,"pricing_unverified"):
-            wf.plan_budget_stage({"report_budget_usd":"1.00","per_creator_limit":2,"accounts":["a"]},
-                                 "discovery",[run],OFFLINE_HOST_CONTRACT)
-
-    def test_batch_splitting_uses_verified_limit_and_remaining_budget(self):
+    def test_batch_splitting_uses_live_limit(self):
         self.assertEqual(wf.split_batches(["a","b","c","d","e"],2),[["a","b"],["c","d"],["e"]])
-        self.assertEqual(wf.remaining_budget("2.50","2.50"),0)
         with self.assertRaises(wf.ContractError):
             wf.split_batches(["a"],0)
 
@@ -496,8 +559,10 @@ class CreatorWorkflowTests(unittest.TestCase):
         self.assertEqual(got["counts"]["a"]["unknown_media_type"], 1)
         self.assertFalse(got["counts"]["a"]["additional_candidates_unknown"])
         self.assertEqual([u["status"] for u in got["unresolved"]], ["non_video", "unknown_media_type"])
+        self.assertEqual(got["unresolved"][1]["value"], "short_video_v2")
+        self.assertNotIn("reason", got["unresolved"][1])
 
-    def test_cli_stdin_json_executes_complete_offline_report_chain(self):
+    def test_cli_stdin_json_executes_report_chain_without_budget_operations(self):
         env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
         def invoke(payload):
             proc = subprocess.run([sys.executable, str(PATH)], input=json.dumps(payload), text=True,
@@ -509,10 +574,10 @@ class CreatorWorkflowTests(unittest.TestCase):
                 self.fail(f"CLI did not emit JSON: {exc}: {proc.stdout!r}")
             return proc.returncode, result
 
-        code, settings = invoke({"operation":"settings", "settings":{"report_budget_usd":"1.20",
+        code, settings = invoke({"operation":"settings", "settings":{"report_budget_usd":"legacy and ignored",
             "per_creator_limit":1,"accounts":["@a"],"save_consent":False}})
         self.assertEqual(code, 0)
-        self.assertEqual(settings["accounts"], ["a"])
+        self.assertEqual(settings, {"accounts":["a"],"per_creator_limit":1,"save_consent":False})
         code, bounds = invoke({"operation":"window","now":"2026-11-06T00:00:00Z","mode":"daily"})
         self.assertEqual(code, 0)
         selected_input = {"operation":"select","runs":[synthetic_run("synthetic-profile-run",["a"],
@@ -524,26 +589,6 @@ class CreatorWorkflowTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(selected["status"], "complete")
         self.assertEqual(len(selected["selected"]), 1)
-        code, discovery = invoke({"operation":"plan_stage","stage":"discovery","settings":settings,"runs":[
-                {"actor":"owner/profile","input":{"usernames":["a"],"resultsLimit":1},"wait_secs":45,
-                 "pricing":pricing("pay_per_result","0.10"),"billable_items_requested":1}],
-            "host_contract":OFFLINE_HOST_CONTRACT})
-        self.assertEqual(code, 0)
-        self.assertEqual(len(discovery["calls"]), 1)
-        self.assertEqual(set(discovery["calls"][0]["tool_call"]["arguments"]),
-                         {"actor","input","waitSecs","callOptions"})
-        code, transcript = invoke({"operation":"plan_stage","stage":"transcription","settings":settings,
-            "ledger":discovery["ledger"],"runs":[
-                {"actor":"owner/transcript","input":{"bulkUrls":[selected["selected"][0]["url"]]},"wait_secs":0,
-                 "pricing":pricing("pay_per_event")}],"host_contract":OFFLINE_HOST_CONTRACT})
-        self.assertEqual(code,0)
-        self.assertIn("maxTotalChargeUsd",transcript["calls"][0]["tool_call"]["arguments"]["callOptions"])
-        code, checked = invoke({"operation":"verify_run","planned_call":transcript["calls"][0],
-            "run_id":"synthetic-run","response":{"items":[{"id":"synthetic-run",
-                "options":transcript["calls"][0]["tool_call"]["arguments"]["callOptions"]}]},
-            "host_contract":OFFLINE_HOST_CONTRACT})
-        self.assertEqual(code,0)
-        self.assertEqual(checked["state"],"budget_readback_verified")
         code, batches = invoke({"operation":"split","urls":[selected["selected"][0]["url"]],"batch_size":1})
         self.assertEqual(code, 0)
         self.assertEqual(batches["batches"], [[selected["selected"][0]["url"]]])
@@ -554,13 +599,10 @@ class CreatorWorkflowTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(reconciled["results"][0]["status"], "success")
 
-        for payload, expected in (({"operation":"unknown"}, "unknown operation"),
-                                  ({"operation":"settings","settings":{"report_budget_usd":0,
-                                    "per_creator_limit":1,"accounts":["a"]}}, "greater than zero")):
-            code, error = invoke(payload)
+        for operation in ("plan_stage", "verify_run", "remaining", "unknown"):
+            code, error = invoke({"operation":operation})
             self.assertEqual(code, 2)
-            self.assertIn("error", error)
-            self.assertIn(expected, error["error"])
+            self.assertEqual(error["error"], "unknown operation")
 
 if __name__ == "__main__":
     unittest.main()
