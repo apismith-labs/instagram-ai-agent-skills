@@ -21,6 +21,9 @@ def post(code, creator="a", created=START, url=None, stable=None):
 
 def synthetic_run(run_id, usernames, posts, results_limit, retrieval_complete=True, **extra):
     """Synthetic Profile Posts run envelope for offline tests; not Actor evidence."""
+    if retrieval_complete is True and "retrieval_complete_evidence" not in extra:
+        extra["retrieval_complete_evidence"] = {
+            "source":"synthetic_fixture", "detail":"synthetic fixture includes all declared rows"}
     return {"run_id":run_id,"usernames":usernames,"posts":posts,"results_limit":results_limit,
             "retrieval_complete":retrieval_complete,"run_status":"SUCCEEDED",**extra}
 
@@ -106,6 +109,83 @@ class CreatorWorkflowTests(unittest.TestCase):
         self.assertEqual(result["row_interface_error_count"],1)
         self.assertEqual(result["unresolved"][0]["status"],"interface_error")
         self.assertNotEqual(result["coverage_status"],"complete")
+
+    def test_succeeded_empty_run_without_completeness_signal_is_unknown_not_no_candidates(self):
+        run = synthetic_run("synthetic-no-signal-empty", ["a"], [], 5, retrieval_complete=None)
+        run.pop("retrieval_complete")
+        got = wf.select_posts([run], ["a"], 3, START, END, POST_CONTRACT)
+        self.assertNotEqual(got["status"], "no_candidates")
+        self.assertEqual(got["status"], "partial")
+        self.assertEqual(got["coverage_status"], "unknown")
+        self.assertEqual(got["counts"]["a"]["coverage_status"], "unknown")
+        self.assertEqual(got["counts"]["a"]["selected"], 0)
+        self.assertEqual(got["run_coverage"][0]["retrieval_complete"], None)
+
+    def test_succeeded_below_limit_without_completeness_signal_keeps_candidate_unknown(self):
+        run = synthetic_run("synthetic-no-signal-rows", ["a"], [post("candidate")], 5,
+                            retrieval_complete=None)
+        run.pop("retrieval_complete")
+        got = wf.select_posts([run], ["a"], 3, START, END, POST_CONTRACT)
+        self.assertEqual(len(got["selected"]), 1)
+        self.assertEqual(got["selected"][0]["row"]["stable"], "candidate")
+        self.assertEqual(got["status"], "partial")
+        self.assertEqual(got["coverage_status"], "unknown")
+        self.assertEqual(got["counts"]["a"]["coverage_status"], "unknown")
+        self.assertEqual(got["run_coverage"][0]["retrieval_complete"], None)
+
+    def test_nonempty_evidence_source_and_detail_pass_structure_check_only(self):
+        run = synthetic_run("synthetic-explicit-complete", ["a"], [post("candidate")], 5,
+                            retrieval_complete=True,
+                            retrieval_complete_evidence={"source":"x", "detail":"y"})
+        got = wf.select_posts([run], ["a"], 3, START, END, POST_CONTRACT)
+        self.assertEqual(got["status"], "complete")
+        self.assertEqual(got["coverage_status"], "complete")
+        self.assertEqual(got["run_coverage"][0]["retrieval_complete"], True)
+        self.assertEqual(got["run_coverage"][0]["retrieval_completeness_evidence"],
+                         {"source":"x", "detail":"y"})
+
+    def test_true_without_completeness_evidence_is_downgraded_to_unknown(self):
+        run = synthetic_run("synthetic-unbacked-true", ["a"], [], 5,
+                            retrieval_complete=True, retrieval_complete_evidence=None)
+        got = wf.select_posts([run], ["a"], 3, START, END, POST_CONTRACT)
+        self.assertNotEqual(got["status"], "no_candidates")
+        self.assertEqual(got["coverage_status"], "unknown")
+        self.assertIsNone(got["run_coverage"][0]["retrieval_complete"])
+        self.assertEqual(got["run_coverage"][0]["retrieval_completeness_evidence"]["status"],
+                         "missing_or_unverifiable")
+
+    def test_completeness_evidence_shape_requires_nonempty_source_and_detail(self):
+        invalid_evidence = ["source/detail", {}, {"detail":"read all pages"},
+                            {"source":"tool"}, {"source":"  ","detail":"pages read"},
+                            {"source":"tool","detail":"  "}]
+        for evidence in invalid_evidence:
+            with self.subTest(evidence=evidence):
+                run = synthetic_run("synthetic-invalid-evidence", ["a"], [], 5,
+                                    retrieval_complete=True, retrieval_complete_evidence=evidence)
+                got = wf.select_posts([run], ["a"], 3, START, END, POST_CONTRACT)
+                self.assertEqual(got["coverage_status"], "unknown")
+                self.assertNotEqual(got["status"], "no_candidates")
+                self.assertIsNone(got["run_coverage"][0]["retrieval_complete"])
+
+    def test_unknown_completeness_for_one_creator_does_not_degrade_another(self):
+        unknown = synthetic_run("synthetic-a-unknown", ["a"], [post("a-row")], 5,
+                                retrieval_complete=None)
+        explicit = synthetic_run("synthetic-b-complete", ["b"], [post("b-row", creator="b")], 5,
+                                 retrieval_complete=True,
+                                 retrieval_complete_evidence={"source":"synthetic page ledger",
+                                                              "detail":"all fixture pages supplied"})
+        got = wf.select_posts([unknown, explicit], ["a", "b"], 2, START, END, POST_CONTRACT)
+        self.assertEqual(got["coverage_status"], "unknown")
+        self.assertEqual(got["counts"]["a"]["coverage_status"], "unknown")
+        self.assertEqual(got["counts"]["b"]["coverage_status"], "complete")
+        self.assertEqual({row["creator"] for row in got["selected"]}, {"a", "b"})
+
+    def test_workflow_reference_matches_tri_state_completeness_contract(self):
+        reference = (PATH.parent.parent / "references/workflow.md").read_text()
+        self.assertIn("retrieval_complete` is tri-state", reference)
+        self.assertIn("retrieval_complete_evidence", reference)
+        self.assertIn("never infer it from `SUCCEEDED`", reference)
+        self.assertIn("A `reconcile` row status of `success` means only", reference)
 
     def test_identity_conflicts_reduce_top_and_attributable_creator_coverage(self):
         stable_id_conflict = [post("one", stable="shared"), post("two", stable="shared")]
@@ -203,6 +283,9 @@ class CreatorWorkflowTests(unittest.TestCase):
                 self.assertEqual(result["run_failures"][0]["usernames"], ["a"])
                 self.assertEqual(result["run_failures"][0]["run_status"], failed_status)
                 self.assertEqual(result["run_failures"][0]["error"], "synthetic failure")
+                self.assertEqual(set(result["run_failures"][0]), {
+                    "run_id", "usernames", "row_attributed_usernames", "run_status", "error",
+                    "status_message", "coverage_status"})
                 self.assertEqual(result["counts"]["a"]["coverage_status"], "partial")
 
     def test_missing_or_unknown_discovery_run_status_fails_closed(self):
@@ -213,6 +296,7 @@ class CreatorWorkflowTests(unittest.TestCase):
             result = wf.select_posts([run], ["a"], 2, START, END, POST_CONTRACT)
             self.assertNotEqual(result["status"], "no_candidates")
             self.assertEqual(result["coverage_status"], "unknown")
+            self.assertEqual(result["run_failures"], [])
             self.assertTrue(result["counts"]["a"]["additional_candidates_unknown"])
             self.assertIn(result["run_coverage"][0]["coverage_status"], {"run_status_unknown"})
 
@@ -449,6 +533,9 @@ class CreatorWorkflowTests(unittest.TestCase):
         self.assertEqual(got["run_failures"][0]["run_id"], "r-failed-fallback")
         self.assertEqual(got["run_failures"][0]["run_status"], "FAILED")
         self.assertEqual(got["run_failures"][0]["error"], "synthetic failure")
+        self.assertEqual(set(got["run_failures"][0]), {
+            "run_id", "usernames", "row_attributed_usernames", "run_status", "error",
+            "status_message", "coverage_status"})
         self.assertEqual(got["run_failures"][0]["row_attributed_usernames"], ["a"])
         self.assertEqual(got["counts"]["a"]["coverage_status"], "unknown")
         self.assertEqual(len(got["selected"]), 1)
@@ -506,6 +593,99 @@ class CreatorWorkflowTests(unittest.TestCase):
         postrow = {"url":"https://www.instagram.com/reel/a/","stable_id":"a","creator":"a"}
         got = wf.reconcile_transcripts([postrow], [], "RUNNING", False, POST_CONTRACT, TRANSCRIPT_CONTRACT)
         self.assertEqual(got[0]["status"], "pending")
+        self.assertTrue(got[0]["reason"])
+
+    def test_reconcile_terminal_failures_are_not_pending(self):
+        postrow = {"url":"https://www.instagram.com/reel/a/","stable_id":"a","creator":"a"}
+        for run_status in ("FAILED", "ABORTED", "TIMED-OUT"):
+            for completeness in (False, None):
+                with self.subTest(run_status=run_status, dataset_complete=completeness):
+                    got = wf.reconcile_transcripts([postrow], [], run_status, completeness,
+                                                  POST_CONTRACT, TRANSCRIPT_CONTRACT,
+                                                  "reported terminal failure")
+                    self.assertEqual(got[0]["status"], "run_failed")
+                    self.assertNotEqual(got[0]["status"], "pending")
+                    self.assertEqual(got[0]["run_status"], run_status)
+                    self.assertIs(got[0]["dataset_complete"], completeness)
+                    self.assertEqual(got[0]["reason"], "reported terminal failure")
+                    self.assertEqual(got[0]["error"], "reported terminal failure")
+
+        default_reason = wf.reconcile_transcripts([postrow], [], "FAILED", False,
+                                                  POST_CONTRACT, TRANSCRIPT_CONTRACT)[0]
+        self.assertEqual(default_reason["status"], "run_failed")
+        self.assertIn("FAILED", default_reason["reason"])
+        self.assertIsNone(default_reason["error"])
+
+    def test_reconcile_run_error_accepts_only_text_without_dropping_matches(self):
+        postrow = {"url":"https://www.instagram.com/reel/a/","stable_id":"a","creator":"a"}
+        for value in ("worker stopped", None, 42, ["not", "text"], {"message":"not a string"}):
+            with self.subTest(run_error=value):
+                failed = wf.reconcile_transcripts([postrow], [], "FAILED", False,
+                                                  POST_CONTRACT, TRANSCRIPT_CONTRACT, value)[0]
+                self.assertEqual(failed["status"], "run_failed")
+                self.assertIs(failed["dataset_complete"], False)
+                if value == "worker stopped":
+                    self.assertEqual(failed["error"], value)
+                    self.assertEqual(failed["reason"], value)
+                else:
+                    self.assertIsNone(failed["error"])
+                    self.assertEqual(failed["reason"], "Transcript Actor run ended with FAILED")
+
+        missing = wf.reconcile_transcripts([postrow], [], "FAILED", None,
+                                            POST_CONTRACT, TRANSCRIPT_CONTRACT)[0]
+        self.assertIsNone(missing["error"])
+        self.assertEqual(missing["reason"], "Transcript Actor run ended with FAILED")
+
+        matched = wf.reconcile_transcripts([postrow], [
+            {"url":postrow["url"],"pk":"a","userName":"a","text":"transcript"}],
+            "SUCCEEDED", None, POST_CONTRACT, TRANSCRIPT_CONTRACT,
+            {"unexpected":"object"})[0]
+        self.assertEqual(matched["status"], "success")
+        self.assertEqual(matched["transcript"], "transcript")
+        self.assertIsNone(matched["dataset_complete"])
+
+        for field, value in (("run_error", "actual host message"),
+                             ("run_error", None),
+                             ("run_error", {"message":"unsupported shape"}),
+                             (None, None)):
+            with self.subTest(cli_run_error=(field, value)):
+                request = {"operation":"reconcile", "submitted":[postrow], "rows":[],
+                           "run_status":"FAILED", "dataset_complete":None,
+                           "post_contract":POST_CONTRACT, "transcript_contract":TRANSCRIPT_CONTRACT}
+                if field is not None:
+                    request[field] = value
+                proc = subprocess.run([sys.executable, str(PATH)], input=json.dumps(request), text=True,
+                                      capture_output=True, env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+                self.assertEqual(proc.returncode, 0, proc.stderr)
+                result = json.loads(proc.stdout)["results"][0]
+                self.assertEqual(result["status"], "run_failed")
+                self.assertTrue(isinstance(result["reason"], str) and result["reason"])
+                self.assertTrue(result["error"] is None or isinstance(result["error"], str))
+
+    def test_reconcile_pending_reasons_distinguish_run_and_dataset(self):
+        postrow = {"url":"https://www.instagram.com/reel/a/","stable_id":"a","creator":"a"}
+        for run_status in ("READY", "RUNNING", "ABORTING", "TIMING-OUT", "UNKNOWN"):
+            with self.subTest(run_status=run_status):
+                result = wf.reconcile_transcripts([postrow], [], run_status, None,
+                                                  POST_CONTRACT, TRANSCRIPT_CONTRACT)[0]
+                self.assertEqual(result["status"], "pending")
+                self.assertIn("run", result["reason"].lower())
+                self.assertEqual(result["run_status"], run_status)
+                self.assertIsNone(result["dataset_complete"])
+
+        for completeness, expected in ((False, "incomplete"), (None, "unknown")):
+            with self.subTest(run_status="SUCCEEDED", dataset_complete=completeness):
+                result = wf.reconcile_transcripts([postrow], [], "SUCCEEDED", completeness,
+                                                  POST_CONTRACT, TRANSCRIPT_CONTRACT)[0]
+                self.assertEqual(result["status"], "pending")
+                self.assertIn(expected, result["reason"].lower())
+                self.assertEqual(result["run_status"], "SUCCEEDED")
+                self.assertIs(result["dataset_complete"], completeness)
+
+        complete_empty = wf.reconcile_transcripts([postrow], [], "SUCCEEDED", True,
+                                                  POST_CONTRACT, TRANSCRIPT_CONTRACT)[0]
+        self.assertEqual(complete_empty["status"], "not_returned")
+        self.assertIs(complete_empty["dataset_complete"], True)
 
     def test_text_empty_missing_invalid_and_segments_are_distinct(self):
         postrow = {"url":"https://www.instagram.com/reel/a/","stable_id":"a","creator":"a"}
@@ -527,6 +707,32 @@ class CreatorWorkflowTests(unittest.TestCase):
         self.assertEqual(len(got[0]["rows"]), 2)
         self.assertEqual(got[1]["status"], "unmatched")
 
+    def test_duplicate_candidate_reason_is_independent_of_dataset_completeness(self):
+        postrow = {"url":"https://www.instagram.com/reel/a/","stable_id":"a","creator":"a"}
+        for completeness in (True, False, None):
+            with self.subTest(dataset_complete=completeness):
+                got = wf.reconcile_transcripts([postrow, dict(postrow)], [], "SUCCEEDED", completeness,
+                                              POST_CONTRACT, TRANSCRIPT_CONTRACT)
+                self.assertEqual(len(got), 1)
+                self.assertEqual(got[0]["status"], "duplicate_candidate")
+                self.assertEqual(got[0]["reason"], "Duplicate candidate in submitted list")
+                self.assertIs(got[0]["dataset_complete"], completeness)
+
+    def test_reconcile_normalizes_known_run_status_variants_like_select(self):
+        postrow = {"url":"https://www.instagram.com/reel/a/","stable_id":"a","creator":"a"}
+        for raw_status in ("TIMED_OUT", "timed-out", "timed_out"):
+            with self.subTest(run_status=raw_status):
+                result = wf.reconcile_transcripts([postrow], [], raw_status, None,
+                                                  POST_CONTRACT, TRANSCRIPT_CONTRACT)[0]
+                self.assertEqual(result["status"], "run_failed")
+                self.assertEqual(result["run_status"], "TIMED-OUT")
+                self.assertEqual(result["reason"], "Transcript Actor run ended with TIMED-OUT")
+
+                discovery = synthetic_run("synthetic-timed-out", ["a"], [], 3, True,
+                                          run_status=raw_status)
+                selected = wf.select_posts([discovery], ["a"], 2, START, END, POST_CONTRACT)
+                self.assertEqual(selected["run_failures"][0]["run_status"], "TIMED-OUT")
+
     def test_batch_splitting_uses_live_limit(self):
         self.assertEqual(wf.split_batches(["a","b","c","d","e"],2),[["a","b"],["c","d"],["e"]])
         with self.assertRaises(wf.ContractError):
@@ -545,6 +751,67 @@ class CreatorWorkflowTests(unittest.TestCase):
         compatible = wf.reconcile_transcripts([postrow], [], "SUCCEEDED", True, POST_CONTRACT, TRANSCRIPT_CONTRACT)
         self.assertEqual(compatible[0]["status"], "not_returned")
 
+    def test_reconcile_match_success_does_not_claim_dataset_completeness(self):
+        submitted = [{"url":"https://www.instagram.com/reel/a/", "stable_id":"a", "creator":"a"}]
+        row = {"url":submitted[0]["url"], "pk":"a", "userName":"a", "text":"matched transcript"}
+        for completeness in (False, None):
+            with self.subTest(dataset_complete=completeness):
+                got = wf.reconcile_transcripts([submitted[0]], [row], "SUCCEEDED", completeness,
+                                              POST_CONTRACT, TRANSCRIPT_CONTRACT)
+                self.assertEqual(got[0]["status"], "success")
+                self.assertIs(got[0]["dataset_complete"], completeness)
+                self.assertEqual(got[0]["run_status"], "SUCCEEDED")
+
+    def test_reconcile_dataset_completeness_is_stable_on_duplicate_and_conflict_paths(self):
+        post_a = {"url":"https://www.instagram.com/reel/a/", "stable_id":"a", "creator":"a"}
+        post_b = {"url":"https://www.instagram.com/reel/b/", "stable_id":"b", "creator":"b"}
+        for completeness in (False, None):
+            with self.subTest(dataset_complete=completeness):
+                duplicate = wf.reconcile_transcripts([post_a], [
+                    {"url":post_a["url"], "pk":"a", "userName":"a", "text":"one"},
+                    {"url":post_a["url"], "pk":"a", "userName":"a", "text":"two"}],
+                    "SUCCEEDED", completeness, POST_CONTRACT, TRANSCRIPT_CONTRACT)
+                self.assertEqual(duplicate[0]["status"], "duplicate_transcript_rows")
+                self.assertIs(duplicate[0]["dataset_complete"], completeness)
+                self.assertEqual(len(duplicate[0]["rows"]), 2)
+
+                url_pk_conflict = wf.reconcile_transcripts([post_a, post_b], [
+                    {"url":post_a["url"], "pk":"b", "userName":"a", "text":"conflict"}],
+                    "SUCCEEDED", completeness, POST_CONTRACT, TRANSCRIPT_CONTRACT)
+                conflicts = [item for item in url_pk_conflict if item.get("status") == "identity_conflict"]
+                self.assertEqual(len(conflicts), 2)
+                self.assertTrue(all(item["dataset_complete"] is completeness for item in conflicts))
+
+                author_conflict = wf.reconcile_transcripts([post_a], [
+                    {"url":post_a["url"], "pk":"a", "userName":"other", "text":"conflict"}],
+                    "SUCCEEDED", completeness, POST_CONTRACT, TRANSCRIPT_CONTRACT)
+                self.assertEqual(author_conflict[0]["status"], "identity_conflict")
+                self.assertIs(author_conflict[0]["dataset_complete"], completeness)
+
+                invalid_url_id_hit = wf.reconcile_transcripts([post_a], [
+                    {"url":"https://example.com/bad", "pk":"a", "userName":"a", "text":"conflict"}],
+                    "SUCCEEDED", completeness, POST_CONTRACT, TRANSCRIPT_CONTRACT)
+                self.assertEqual(invalid_url_id_hit[0]["status"], "identity_conflict")
+                self.assertIs(invalid_url_id_hit[0]["dataset_complete"], completeness)
+
+        missing = wf.reconcile_transcripts([post_a], [
+            {"url":post_a["url"], "pk":"a", "userName":"a", "text":"matched"}],
+            "SUCCEEDED", None, POST_CONTRACT, TRANSCRIPT_CONTRACT)
+        self.assertIsNone(missing[0]["dataset_complete"])
+
+    def test_reconcile_cli_missing_dataset_complete_is_unknown(self):
+        request = {"operation":"reconcile", "submitted":[{"url":"https://www.instagram.com/reel/a/",
+                    "stable_id":"a", "creator":"a"}],
+                   "rows":[{"url":"https://www.instagram.com/reel/a/", "pk":"a",
+                            "userName":"a", "text":"matched"}],
+                   "run_status":"SUCCEEDED", "post_contract":POST_CONTRACT,
+                   "transcript_contract":TRANSCRIPT_CONTRACT}
+        proc = subprocess.run([sys.executable, str(PATH)], input=json.dumps(request), text=True,
+                              capture_output=True, env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        output = json.loads(proc.stdout)
+        self.assertEqual(output["results"][0]["status"], "success")
+        self.assertIsNone(output["results"][0]["dataset_complete"])
     def test_media_values_are_case_insensitive_and_unknowns_are_auditable(self):
         rows = [post("upper", created="2026-11-05T13:00:00Z"),
                 post("photo", created="2026-11-05T12:00:00Z"),

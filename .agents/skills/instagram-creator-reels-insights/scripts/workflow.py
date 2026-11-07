@@ -127,6 +127,19 @@ def _selection_metadata_error(accounts, code, missing, detail):
             "run_failures": [], "unattributed_issue_count": 0,
             "possible_results_limit_reached": None}
 
+def _verified_retrieval_completeness(bundle):
+    value = bundle.get("retrieval_complete")
+    evidence = bundle.get("retrieval_complete_evidence")
+    if value is True:
+        if (isinstance(evidence, dict)
+                and isinstance(evidence.get("source"), str) and evidence["source"].strip()
+                and isinstance(evidence.get("detail"), str) and evidence["detail"].strip()):
+            return True, {"source": evidence["source"].strip(), "detail": evidence["detail"].strip()}
+        return None, {"status": "missing_or_unverifiable"}
+    if value is False:
+        return False, {"status": "explicitly_incomplete"}
+    return None, {"status": "not_provided"}
+
 def select_posts(runs, accounts, cap, start, end, contract):
     """Select posts from per-run bundles; limit checks always use pre-filter run rows."""
     require_post_contract(contract)
@@ -189,7 +202,7 @@ def select_posts(runs, accounts, cap, start, end, contract):
         if not isinstance(bundle, dict):
             missing_run_fields.append({"run_index": index, "missing": ["run_id", "usernames", "results_limit", "posts", "retrieval_complete"]})
             continue
-        required_run_fields = ("run_id", "usernames", "results_limit", "posts", "retrieval_complete")
+        required_run_fields = ("run_id", "usernames", "results_limit", "posts")
         missing = [field for field in required_run_fields if field not in bundle]
         if missing:
             missing_run_fields.append({"run_index": index, "missing": missing})
@@ -199,18 +212,20 @@ def select_posts(runs, accounts, cap, start, end, contract):
                 isinstance(run_id, str) and bool(run_id) and run_id not in used_run_ids
                 and type(bundle.get("results_limit")) is int and bundle["results_limit"] > 0
                 and isinstance(bundle.get("posts"), list)
-                and type(bundle.get("retrieval_complete")) is bool
+                and (bundle.get("retrieval_complete") is None or type(bundle.get("retrieval_complete")) is bool)
             )
             if usernames_missing_only and valid_remaining_metadata:
                 raw_posts = bundle["posts"]
                 normalized_status = (bundle.get("run_status").upper().replace("_", "-")
                                      if isinstance(bundle.get("run_status"), str) else None)
+                retrieval_complete, completeness_evidence = _verified_retrieval_completeness(bundle)
                 run_record = {"run_id": run_id, "usernames": [],
                               "results_limit": bundle["results_limit"],
                               "raw_returned_rows": len(raw_posts),
                               "possible_results_limit_reached": len(raw_posts) >= bundle["results_limit"],
                               "coverage_status": "run_username_mapping_missing",
-                              "retrieval_complete": bundle["retrieval_complete"],
+                              "retrieval_complete": retrieval_complete,
+                              "retrieval_completeness_evidence": completeness_evidence,
                               "limit_scope_unknown": True,
                               "run_status": normalized_status,
                               "status_message": bundle.get("status_message"),
@@ -230,12 +245,13 @@ def select_posts(runs, accounts, cap, start, end, contract):
                 preserve_unattributable_bundle_rows(bundle, index, missing)
             continue
         run_id, usernames = bundle["run_id"], bundle["usernames"]
-        limit, raw_posts, retrieval_complete = bundle["results_limit"], bundle["posts"], bundle["retrieval_complete"]
+        limit, raw_posts = bundle["results_limit"], bundle["posts"]
+        retrieval_complete, completeness_evidence = _verified_retrieval_completeness(bundle)
         if (not isinstance(run_id, str) or not run_id or run_id in used_run_ids
                 or not isinstance(usernames, list) or not usernames
                 or any(not isinstance(name, str) or not name for name in usernames)
                 or type(limit) is not int or limit <= 0 or not isinstance(raw_posts, list)
-                or type(retrieval_complete) is not bool):
+                or (bundle.get("retrieval_complete") is not None and type(bundle.get("retrieval_complete")) is not bool)):
             missing_run_fields.append({"run_index": index, "missing": ["valid unique run_id, usernames, positive results_limit, posts array, or retrieval_complete"]})
             preserve_unattributable_bundle_rows(bundle, index,
                                                 ["valid unique run_id, usernames, positive results_limit, posts array, or retrieval_complete"])
@@ -251,7 +267,8 @@ def select_posts(runs, accounts, cap, start, end, contract):
         normalized_status = raw_status.upper().replace("_", "-") if isinstance(raw_status, str) else None
         known_statuses = {"SUCCEEDED", "FAILED", "ABORTED", "TIMED-OUT", "READY", "RUNNING", "ABORTING", "TIMING-OUT"}
         status_known = normalized_status in known_statuses
-        run_succeeded = normalized_status == "SUCCEEDED" and retrieval_complete
+        actor_succeeded = normalized_status == "SUCCEEDED"
+        run_succeeded = actor_succeeded and retrieval_complete is True
         run_failed = normalized_status in {"FAILED", "ABORTED", "TIMED-OUT"}
         run_status_unknown = not status_known
         scope_verified = (bundle.get("results_limit_scope") == "run_total"
@@ -262,25 +279,29 @@ def select_posts(runs, accounts, cap, start, end, contract):
             coverage = "run_failed"
         elif run_status_unknown:
             coverage = "run_status_unknown"
-        elif not run_succeeded:
+        elif not actor_succeeded:
             coverage = "run_incomplete"
+        elif retrieval_complete is None:
+            coverage = "retrieval_completeness_unknown"
+        elif retrieval_complete is False:
+            coverage = "retrieval_incomplete"
         elif multi_scope_unknown:
             coverage = "possible_results_limit_reached_scope_unknown" if reached else "unknown_multi_username_limit_scope"
         elif reached:
             coverage = "possible_results_limit_reached"
-        elif not retrieval_complete:
-            coverage = "retrieval_incomplete"
         else:
             coverage = "returned_below_run_limit"
         run_record = {"run_id": run_id, "usernames": sorted(mapped), "results_limit": limit,
                       "raw_returned_rows": len(raw_posts), "possible_results_limit_reached": reached,
                       "coverage_status": coverage, "retrieval_complete": retrieval_complete,
+                      "retrieval_completeness_evidence": completeness_evidence,
                       "limit_scope_unknown": multi_scope_unknown, "run_status": normalized_status,
                       "status_message": bundle.get("status_message"),
                       "error": bundle.get("run_error"), "run_index": index}
         normalized_runs.append((run_record, mapped, raw_posts))
-        if not run_succeeded:
+        if run_failed:
             run_failures.append({"run_id": run_id, "usernames": sorted(mapped),
+                                 "row_attributed_usernames": [],
                                  "run_status": normalized_status or "MISSING_OR_UNKNOWN",
                                  "error": bundle.get("run_error"),
                                  "status_message": bundle.get("status_message"),
@@ -439,7 +460,8 @@ def select_posts(runs, accounts, cap, start, end, contract):
         selected.extend(chosen)
         creator_run_records = classifications[creator]["run_coverage"]
         creator_unknown = (classifications[creator].get("results_limit_scope_unknown", False)
-                           or any(item["status"] == "run_status_unknown" for item in creator_run_records))
+                           or any(item["status"] in {"run_status_unknown", "retrieval_completeness_unknown"}
+                                  for item in creator_run_records))
         creator_partial = (classifications[creator]["row_issue_count"] > 0
                            or classifications[creator]["additional_candidates_unknown"]
                            or len(rows) > len(chosen)
@@ -478,7 +500,7 @@ def select_posts(runs, accounts, cap, start, end, contract):
     else:
         status = "no_candidates"
     coverage_unknown = (unknown_scope or unattributed_issue_count > 0 or bool(missing_run_fields)
-                        or any(record["coverage_status"] == "run_status_unknown"
+                        or any(record["coverage_status"] in {"run_status_unknown", "retrieval_completeness_unknown"}
                                for record, _, _ in normalized_runs))
     interface_errors = ([{"code": "invalid_or_missing_run_metadata", "missing": missing_run_fields}]
                         if missing_run_fields else [])
@@ -491,17 +513,23 @@ def select_posts(runs, accounts, cap, start, end, contract):
             "interface_errors": interface_errors,
             "possible_results_limit_reached": at_limit_possible}
 
-def reconcile_transcripts(submitted, rows, run_status, dataset_complete, post_contract, transcript_contract):
+def reconcile_transcripts(submitted, rows, run_status, dataset_complete, post_contract, transcript_contract, run_error=None):
     require_post_contract(post_contract)
     names = ("url", "code", "pk", "creator", "text", "segments", "error", "segment_text")
     if not isinstance(transcript_contract, dict) or any(not isinstance(transcript_contract.get(k), str) or not transcript_contract[k] for k in names):
         raise ContractError("interface_error: exact Transcript output field contract is missing")
     if not isinstance(submitted, list) or not isinstance(rows, list):
         raise ContractError("interface_error: submitted candidates and transcript rows must be arrays")
-    if type(dataset_complete) is not bool:
-        raise ContractError("dataset_complete must be boolean evidence")
-    if run_status not in {"SUCCEEDED", "FAILED", "ABORTED", "TIMED-OUT", "RUNNING", "UNKNOWN"}:
+    if dataset_complete is not None and type(dataset_complete) is not bool:
+        raise ContractError("dataset_complete must be true, false, or unknown/null")
+    if isinstance(run_status, str):
+        run_status = run_status.upper().replace("_", "-")
+    if run_status not in {"SUCCEEDED", "FAILED", "ABORTED", "TIMED-OUT", "READY", "RUNNING", "ABORTING", "TIMING-OUT", "UNKNOWN"}:
         raise ContractError("unrecognized run status")
+    if isinstance(run_error, str):
+        run_error = run_error.strip() or None
+    else:
+        run_error = None
     post_id_kind = transcript_contract.get("post_id_kind")
     if post_id_kind not in {"code", "pk"}:
         raise ContractError("interface_error: verified post stable-ID kind is missing")
@@ -513,13 +541,28 @@ def reconcile_transcripts(submitted, rows, run_status, dataset_complete, post_co
         if post.get("stable_id"):
             by_id.setdefault((post_id_kind, str(post["stable_id"])), []).append(post)
     results = {}
+    failed_statuses = {"FAILED", "ABORTED", "TIMED-OUT"}
     for p in submitted:
         prior = results.get(p["url"])
         if prior:
             prior["status"] = "duplicate_candidate"
+            prior["dataset_complete"] = dataset_complete
+            prior["reason"] = "Duplicate candidate in submitted list"
             prior.setdefault("duplicates", []).append(p)
         else:
-            results[p["url"]] = {"post": p, "status": "pending" if run_status in {"RUNNING", "UNKNOWN"} or not dataset_complete else ("not_returned" if run_status == "SUCCEEDED" else "run_failed")}
+            result = {"post": p, "dataset_complete": dataset_complete, "run_status": run_status}
+            if run_status in failed_statuses:
+                result.update({"status": "run_failed", "reason": run_error or f"Transcript Actor run ended with {run_status}",
+                               "error": run_error})
+            elif run_status in {"READY", "RUNNING", "ABORTING", "TIMING-OUT", "UNKNOWN"}:
+                result.update({"status": "pending", "reason": "Transcript Actor run has not reached a confirmed terminal state"})
+            elif run_status == "SUCCEEDED" and dataset_complete is not True:
+                reason = ("Transcript Dataset is explicitly incomplete" if dataset_complete is False
+                          else "Transcript Dataset completeness is unknown")
+                result.update({"status": "pending", "reason": reason})
+            else:
+                result["status"] = "not_returned"
+            results[p["url"]] = result
     row_counts, conflicted_posts = {}, set()
     url_field, code_field, pk_field, creator_field = (transcript_contract[k] for k in ("url", "code", "pk", "creator"))
     id_field = pk_field if post_id_kind == "pk" else code_field
@@ -527,15 +570,17 @@ def reconcile_transcripts(submitted, rows, run_status, dataset_complete, post_co
         for candidate in posts:
             if candidate["url"] in results:
                 results[candidate["url"]] = {"post": candidate, "row": row,
+                    "dataset_complete": dataset_complete,
+                    "run_status": run_status,
                     "status": "identity_conflict", "reason": reason, "row_index": row_index}
                 conflicted_posts.add(candidate["url"])
 
     for row_index, row in enumerate(rows):
         if not isinstance(row, dict):
-            results[f"unassigned:{row_index}"] = {"row": row, "status": "schema_invalid"}
+            results[f"unassigned:{row_index}"] = {"row": row, "dataset_complete": dataset_complete, "status": "schema_invalid"}
             continue
         if url_field not in row:
-            results[f"unassigned:{row_index}"] = {"row": row, "status": "schema_invalid", "reason": "URL field is missing"}
+            results[f"unassigned:{row_index}"] = {"row": row, "dataset_complete": dataset_complete, "status": "schema_invalid", "reason": "URL field is missing"}
             continue
         raw_url = row.get(url_field)
         canon = canonical_post_url(raw_url) if raw_url is not None else None
@@ -545,10 +590,10 @@ def reconcile_transcripts(submitted, rows, run_status, dataset_complete, post_co
             if id_candidates:
                 mark_conflict(id_candidates, row, row_index, "transcript URL is invalid but the stable ID points to a submitted post")
             else:
-                results[f"unassigned:{row_index}"] = {"row": row, "status": "schema_invalid", "reason": "invalid transcript URL"}
+                results[f"unassigned:{row_index}"] = {"row": row, "dataset_complete": dataset_complete, "status": "schema_invalid", "reason": "invalid transcript URL"}
             continue
         if raw_url is None and not id_candidates:
-            results[f"unassigned:{row_index}"] = {"row": row, "status": "schema_invalid"}
+            results[f"unassigned:{row_index}"] = {"row": row, "dataset_complete": dataset_complete, "status": "schema_invalid"}
             continue
         url_candidates = by_url.get(canon, []) if canon else []
         if url_candidates and ident not in (None, "") and any(
@@ -566,7 +611,7 @@ def reconcile_transcripts(submitted, rows, run_status, dataset_complete, post_co
             continue
         candidates = url_candidates or id_candidates
         if not candidates:
-            results[f"unassigned:{row_index}"] = {"row": row, "status": "unmatched"}
+            results[f"unassigned:{row_index}"] = {"row": row, "dataset_complete": dataset_complete, "status": "unmatched"}
             continue
         if len(candidates) != 1:
             mark_conflict(candidates, row, row_index, "transcript identity matches more than one submitted post")
@@ -588,7 +633,10 @@ def reconcile_transcripts(submitted, rows, run_status, dataset_complete, post_co
         if row_counts[post["url"]] > 1:
             previous = results[post["url"]]
             prior_rows = previous.get("rows", [previous["row"]])
-            results[post["url"]] = {"post": post, "rows": prior_rows + [row], "status": "duplicate_transcript_rows"}
+            results[post["url"]] = {"post": post, "rows": prior_rows + [row],
+                                     "dataset_complete": dataset_complete,
+                                     "run_status": run_status,
+                                     "status": "duplicate_transcript_rows"}
             continue
         if error_key in row and not isinstance(row[error_key], (str, type(None))):
             status, transcript = "schema_invalid", None
@@ -611,7 +659,9 @@ def reconcile_transcripts(submitted, rows, run_status, dataset_complete, post_co
             status, transcript = "empty", ""
         else:
             status, transcript = "success", row[text_key]
-        results[post["url"]] = {"post": post, "row": row, "transcript": transcript, "status": status}
+        results[post["url"]] = {"post": post, "row": row, "transcript": transcript,
+                                 "dataset_complete": dataset_complete, "run_status": run_status,
+                                 "status": status}
     return list(results.values())
 
 def split_batches(urls, batch_size):
@@ -630,7 +680,7 @@ def main():
         elif op == "select": result = select_posts(req.get("runs"), req.get("accounts"), req.get("per_creator_limit"), req.get("start"), req.get("end_exclusive"), req.get("post_contract"))
         elif op == "split": result = {"batches": split_batches(req.get("urls"), req.get("batch_size"))}
         elif op == "reconcile":
-            result = {"results": reconcile_transcripts(req.get("submitted"), req.get("rows"), req.get("run_status"), req.get("dataset_complete"), req.get("post_contract"), req.get("transcript_contract"))}
+            result = {"results": reconcile_transcripts(req.get("submitted"), req.get("rows"), req.get("run_status"), req.get("dataset_complete"), req.get("post_contract"), req.get("transcript_contract"), req.get("run_error"))}
         else: raise ContractError("unknown operation")
         print(json.dumps(result, ensure_ascii=False, default=lambda x: x.isoformat()))
     except (ContractError, TypeError, AttributeError, KeyError) as exc:
