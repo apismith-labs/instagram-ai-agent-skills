@@ -12,6 +12,18 @@ WorkBuddy 复审指出，以上 run 状态、输入/返回行数、coverage、he
 
 这次仅是一条单账号、小样本的用户运行报告；当时 helper 版本未记录。它不证明该账号整周已完整扫描，也不验证排序、媒体枚举、分页、费用、批量、多账号或 Daily Scan。helper 的 transcript URL/code 匹配成功仅表示该返回行与提交帖子匹配，不表示发现 Dataset 完整。
 
+## OpenClaw 第二轮单账号运行观察（用户提供，2026-11-08）
+
+以下内容来自用户提供的 OpenClaw 执行报告，不是 Codex 本轮独立取证。报告称 OpenClaw Agent 可见并调用已同步的 Creator Reels Insights Skill；安装 helper SHA-256 为 `ad9f31aeb9fc615d2d37f756a06e03e6029cbdb878d8e56d48963343a26f2e49`，报告称该值与此前同步核验报告一致。该运行环境中的 Git 历史无法确认；这不是“仓库没有 commit”的证据。Codex 本轮没有独立读取原始 `start`/`collect` JSON、会话 trace 或安装副本来复核上述报告与哈希。
+
+报告描述一次 `danmartell` 的 Weekly Review，每作者处理上限为 1，锚点 `2026-11-08T10:08:00+08:00`，helper 半开 UTC 窗口为 `[2026-11-01T02:08:00Z, 2026-11-08T02:08:00Z)`。Profile Posts Actor `apple_yang~instagram-post-scraper` 的输入为 `usernames=["danmartell"]`、`resultsLimit=5`、`onlyPostsNewerThan="7 days"`、`skipPinnedPosts=true`。报告自述 run `gYklaQSlVA0qn7OwE`（Dataset `hhtAeFy11P3lpluRR`）为 `SUCCEEDED`，`resultCount=5`，一次 collect 即返回；5 行均在窗口内，其中 1 条 `Album`、4 条 `Video`。helper 据报选出最新 1 条视频，另 3 条视频因本地每作者上限未选；原始 5 行等于 `resultsLimit=5`，helper 据报标记 `possible_results_limit_reached=true`。这只是可能触顶信号，不证明结果已截断，也不证明覆盖完整。
+
+报告自述未提供可信的 `retrieval_complete` 证据，因此为 `null`，整体状态为 `partial`、覆盖为 `unknown`；没有 Dataset 完整性证据，因此不能声称该账号在窗口内已完整发现。`skipPinnedPosts=true` 的实际效果没有置顶标记或对照运行支持，仍未验证。此次同时改变了请求上限和 `skipPinnedPosts` 输入；报告不证明其中任何一项导致候选数量变化。
+
+报告还描述 Transcript Actor `apple_yang~instagram-transcripts-scraper` 对唯一选中 URL `https://www.instagram.com/p/DfdGTWpCTr6/` 执行处理。run `EkXH9zbOjYdyttYl7`（Dataset `GuhGoQhF7fORQTqva`）据报状态为 `SUCCEEDED`、`resultCount=1`；两次 collect 中第一次状态为 `RUNNING`，第二次为 `SUCCEEDED`。报告称返回行的 `text` 非空、含 17 个 `segments`、`errMsg=""`。helper `reconcile` 据报返回 `success`，`dataset_complete=null`、`run_status=SUCCEEDED`，未传 `run_error`；报告描述返回行的 URL 与 `code`/`shortCode` 和提交候选一致。没有原始 helper 输出可独立确认实际匹配键，因此不声称 helper 分别用 URL 与 code 两项完成匹配。`reconcile: success` 只表示该 transcript 返回行与提交候选成功对账，不证明 Transcript Dataset 完整。
+
+这条报告只支持“一个账号、一次 Profile Posts run、一个候选视频、一次 Transcript run 的正向链路被报告为成功”。两个 Dataset 均无可信完整性证据，费用未查；它不是全面集成验证，也不证明可发布。仍未验证 Profile Posts 的完整 Dataset 覆盖、`resultsLimit` 排序和计数语义、完整媒体类型枚举、`skipPinnedPosts` 效果、多账号行为及实际费用。
+
 ## Actor 输入和输出
 
 来源：[Actor 页面及 README](https://apify.com/apple_yang/instagram-transcripts-scraper)、[输入页](https://apify.com/apple_yang/instagram-transcripts-scraper/input)，以及本轮 Apify MCP `fetch-actor-details` 返回的输入 schema 和输出推断。
@@ -69,4 +81,4 @@ WorkBuddy 复审指出，以上 run 状态、输入/返回行数、coverage、he
 - **结果限制与排序：** 公开输入 schema 对 `resultsLimit` 只写最大返回结果数。helper 的 select 输入为每次 Profile Posts run 一个 bundle（run ID、该次提交用户名、该次实际 `resultsLimit`、完整原始返回行、读取完整性信号）。它在时间窗筛选前按每个 run 的原始返回行数分别比较该 run 的上限；不同 run 不会合计。run 边界/上限/用户名映射缺失时返回顶层 `partial_interface_error` 和 `coverage_status: unknown`，不报完整。一个 run 包含多用户名且上限作用范围未核实时，输出 `unknown_multi_username_limit_scope` 或 `possible_results_limit_reached_scope_unknown`，不按作者拆分推断。单 run 行数达到上限只说明可能触顶。Actor 的真实单/多用户名计数语义、最新优先顺序、图片/非视频计入规则和完整性信号仍未核实；这些离线测试仅验证本地逻辑，不验证 Actor 行为。
 - **运行费用参数（范围说明，2026-11-06）：** 公开 Apify MCP 与 API 文档存在运行费用选项的描述，见上文来源；这些信息不表示本 Skill 实现了参数透传或费用封顶。当前产品版本不要求报告总预算、run 级预算分配、`callOptions.maxTotalChargeUsd`、`maxItems` 或选项读回；相关预算规划/验证操作已从第二 Skill helper 和 CLI 移除。实际使用量按用户的 Apify 账户及 Actor 计费规则产生，不作固定费用或费用上限声明。
 - **Profile Posts 待验证事项：** `resultsLimit` 对单/多用户名的实际语义、最新优先排序、图片/非视频计入规则、完整 media type 枚举和完整性信号仍无充分证据。候选行数达到传入 `resultsLimit` 时 helper 只标记“可能触及结果限制/额外候选未知”，不断言已截断或完整。没有已核验媒体值/字段合同仍 fail closed；离线 `select` 通过不代表真实 Profile Posts 数据可用，也不能报告完整扫描或“没有新视频”。
-- **执行状态：** URL/作者/稳定 ID 冲突对账、顶层选择状态、可能触及结果限制分类、窗口筛选、候选去重、转录批次拆分、transcript reconciliation 及 stdin JSON 入口已有离线实现。helper 的每作者数量设置只限制本地候选选择，不是 Actor `resultsLimit` 或费用上限。存在一条用户提供的第二 Skill 单账号真实运行报告，但原始 run 输出未独立核实；因此该报告不等于全面集成验证。离线测试不证明 Actor 输出、真实批次限制或宿主集成。Profile Posts 的媒体类型值、排序、结果限制语义与完整性仍待验证；全面集成验证未完成，不能据此标为已完成或可发布。
+- **执行状态：** URL/作者/稳定 ID 冲突对账、顶层选择状态、可能触及结果限制分类、窗口筛选、候选去重、转录批次拆分、transcript reconciliation 及 stdin JSON 入口已有离线实现。helper 的每作者数量设置只限制本地候选选择，不是 Actor `resultsLimit` 或费用上限。目前有两次用户提供的第二 Skill 单账号运行报告，日期为 2026-11-07 和 2026-11-08；原始运行输出未由 Codex 独立核实。这些报告不等于全面集成验证。离线测试不证明 Actor 输出、真实批次限制或宿主集成。Profile Posts 的媒体类型值、排序、结果限制语义与完整性仍待验证；全面集成验证未完成，不能据此标为已完成或可发布。
