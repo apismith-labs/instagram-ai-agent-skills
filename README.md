@@ -1,129 +1,85 @@
 # Instagram AI Agent Skills
 
-Use AI agent skills to get spoken-word transcripts from public Instagram Reels and videos. The first available Skill, **Instagram Transcript Extractor**, works with one or more links and can also summarize, translate, or analyze the returned transcript text.
+A collection of independent AI agent Skills for working with public Instagram video content. Each Skill has its own scope and installation path; this repository is not a single Skill that installs every feature automatically.
 
-## Available skill: Instagram Transcript Extractor
+## Choose a Skill
 
-The Skill transcribes speech from accessible videos. Timestamps may be available, and you can ask for summaries, translations, or analysis based on the transcript. It does not analyze video imagery or engagement metrics.
+| Skill | What it does | Distribution status | Start here |
+| --- | --- | --- | --- |
+| **Instagram Transcript Extractor** (`instagram-transcript-extractor`) | Gets spoken-word transcripts from public Instagram Reels and videos. You can request translation, summaries, text-based analysis, or subtitles when the host supports file export and valid timestamps are returned. | The v0.2.0 ZIP Release asset is uploaded and available below. | [Choose a platform below](#availability-and-installation) or inspect the [Skill source](skills/instagram-transcript-extractor/SKILL.md). |
+| **Instagram Creator Reels Insights** (`instagram-creator-reels-insights`) | Discovers recent public videos for a creator and builds source-linked Daily Scan or Weekly Review analysis from their actual transcripts. | Preview/source available; no standalone GitHub Release ZIP is available. Platform-specific installation paths have not yet been confirmed for it. | [Inspect the source](skills/instagram-creator-reels-insights/SKILL.md). |
 
-For ChatGPT or Claude Web, download the [v0.2.0 Skill ZIP](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.0/instagram-transcript-extractor-v0.2.0.zip). Choose this named Release asset, not GitHub's automatically generated **Source code (zip)**, and keep the ZIP intact when uploading it.
+## Availability and installation
 
-## What you need
+Installation instructions below apply only to the named Skill. Installing a Skill and connecting Apify are separate steps.
 
-You need your own [Apify account](https://console.apify.com/) and must connect it to your AI platform. Using the Skill consumes usage from your Apify account's plan allowance; check Apify Console for current usage and billing details. Installing the Skill does not connect or configure Apify—the Skill and account connection are separate setup steps.
+### Instagram Transcript Extractor
 
-## Choose your platform
+The existing platform guides cover this Skill:
 
-| Platform | Setup order |
+| Platform | Installation route in the project guide |
 | --- | --- |
-| [ChatGPT](docs/platforms/chatgpt.md) | Connect Apify → upload the named v0.2.0 ZIP → start a new conversation, select the Apify plugin with **@**, and request a transcript. Skill availability may depend on your account and workspace. |
-| [Codex](docs/platforms/codex.md) | Install the Apify plugin and authorize with OAuth → install the Skill using the documented Codex installer flow → start a new session, confirm discovery, then explicitly invoke it. The guide covers Codex desktop and CLI separately. |
-| [Manus](docs/platforms/manus.md) | Enable the existing Apify Connector and authorize with OAuth → import the Skill folder from GitHub → in chat select it with **/** and confirm the Apify Connector is enabled. Manus tasks using the Connector may consume Manus credits. |
-| [Claude Web, Claude Desktop regular chat, and Claude Code](docs/platforms/claude-web.md) | Set up Apify and upload/enable the Skill in Claude Web. To use it in Claude Desktop regular chat, sign in with the same Claude account; Claude Code has a separate guide. |
-| [OpenClaw](docs/platforms/openclaw.md) | Recommended: install through the OpenClaw Control UI. Alternatives: use the ClawHub CLI or install directly from GitHub with Vercel Skills CLI. A GitHub local-directory install is also documented as a backup. |
+| ChatGPT chat | Upload the named v0.2.0 ZIP; select the Apify plugin when making a request. Skill availability may depend on your account and workspace. See the [ChatGPT guide](docs/platforms/chatgpt.md). The asset is available on the [v0.2.0 Release page](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v0.2.0). |
+| Codex desktop app and Codex CLI | Separate setup guidance is provided for each environment. The installer example uses the Git method and pins source ref v0.1.0, which may not be the latest Release; the exact natural-language flow has not been verified word for word. See the [Codex guide](docs/platforms/codex.md). |
+| Manus | The guide describes importing this Skill folder from GitHub. Tasks using the Apify Connector may consume Manus credits. One project-owner account reported a successful single-Reel task; this is not a general platform guarantee. See the [Manus guide](docs/platforms/manus.md). |
+| Claude Web | Upload the named ZIP and connect Apify as described in the [Claude guide](docs/platforms/claude-web.md). A task using the exact v0.2.0 ZIP has not been confirmed. |
+| Claude Desktop regular chat | The guide describes using the same account as Claude Web; the reported account saw the Skill and Apify connection there. See the [Claude guide](docs/platforms/claude-web.md). |
+| Claude Code | The primary path is syncing a Skill from your Claude.ai account; local ZIP installation is an alternative. This project has not tested a Claude Code installation or transcript task. See the [Claude guide](docs/platforms/claude-web.md). |
+| OpenClaw | The guide describes Control UI, ClawHub CLI, and GitHub source installation routes. GitHub/local installation and visibility have been reported, but a successful Skill task through the plugin has not been confirmed. See the [OpenClaw guide](docs/platforms/openclaw.md). |
 
-### OpenClaw: install directly from GitHub with Skills CLI
+The uploaded [Instagram Transcript Extractor v0.2.0 ZIP](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.0/instagram-transcript-extractor-v0.2.0.zip) is available from the [v0.2.0 Release page](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v0.2.0). Do not substitute GitHub's automatically generated **Source code (zip)** for the Skill package.
 
-The [Vercel Skills CLI](https://skills.sh/docs/cli) installs this Skill directly from GitHub. It requires [Node.js 22.20.0 or later](https://github.com/vercel-labs/skills#install-a-skill). Run it in the same environment as your OpenClaw Gateway and from that Gateway's actual workspace.
+### Instagram Creator Reels Insights — Preview
 
-First check the workspace:
+There is **no Release ZIP** for this Skill at present. Platforms that require an uploaded ZIP or Release artifact therefore do not have a downloadable package for it. Existing platform guides specify installation paths for Transcript Extractor and do not yet confirm a corresponding Creator Reels Insights installation path. This does not mean that a platform is inherently incompatible; its installation route simply remains unconfirmed here.
 
-```bash
-openclaw config get agents.defaults.workspace
-```
+Technical users can inspect the [Creator Reels Insights source directory](skills/instagram-creator-reels-insights/) or its [`SKILL.md`](skills/instagram-creator-reels-insights/SKILL.md). These are source links, not a packaged download or an installation instruction.
 
-If the command prints a path, use that workspace. If it says the runtime default applies, it has not printed a resolved path; confirm your Gateway's actual workspace before continuing. The example below uses `~/.openclaw/workspace`, which was the project owner's workspace in their test environment. Replace it with your own workspace path if different. See OpenClaw's [config guide](https://docs.openclaw.ai/cli/config) for how unset settings are reported.
+## Setup requirements
 
-```bash
-cd ~/.openclaw/workspace
-npx skills add apismith-labs/instagram-ai-agent-skills \
-  --skill instagram-transcript-extractor \
-  -a openclaw
-```
-
-When prompted for the installation scope, choose **Project**.
-
-The CLI may offer to install `find-skills`, an optional search helper. You can skip it; it is not needed to install this Skill. After installation, check the Skill for the `main` agent:
-
-```bash
-openclaw skills check --agent main
-```
-
-Start a new session and select the Skill with `$instagram-transcript-extractor`. Direct installation from GitHub does not depend on the Skill appearing in the skills.sh search directory. See the [OpenClaw guide](docs/platforms/openclaw.md) for Apify setup and the other installation options.
-
-## Try a request
-
-After completing setup and selecting or activating the Skill as described in your platform guide, replace the example with a real public Instagram link:
-
-```text
-Get the transcript of this public Instagram Reel and give me a short summary:
-https://www.instagram.com/reel/REPLACE_WITH_A_REAL_LINK/
-```
+Both Skills use Apify Actors. You need an Apify account and a connection supported by your chosen host. Follow the matching platform guide for the Transcript Extractor; Creator Reels Insights does not yet have a confirmed platform installation guide. Review actual usage in [Apify Console](https://console.apify.com/); usage follows your account and the Actors' current billing rules. No fixed fee or fee cap is promised here.
 
 ## Copy-ready prompts
 
-OpenClaw and Codex use `$instagram-transcript-extractor` for explicit invocation; other platforms use the method in their guide. Replace every bracketed placeholder and remove unused URL list lines before sending a prompt.
+Replace each placeholder with a public Instagram URL or creator username that you want to use.
 
-### Transcript and translation
+### Instagram Transcript Extractor
 
-```text
-Use Instagram Transcript Extractor for this public Instagram Reel:
-[PUBLIC_INSTAGRAM_REEL_URL]
-
-Return the transcript in the language actually returned, followed by a faithful, natural translation into [TARGET_LANGUAGE, e.g., Korean]. Keep the original transcript and translation clearly separate. Include timestamps only if valid timestamps were actually returned. Do not invent missing words or timestamps.
-```
-
-### Subtitle file
+**Transcribe and summarize one Reel**
 
 ```text
-Use Instagram Transcript Extractor for this public Instagram Reel:
-[PUBLIC_INSTAGRAM_REEL_URL]
-
-Prepare [SRT or VTT] subtitles in [SUBTITLE_LANGUAGE, e.g., Korean]. Use the transcript and valid timestamps actually returned. If timing information is unavailable or invalid, say so; do not invent timings. Create a downloadable file only if this platform supports file export. Otherwise provide the complete subtitle text for me to copy. Label the subtitle language. The subtitle file or text is generated from the transcript; it is not supplied as a file by the transcript service.
+Use Instagram Transcript Extractor on this public Instagram Reel. Return the transcript actually provided, then give me a short summary in [SUMMARY_LANGUAGE]. Include timestamps only if they were returned. Do not invent transcript text or timestamps.
+[PUBLIC_REEL_URL]
 ```
 
-### Single-video insight analysis
+**Compare multiple transcripts**
 
 ```text
-Use Instagram Transcript Extractor for this public Instagram Reel:
-[PUBLIC_INSTAGRAM_REEL_URL]
-
-Base your analysis on the transcript actually returned. Identify the hook/opening, core idea, content structure and supporting points, call to action, likely target audience, and reusable presentation or topic angles. Separate transcript-supported facts from your interpretations. Do not infer views, likes, or other performance data that was not returned.
+Use Instagram Transcript Extractor on exactly these public Instagram links only if this host and connected tool support this batch. For each input, show the original URL, status, and actual transcript. Match results by URL, never by return order. Then compare the hooks, core points, and content structure using only returned transcript text. Do not invent transcripts, timestamps, or engagement data; flag missing or uncertain results.
+[PUBLIC_REEL_URL_1]
+[PUBLIC_REEL_URL_2]
 ```
 
-### Batch competitor-content comparison
+### Instagram Creator Reels Insights
+
+**Weekly review for one creator**
 
 ```text
-Use Instagram Transcript Extractor to process these URLs as one batch only if the connected processing tool accepts this input and it fits my account and platform limits. Report each URL separately:
-- [PUBLIC_INSTAGRAM_URL_1]
-- [PUBLIC_INSTAGRAM_URL_2]
-- [ADD_MORE_PUBLIC_INSTAGRAM_URLS_AS_NEEDED]
-
-For each input, preserve the exact URL and report its processing status. Match results by URL, never by result order. In a table, compare each video's hook, topic, core idea, call to action, and reusable presentation choices, then summarize shared themes and differences. Clearly flag failures, uncertain matches, and incomplete transcripts. Do not invent views, likes, comments, or other data. Do not add links or retry automatically.
+Use Instagram Creator Reels Insights for [CREATOR_USERNAME]. Review the most recent 7 days and process up to [VIDEO_LIMIT] eligible videos for this creator. Analyze only transcripts actually returned. Summarize recurring topics, hooks, and speaking structures with links to the source posts and short transcript evidence. Report partial or unknown coverage; do not claim a complete scan or infer that no videos exist from an empty result.
 ```
 
-### Batch translation and subtitles
+**Transcript-based content ideas**
 
 ```text
-Use Instagram Transcript Extractor to process these URLs as one batch only if the connected processing tool accepts this input and it fits my account and platform limits. Use the same target language for every URL and report each separately:
-- [PUBLIC_INSTAGRAM_URL_1]
-- [PUBLIC_INSTAGRAM_URL_2]
-- [ADD_MORE_PUBLIC_INSTAGRAM_URLS_AS_NEEDED]
-
-For each URL, preserve the exact input and report its own processing status, transcript in the language actually returned, translation into [TARGET_LANGUAGE, e.g., Korean], and subtitle text in [SRT or VTT] format in that target language. Match results by URL, never by result order. Use only valid timestamps; do not invent timings. If this platform supports file export, create a separate file for each video with a filename that identifies its URL. Otherwise provide copyable subtitle text. List failed or uncertain matches separately. Do not guess or retry automatically.
+For [CREATOR_USERNAME], review the most recent 7 days using Instagram Creator Reels Insights and process up to [VIDEO_LIMIT] eligible videos. Based only on the transcripts actually returned, suggest a few content ideas and explain which transcript evidence inspired each one. Separate evidence from interpretation, link the source posts, and disclose partial or unknown coverage. Do not infer visuals, invent transcript text, or claim a complete scan.
 ```
 
-## What to expect
+## Scope and limitations
 
-Not every link will return a complete transcript. Some links may be private, deleted, restricted, or otherwise inaccessible, and videos without detectable speech may not produce a transcript. A batch may include both successful and failed links. Timestamps appear only when available; missing timestamps alone do not mean transcription failed. Summaries, translations, and analysis are based on the transcript, not video imagery, views, or audience response. Downloadable subtitle files depend on the host's export features; the subtitle text can still be provided for copying.
+- Transcript Extractor analyzes returned speech text. It does not analyze video imagery, editing, audience response, or unreturned engagement metrics. Timestamps, subtitle files, and batch processing depend on the returned data and host capabilities.
+- Creator Reels Insights is a preview. Its reports depend on videos and transcripts actually returned; discovery coverage may be `partial` or `unknown`. A successful transcript match does not prove that the Dataset was fully read. Results do not establish a complete account scan, trends beyond the reviewed sample, or multi-account behavior.
+- Neither Skill bypasses private, deleted, restricted, or otherwise inaccessible content. Do not provide Instagram passwords, cookies, or session credentials in chat.
 
-Questions or problems? [Open a GitHub issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues). This project is licensed under the [MIT License](LICENSE).
+## Help and license
 
-## Project documentation and maintenance
-
-- [User guide index](docs/README.md)
-- [Platform evidence matrix](docs/platform-support.md)
-- [Detailed test status](docs/test-status.md)
-- [Project architecture](docs/project-architecture.md)
-
-The project currently provides one Skill, Instagram Transcript Extractor, which supports summaries, translations, and analysis based on returned transcript text. Separate Skills for Reels analysis, competitor research, creator analysis, and comment analysis remain future ideas. For maintainers, `skills/instagram-transcript-extractor/` is the distribution source and `.agents/skills/instagram-transcript-extractor/` is a separate Codex project discovery copy that does not sync automatically. See the [architecture guide](docs/project-architecture.md) for maintenance details.
+Questions or problems? [Open a GitHub issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues). Read the [Instagram Transcript Extractor user guide](docs/skills/instagram-transcript-extractor.md). This project is licensed under the [MIT License](LICENSE).
