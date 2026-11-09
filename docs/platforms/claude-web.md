@@ -43,6 +43,10 @@ The ZIP upload steps are documented, but this project has not confirmed end-to-e
 
 Claude Desktop regular chat is separate from Claude Code. If the Skill or Connector is not available in Desktop, complete setup in Claude Web and check the account signed in to Desktop.
 
+## Use Creator Reels Insights in Claude Desktop regular chat
+
+Enable Instagram Creator Reels Insights in Claude Web, then sign in to Claude Desktop with the same Claude account. In a regular chat, select `instagram-creator-reels-insights` from the available Skills controls and enable the Apify Web Connector. The project has not confirmed the full Creator report workflow in Claude Desktop.
+
 ## Claude Code
 
 The Claude Code instructions below apply to Instagram Transcript Extractor. Claude Code is a separate coding environment, not regular chat in Claude Desktop. The steps follow Anthropic's documented Skill and connector setup; this project has not tested a Claude Code installation or transcript task.
@@ -59,6 +63,10 @@ PUBLIC_INSTAGRAM_URL
 4. Anthropic documents that connectors added in Claude Web are available in Claude Code when you are signed in with a `claude.ai` account. Run `/mcp` to check the connector list. Skill or Connector visibility alone does not confirm that a transcript task will work.
 
 See Anthropic's [Skills guide](https://code.claude.com/docs/en/skills) and [MCP guide](https://code.claude.com/docs/en/mcp) for current details.
+
+### Creator Reels Insights in Claude Code
+
+The account-sync route applies to a Skill enabled in Claude Web when Claude Code is signed into the same `claude.ai` account. For a local installation instead, use the top-level `instagram-creator-reels-insights/` directory from the [Creator Reels Insights v1.0.1 ZIP](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.1/instagram-creator-reels-insights-v1.0.1.zip) in the personal skills directory documented above. After installation, use `/skills` to check visibility and invoke the displayed slash command. The project has not confirmed this Creator installation path or its full task workflow in Claude Code.
 
 ## Copyable requests for Claude Web and Desktop chat
 

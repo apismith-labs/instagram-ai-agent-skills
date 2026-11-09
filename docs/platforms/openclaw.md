@@ -54,11 +54,13 @@ Apify is a separate prerequisite for both Skills. The [Apify OpenClaw plugin REA
 openclaw plugins install @apify/apify-openclaw-plugin
 ```
 
+Restart the OpenClaw Gateway after installing the plugin, as directed by the [official plugin README](https://github.com/apify/apify-openclaw-plugin#install).
+
 Follow the plugin's [setup instructions](https://github.com/apify/apify-openclaw-plugin) to connect your Apify account securely. Never paste an API key, password, cookie, or other credential into chat. If the Apify tool is unavailable to your Agent, review OpenClaw's tool permissions and allow the plugin as needed without replacing existing settings.
 
 ## Instagram Transcript Extractor
 
-Instagram Transcript Extractor is separately available on [ClawHub](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) as version **1.0.0**. Its GitHub [v0.2.1 ZIP package](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.1/instagram-transcript-extractor-v0.2.1.zip) is a separate distribution method for platforms that support Skill package uploads; it is not an OpenClaw installation route. Before installing from ClawHub, confirm the publisher is `apismith-labs` and review the [Skill's security audit](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor/security-audit).
+Instagram Transcript Extractor is separately available on [ClawHub](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) as version **1.0.1**. Its GitHub [v0.2.1 ZIP package](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.1/instagram-transcript-extractor-v0.2.1.zip) is a separate distribution method for platforms that support Skill package uploads; it is not an OpenClaw installation route. Before installing from ClawHub, confirm the publisher is `apismith-labs` and review the [Skill's security audit](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor/security-audit).
 
 For Transcript Extractor, choose one source: Control UI, OpenClaw CLI from ClawHub, Vercel Skills CLI from GitHub, or the local repository directory. Do not install multiple copies of the same Skill, which can create duplicate entries or version confusion.
 

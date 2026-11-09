@@ -1,4 +1,4 @@
-# Use Instagram Transcript Extractor in Codex
+# Use Instagram Skills in Codex
 
 Codex in the ChatGPT desktop app and Codex CLI are separate environments. Follow the matching setup section below for your Codex version.
 
@@ -16,13 +16,13 @@ Follow Apify's [Codex CLI guide](https://docs.apify.com/integrations/codex-cli).
 
 ## Install the Skill
 
-The following installation request is based on a reported successful use of the installer's Git method and a `v0.1.0` source ref. The `$skill-installer` must be available in your Codex environment, and the public GitHub repository must be reachable; its Git method requires Git. The installer supports multiple fetch methods; the request below explicitly selects the Git method. This project has not tested the installer's default method. The exact natural-language request and complete journey in each Codex environment have not been verified verbatim. The installation path is separate from the Apify plugin setup above.
+The Codex Skill Installer documents GitHub URLs in the form `tree/<ref>/<path>` and uses `main` as the default ref. The examples below use `main` and each Skill's own folder. `main` follows repository changes; it is a source branch, not either Skill's GitHub ZIP or ClawHub version. A `v0.1.0` ref points to older repository source. This project has not confirmed whether the Transcript Extractor `v0.2.1` tag contains matching source for both Skills, so these instructions do not use it as a fixed ref. The `$skill-installer` must be available in your Codex environment, and the public GitHub repository must be reachable; its Git method requires Git. The exact natural-language request and complete journey in each Codex environment have not been verified verbatim. The installation path is separate from the Apify plugin setup above.
 
 In a Codex session where `$skill-installer` is available, you can ask:
 
 ```text
 Use $skill-installer to install the skill at
-https://github.com/apismith-labs/instagram-ai-agent-skills/tree/v0.1.0/skills/instagram-transcript-extractor
+https://github.com/apismith-labs/instagram-ai-agent-skills/tree/main/skills/instagram-transcript-extractor
 using the Git method. Use ~/.agents/skills/ as the destination skills folder;
 the installed skill should be ~/.agents/skills/instagram-transcript-extractor/.
 If that destination already exists, stop and tell me; do not overwrite it.
@@ -30,7 +30,7 @@ If that destination already exists, stop and tell me; do not overwrite it.
 
 If `$skill-installer` is not available in your Codex environment, do not substitute an unverified manual installation process. [Open a GitHub issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues) with your Codex version and environment (desktop app or CLI); do not include credentials or other private information. This project has not verified an alternative installation method.
 
-This pins the installation example to `v0.1.0`; it may not be the latest release. If `~/.agents/skills/instagram-transcript-extractor/` already exists, inspect that installation and stop before reinstalling. Do not overwrite it or guess at an update/removal procedure. The exact request above has not been tested word for word, and installer behavior can vary by Codex environment.
+This example follows the repository's `main` branch and can change as that branch changes. If `~/.agents/skills/instagram-transcript-extractor/` already exists, inspect that installation and stop before reinstalling. Do not overwrite it or guess at an update/removal procedure. The exact request above has not been tested word for word, and installer behavior can vary by Codex environment.
 
 After installation, start a new Codex session and explicitly check that the Skill is discovered:
 
@@ -40,6 +40,20 @@ instagram-transcript-extractor skill. Do not run an Actor yet.
 ```
 
 Success means the new session identifies the Skill by the name `instagram-transcript-extractor`. If Codex cannot find it, check the requested installation directory and confirm that `SKILL.md` is present; do not treat the installation as usable until discovery succeeds. If it remains unavailable, [open a GitHub issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues).
+
+## Install Creator Reels Insights
+
+Creator Reels Insights is a separate Skill with its own source directory. In a Codex session where `$skill-installer` is available, use the same Git installation method documented above, but point it to the Creator directory and a matching destination:
+
+```text
+Use $skill-installer to install the skill at
+https://github.com/apismith-labs/instagram-ai-agent-skills/tree/main/skills/instagram-creator-reels-insights
+using the Git method. Use ~/.agents/skills/ as the destination skills folder;
+the installed skill should be ~/.agents/skills/instagram-creator-reels-insights/.
+If that destination already exists, stop and tell me; do not overwrite it.
+```
+
+Start a new Codex session and check that `instagram-creator-reels-insights` is discovered before using it. For an example Creator request, see the [README prompts](../../README.md#instagram-creator-reels-insights-prompts). The Creator task workflow has not been confirmed in Codex. If `$skill-installer` is unavailable, do not substitute an unverified manual installation process; [open a GitHub issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues).
 
 ## Request a transcript
 

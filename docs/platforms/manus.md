@@ -1,6 +1,6 @@
-# Use Instagram Transcript Extractor in Manus
+# Use Instagram Skills in Manus
 
-This guide explains how to connect Apify, import Instagram Transcript Extractor from GitHub, and use it in Manus. Connector access and results can vary by account and request.
+This guide explains how to connect Apify and import either Instagram Transcript Extractor or Instagram Creator Reels Insights from its own GitHub folder. Connector access and results can vary by account and request; the two Skills have separate paths and task scopes.
 
 ## Before you start
 
@@ -34,7 +34,23 @@ https://www.instagram.com/reels/REPLACE_WITH_A_REAL_LINK/
 
 The result depends on the requested public link and the connected tools. A restricted or inaccessible post, or a video without detectable speech, may not yield a transcript. Review the status shown for each requested link; do not assume that success for one link establishes batch behavior or results for other accounts.
 
-### Official references
+## Use Creator Reels Insights
+
+Creator Reels Insights is a separate Skill. After enabling the Apify Connector as described above, import this Skill from its own GitHub folder:
+
+```text
+https://github.com/apismith-labs/instagram-ai-agent-skills/tree/main/skills/instagram-creator-reels-insights
+```
+
+Use the same **Skills → + Add → Import from GitHub** flow described in step 2, but choose the Creator folder URL above, not the Transcript Extractor folder. Confirm that `instagram-creator-reels-insights` appears in your personal Skill list and is enabled. In a conversation, type `/` and select that Skill. The Creator report workflow has not been confirmed in Manus.
+
+For a single-account weekly review, replace the placeholder with a public creator username:
+
+```text
+Use instagram-creator-reels-insights to review [CREATOR_USERNAME] for the most recent 7 days. Analyze only posts and transcripts actually returned, include source links, and separate observations from interpretation. If results are partial or unknown, say they may be incomplete; do not imply that unreturned posts were reviewed.
+```
+
+## Official references
 
 - [Apify integration with Manus](https://docs.apify.com/integrations/manus)
 - [Manus: share, import, and use Skills](https://help.manus.im/en/articles/14753565-how-to-share-and-use-skills-in-manus)
