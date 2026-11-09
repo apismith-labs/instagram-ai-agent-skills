@@ -3,7 +3,7 @@
 This guide helps you choose between two Instagram Skills and find their platform setup instructions:
 
 - [Instagram Transcript Extractor](skills/instagram-transcript-extractor.md) retrieves speech transcripts from public Instagram videos and supports transcript-based summaries, translations, and analysis.
-- [Instagram Creator Reels Insights](platforms/openclaw.md#instagram-creator-reels-insights) is available on ClawHub v1.0.1 for OpenClaw and as the separate GitHub v1.0.1 ZIP for upload platforms. Use the ZIP for the Skill you want: [ChatGPT upload guide](platforms/chatgpt.md) or [Claude Web guide](platforms/claude-web.md). It creates per-creator Daily Scan or Weekly Review insights from posts and transcripts actually returned.
+- [Instagram Creator Reels Insights](platforms/openclaw.md#instagram-creator-reels-insights) is for recent creator-video insights based on returned posts and transcripts. Find its installation steps in the [ChatGPT guide](platforms/chatgpt.md), [Claude Web guide](platforms/claude-web.md), and [OpenClaw guide](platforms/openclaw.md#instagram-creator-reels-insights). It is available as ClawHub v1.0.1 and the separate GitHub v1.0.1 ZIP; upload the ZIP for the Skill you want to use.
 
 Each Skill has its own installation path. Connecting Apify is a separate setup step from installing a Skill.
 

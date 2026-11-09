@@ -1,5 +1,7 @@
 # Instagram Transcript Extractor
 
+This guide covers Instagram Transcript Extractor only. For Instagram Creator Reels Insights, see the [Creator request examples in the project README](../../README.md#instagram-creator-reels-insights-prompts) and its [SKILL.md](../../skills/instagram-creator-reels-insights/SKILL.md).
+
 Instagram Transcript Extractor is one of two Skills in this project. Give your agent one or more public Instagram Reel, video, or supported video post links to request spoken transcripts. You can also ask for a summary, translation, or analysis based on the returned text.
 
 ## Before using it
