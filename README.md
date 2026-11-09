@@ -14,7 +14,7 @@ Browse the [user guide and platform installation index](docs/README.md) for all 
 **Instagram Creator Reels Insights** (`instagram-creator-reels-insights`) reviews recent public videos and creates source-linked Daily Scan or Weekly Review reports from returned transcripts.
 
 - **Available:** [GitHub ZIP v1.0.1](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.1/instagram-creator-reels-insights-v1.0.1.zip) · [ClawHub 1.0.1](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights)
-- **Start here:** [Platform instructions](#install-by-platform) · [Creator installation entry](#instagram-creator-reels-insights) · [User guide](docs/README.md) · [Copy-ready examples](#instagram-creator-reels-insights-prompts)
+- **Start here:** [Platform instructions](#install-by-platform) · [Creator installation entry](#instagram-creator-reels-insights) · [User guide](docs/skills/instagram-creator-reels-insights.md) · [Copy-ready examples](#instagram-creator-reels-insights-prompts)
 
 ## Install by platform
 
@@ -136,4 +136,4 @@ For [CREATOR_1], [CREATOR_2], and [CREATOR_3], review the most recent 7 days usi
 
 ## Help and license
 
-Questions or problems? [Open a GitHub issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues). The [Instagram Transcript Extractor user guide](docs/skills/instagram-transcript-extractor.md) covers that Skill only. Creator Reels Insights users can start with the [Creator prompt examples](#instagram-creator-reels-insights-prompts) or inspect its [SKILL.md](skills/instagram-creator-reels-insights/SKILL.md). The repository and GitHub ZIP packages are licensed under [MIT](LICENSE); the ClawHub copies of both Skills are listed under [MIT-0](https://spdx.org/licenses/MIT-0.html).
+Questions or problems? [Open a GitHub issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues). The [Instagram Transcript Extractor user guide](docs/skills/instagram-transcript-extractor.md) covers that Skill only. Creator Reels Insights users can start with its [user guide](docs/skills/instagram-creator-reels-insights.md), browse the [Creator prompt examples](#instagram-creator-reels-insights-prompts), or inspect its [SKILL.md](skills/instagram-creator-reels-insights/SKILL.md). The repository and GitHub ZIP packages are licensed under [MIT](LICENSE); the ClawHub copies of both Skills are listed under [MIT-0](https://spdx.org/licenses/MIT-0.html).
