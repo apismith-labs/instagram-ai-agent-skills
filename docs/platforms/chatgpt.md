@@ -1,10 +1,10 @@
-# Use Instagram Transcript Extractor in ChatGPT
+# Use Instagram Skills in ChatGPT
 
 ## Before you start
 
 You need your own [Apify account](https://console.apify.com/). Actor runs use the allowance and billing terms of that account; the [Apify Console](https://console.apify.com/) shows current Runs and billing details.
 
-ChatGPT Skills availability depends on account, workspace, and product availability. OpenAI's [Skills in ChatGPT guide](https://help.openai.com/en/articles/20001066-skills-in-chatgpt) currently documents Skills for eligible Business, Enterprise, Healthcare, and Edu users, but availability may vary. The project owner reported seeing the Skills page on a Plus account; that does not confirm Plus availability for everyone.
+ChatGPT Skills availability depends on account, workspace, and product availability. OpenAI's [Skills in ChatGPT guide](https://help.openai.com/en/articles/20001066-skills-in-chatgpt) currently documents Skills for eligible Business, Enterprise, Healthcare, and Edu users. Check your account and workspace if the Skills page or upload option is unavailable.
 
 ## 1. Connect and authorize Apify
 
@@ -18,7 +18,7 @@ Apify connection and Skill installation are separate steps. The Apify connection
 
 These steps follow the current [OpenAI custom MCP server guide](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt). The interface and account/workspace permissions can change. OpenAI's current documentation says custom MCP server creation is available on ChatGPT web for Business and Enterprise/Edu, with workspace roles controlling who may create or publish connections. Business workspace creation is limited to admins and owners; Enterprise/Edu admins may grant selected members permission to create connections, while only admins or owners publish workspace apps. Personal plugin installation is not the same as publishing to a workspace. Plus custom MCP creation rights are not confirmed by this project. If the option is missing, check your plan and workspace permissions and ask your workspace administrator if needed.
 
-## 2. Upload the Skill
+## 2. Upload a Skill package
 
 Download `instagram-transcript-extractor-v0.2.0.zip` from the [v0.2.0 Release asset](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.0/instagram-transcript-extractor-v0.2.0.zip), or open the [v0.2.0 Release page](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v0.2.0) and choose that named file under **Assets**. Do not download GitHub's automatically generated **Source code (zip)**. Optional SHA-256 check:
 
@@ -26,17 +26,21 @@ Download `instagram-transcript-extractor-v0.2.0.zip` from the [v0.2.0 Release as
 f24a832b50fde38cfe328f27bf3ad54030edd0959d2e8172ad2a7b00add0bcf0
 ```
 
-Keep the downloaded ZIP intact; do not unzip it before upload. In ChatGPT, open **Plugins → Skills → Create → Upload from your computer**, then select `instagram-transcript-extractor-v0.2.0.zip`. Wait for the upload scan. The Skill may become **Available**, show **Needs Review**, or show **Blocked**:
+Keep the downloaded ZIP intact; do not unzip it before upload. In ChatGPT, open **Plugins → Plugin Directory → Skills → Create → Upload from your computer**, then select `instagram-transcript-extractor-v0.2.0.zip`. Wait for the upload scan. The Skill may become **Available**, show **Needs Review**, or show **Blocked**:
 
 - **Available:** continue to a new conversation.
 - **Needs Review:** read the displayed prompt and follow the review step before using it.
 - **Blocked:** the Skill cannot be used in that state. The scan status alone does not show that the ZIP is damaged. Avoid repeatedly uploading the same ZIP. Note the release version and scan message, then [open a GitHub issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues) for help. Do not include credentials or personal sensitive information.
 
-## 3. Use it in a new conversation
+### Upload Creator Reels Insights
+
+Download the named GitHub Release asset [`instagram-creator-reels-insights-v1.0.0.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.0/instagram-creator-reels-insights-v1.0.0.zip), not GitHub's automatically generated **Source code (zip)**. Keep it intact. In ChatGPT, use **Plugins → Plugin Directory → Skills → Create → Upload from your computer** and select this ZIP. Check the upload scan: it may be **Available**, **Needs Review**, or **Blocked**, as described above. Using the Creator report workflow through ChatGPT and Apify has not been confirmed in this project.
+
+## 3. Use a Skill in a new conversation
 
 Start a new conversation. In the message box, type **@** and select the installed Apify plugin. The connection may apply per message, so select it again in a later message if that message needs new Apify data.
 
-After uploading the Skill, name **Instagram Transcript Extractor** in your task request, as in the example below. This guide does not assume a separate Skill-selection control in ChatGPT.
+After uploading the Skill you need, select the Apify plugin with **@** and name the Skill in your request. This guide does not assume a separate Skill-selection control in ChatGPT.
 
 For example, replace the sample URL with a real public Instagram Reel or supported video post link:
 
@@ -44,6 +48,16 @@ For example, replace the sample URL with a real public Instagram Reel or support
 Use Instagram Transcript Extractor to get the transcript of this public Instagram Reel:
 https://www.instagram.com/reel/REPLACE_WITH_A_REAL_LINK/
 ```
+
+### Creator Reels Insights
+
+For a multi-creator review, use this request:
+
+```text
+Use Instagram Creator Reels Insights to review [CREATOR_1] and [CREATOR_2] for the most recent 7 days. Give each creator a separate section. Base findings only on transcripts actually returned and link each finding to its source post. Compare creators only where the returned transcripts support it. If results are partial or unknown, explain that they may be incomplete; do not treat no returned posts as proof that no posts were published.
+```
+
+Analyze only content returned through your connected tools.
 
 ## Copyable requests
 
@@ -93,5 +107,3 @@ Transcribe each video and give each link its own short summary. Keep the videos 
 Based only on the transcript of this video, identify its hook, core insight, CTA, and content cues. Include timestamps only where valid timestamp segments were returned. Do not analyze visuals, engagement metrics, or audience response.
 PUBLIC_INSTAGRAM_URL_1
 ```
-
-The project has separate reports of Skill upload and ChatGPT transcript tasks; the task report's uploaded version is not confirmed as the v0.1.0 ZIP. A transcript task using that Release ZIP together with Apify authorization is not verified. See the [test status](../test-status.md) for the evidence boundaries.
