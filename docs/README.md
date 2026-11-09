@@ -1,6 +1,11 @@
 # User guide
 
-This guide helps you choose a platform and start with the available [Instagram Transcript Extractor](skills/instagram-transcript-extractor.md). It remains the only validated, available skill. Instagram Creator Reels Insights has an in-development source; its Actor output contract and host integration are not verified, so do not install or run it as a supported feature. Other ideas are listed in the [project README](../README.md), not as installable features.
+This guide helps you choose between two Instagram Skills and find their platform setup instructions:
+
+- [Instagram Transcript Extractor](skills/instagram-transcript-extractor.md) retrieves speech transcripts from public Instagram videos and supports transcript-based summaries, translations, and analysis.
+- [Instagram Creator Reels Insights](platforms/openclaw.md#instagram-creator-reels-insights) is available on ClawHub for OpenClaw and creates Daily Scan or Weekly Review insights from posts and transcripts actually returned.
+
+Each Skill has its own installation path. Connecting Apify is a separate setup step from installing a Skill.
 
 ## The common setup flow
 
@@ -12,17 +17,17 @@ flowchart LR
     D --> E[Start a new conversation and use it]
 ```
 
-In words: choose ChatGPT, Codex, Manus, Claude Web, Claude Desktop regular chat, Claude Code, or OpenClaw; create or sign in to your own Apify account; connect Apify and install or enable the Instagram Transcript Extractor Skill as needed for that environment; then start a conversation and request a transcript. Some clients reuse account-level setup. Follow the platform-specific guide because setup steps differ by environment.
+In words: choose a platform and Skill; create or sign in to your own Apify account; connect Apify and install or enable that Skill as supported in the environment; then start a conversation and make a request. Some clients reuse account-level setup. Follow the platform-specific guide because setup steps differ by environment.
 
-The Apify plugin/MCP connection provides access to external Apify tools and account authorization. The Skill provides instructions for the transcript task. Installing the Skill does not connect Apify, and connecting Apify does not install the Skill.
+The Apify plugin/MCP connection provides access to external Apify tools and account authorization. Each Skill provides instructions for its own task workflow. Installing a Skill does not connect Apify, and connecting Apify does not install a Skill.
 
 ## Choose a guide
 
 - [ChatGPT](platforms/chatgpt.md): connect and authorize Apify first, then upload the Skill ZIP.
 - [Codex](platforms/codex.md): separate instructions for the Codex desktop app and Codex CLI, followed by the Skill installation and discovery check.
 - [Manus](platforms/manus.md): enable the Apify Connector, import the Skill from GitHub, and select it in chat.
-- [Claude Web, Claude Desktop regular chat, and Claude Code](platforms/claude-web.md): set up Apify and upload the Skill in Claude Web, use the same account in Claude Desktop regular chat (one single-Reel call is reported successful), or follow the separate, untested Claude Code workflow.
-- [OpenClaw](platforms/openclaw.md): the Control UI search/add route is recommended, with ClawHub CLI as an alternative and the project-owner-reported GitHub local-directory `--global` install as a backup. UI and ClawHub-native CLI installs are untested on the owner's Gateway; Actor runs remain untested.
+- [Claude Web, Claude Desktop regular chat, and Claude Code](platforms/claude-web.md): set up Apify and upload the Skill in Claude Web, use the same account in Claude Desktop regular chat, or follow the separate Claude Code setup instructions.
+- [OpenClaw](platforms/openclaw.md): install Instagram Creator Reels Insights 1.0.0 from ClawHub; this route and its full task flow are not yet confirmed in the project's Gateway. The same guide has separate ClawHub, GitHub, and local-directory installation instructions for Instagram Transcript Extractor.
 - [Instagram Transcript Extractor](skills/instagram-transcript-extractor.md): what to request, what a result means, and common limitations.
 
-These guides distinguish published platform instructions from this project's test evidence. See the [platform evidence matrix](platform-support.md) and [detailed test status](test-status.md) for what has and has not been tested.
+Follow each platform guide for the Skill-specific setup steps. Installation and Apify authorization are separate.

@@ -1,102 +1,120 @@
-# Use Instagram Transcript Extractor in OpenClaw
+# Instagram Skills in OpenClaw
 
-This guide covers the existing cross-platform Instagram Transcript Extractor Skill with the Apify OpenClaw plugin. It does not provide a separate OpenClaw-specific Skill. The project owner reports it is published on [ClawHub](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) as `@apismith-labs/instagram-transcript-extractor`, version 1.0.0. Before installing, review the [security audit page](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor/security-audit) for its listed findings and separate static-analysis result.
+This guide covers Instagram Creator Reels Insights and Instagram Transcript Extractor. Install the Skill you need, then connect the Apify plugin separately using [Set up the Apify plugin](#set-up-the-apify-plugin).
 
-## Find and add it in the Control UI (recommended)
+## Instagram Creator Reels Insights
 
-In OpenClaw Control UI, open **Plugins → Skills**. Select the target Agent first; the Skills manager and its inline ClawHub search are scoped to that Agent. Search for `instagram-transcript-extractor`. The official [Skills guide](https://docs.openclaw.ai/skills) describes adding a Skill from ClawHub, and the [Control UI settings guide](https://docs.openclaw.ai/web/control-ui/settings) documents the per-Agent Skills manager and search.
+Use this Skill to review public creator videos through their returned transcripts and identify topics, opening hooks, and speaking structures. Daily Scan covers the most recent 24 hours; Weekly Review covers the most recent 7 days.
 
-Before adding it, confirm the publisher is `apismith-labs`, review the currently listed version, and inspect the audit page's listed findings and separate static-analysis result. Then use the ClawHub add flow presented by the UI; this guide does not assume a particular detail-page button. After adding it, run `openclaw skills check --agent main` in the Gateway's CLI, then start a new session and type `$instagram-transcript-extractor` to select the Skill. Picker availability does not establish a successful Skill invocation.
-
-The project owner reports being able to search for and see this Skill in the OpenClaw Skills page after publication; a screenshot showed `openclaw-managed`, `eligible`, and `Enabled`, with a path under `~/.openclaw/skills/`. That path and display do not establish whether the Skill was installed through the UI, ClawHub CLI, or local-directory CLI. Control UI search/add has not been explicitly tested on the owner's Gateway.
-
-## Install from ClawHub CLI (alternative)
-
-Run these commands in the same environment that runs your OpenClaw Gateway. If the `openclaw` CLI is not on your PATH, replace `openclaw` with the full path to your CLI executable.
-
-For a shared Gateway or use across agents, install to OpenClaw's shared managed Skill directory:
+The Skill is published on [ClawHub](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) as version **1.0.0**. The OpenClaw CLI documents this ClawHub install command:
 
 ```sh
-openclaw skills install @apismith-labs/instagram-transcript-extractor --global
-openclaw skills check --agent main
+openclaw skills install @apismith-labs/instagram-creator-reels-insights
 ```
 
-Without `--global`, OpenClaw installs into the current workspace's `skills/` directory instead. The [Skills CLI documentation](https://docs.openclaw.ai/cli/skills) describes these targets and commands. After installation, run `openclaw skills check --agent main` and review the selected Agent's readiness and visibility. The CLI describes these as distinct inventory, readiness, and visibility states; exact status labels can vary. Then start a new session and type `$instagram-transcript-extractor` in the input box to select the Skill. The ClawHub-native install command has not been tested on the project owner's Gateway.
+By default, the OpenClaw CLI installs into the active workspace's `skills/` directory. Add `--global` to use the shared managed Skills directory:
 
-Installing the Skill does not set up Apify. The Apify plugin and its API key are separate prerequisites; see [Set up the Apify plugin](#set-up-the-apify-plugin). Do not paste an API key into chat or documentation.
+```sh
+openclaw skills install @apismith-labs/instagram-creator-reels-insights --global
+```
 
-## Install from GitHub with Vercel Skills CLI (alternative; owner-reported Project-scope tested)
+After installation, check the default Agent's readiness and visibility:
 
-The [Vercel Skills CLI](https://skills.sh/docs/cli) installs directly from the GitHub repository. It requires [Node.js 22.20.0 or later](https://github.com/vercel-labs/skills#install-a-skill). Run the command in the same machine, container, or VM environment that runs the OpenClaw Gateway, from the Gateway's active workspace.
+```sh
+openclaw skills check
+```
 
-Check the workspace before installing:
+To check a specific Agent, use `openclaw skills check --agent YOUR_AGENT_ID`, replacing `YOUR_AGENT_ID` with its ID; if you do not know the ID, omit `--agent`. Then open a new session and select `$instagram-creator-reels-insights`.
+
+The command follows the [OpenClaw Skills CLI documentation](https://docs.openclaw.ai/cli/skills). The ClawHub installation itself and an end-to-end task using this route have not yet been confirmed in this project's Gateway environment.
+
+If the Skill is not listed, confirm you are checking the same Gateway where it was installed. You can inspect the active workspace setting with:
 
 ```sh
 openclaw config get agents.defaults.workspace
 ```
 
-The project owner reports that this returned the workspace path represented as `~/.openclaw/workspace` in the tested environment. OpenClaw's [config documentation](https://docs.openclaw.ai/cli/config) says a valid but unset workspace setting may report that the runtime default applies instead of printing the resolved path. If the command prints a path, use it. If it reports that the runtime default applies or you use a custom workspace, confirm the effective workspace for your Gateway before continuing. Do not assume the config command always prints the final path.
+If the command reports that the runtime default applies instead of printing a path, use the runtime default; do not treat an undisplayed path as a fixed location. Also confirm that the install went to the active workspace or shared managed directory. If it still does not appear, [report the issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues).
 
-For the project owner's reported test environment, run:
+Connect the Apify plugin separately as described in [Set up the Apify plugin](#set-up-the-apify-plugin). For a single creator, you can ask:
 
-```sh
-cd ~/.openclaw/workspace
-npx skills add apismith-labs/instagram-ai-agent-skills \
-  --skill instagram-transcript-extractor \
-  -a openclaw
+```text
+$instagram-creator-reels-insights Review [CREATOR_USERNAME] for the most recent 7 days, processing up to [VIDEO_LIMIT] eligible videos. Analyze only the posts and transcripts actually returned. Summarize topics, hooks, speaking structures, and CTAs with source links and short transcript evidence. Separate observations from interpretation; do not imply that unreturned posts were reviewed.
 ```
 
-When prompted, select **Project** scope. The project owner reports that the Skill was installed to `~/.openclaw/workspace/skills/instagram-transcript-extractor`. Global scope has not been tested. If the CLI offers to install `find-skills`, that is an optional search helper, not a prerequisite for this Skill.
-
-Then check the `main` Agent and select the Skill in a new session:
-
-```sh
-openclaw skills check --agent main
-```
-
-The project owner reports that the check listed `instagram-transcript-extractor` and `find-skills` as `eligible`, `visible`, and `available as command`; in a new session, the `$instagram-transcript-extractor` picker entry was available. This establishes installation and discoverability only, not successful execution of every task. The owner-scoped command `npx skills find instagram-transcript-extractor --owner apismith-labs` returned no result in this check. That result does not prevent direct GitHub installation and does not establish whether the Skill is or will be listed in the skills.sh search directory.
-
-## Install from a GitHub local directory (backup; owner-reported tested route)
-
-The project owner reports cloning the GitHub repository and installing its local Skill directory with `openclaw skills install <local-path> --global`. The owner reports that `openclaw skills check --agent main` listed it as `eligible`, `visible`, and `available as command`, and that a new session's `$` picker could select it. This is evidence for the local-directory `--global` route only. The default workspace install (without `--global`) has not been tested. Do not install using both this route and ClawHub for the same setup.
-
-OpenClaw loads Skills from multiple configured sources, including the active workspace and the shared managed directory. The [Skills guide](https://docs.openclaw.ai/skills) describes those sources and how ClawHub installation works.
+Reports are based on posts and transcripts returned for the request; they do not guarantee that every post in the period was found. The ClawHub copy is listed under MIT-0; the repository uses MIT.
 
 ## Set up the Apify plugin
 
-The project owner reports manually installing the Apify plugin from the OpenClaw web interface's **Plugins** page. The plugin's [README](https://github.com/apify/apify-openclaw-plugin) documents this CLI alternative:
+Apify is a separate prerequisite for both Skills. The [Apify OpenClaw plugin README](https://github.com/apify/apify-openclaw-plugin) documents this OpenClaw CLI install command:
 
 ```sh
 openclaw plugins install @apify/apify-openclaw-plugin
 ```
 
-The CLI command is documented by the plugin, but was not the method used in the owner's reported installation. Follow the plugin README for any install-specific steps and restart the Gateway if instructed.
+Follow the plugin's [setup instructions](https://github.com/apify/apify-openclaw-plugin) to connect your Apify account securely. Never paste an API key, password, cookie, or other credential into chat. If the Apify tool is unavailable to your Agent, review OpenClaw's tool permissions and allow the plugin as needed without replacing existing settings.
 
-The plugin needs an Apify API key configured through the OpenClaw CLI/plugin configuration. Never paste the key into a chat, Skill file, issue, or other text field. Do not include it in logs or commands that may be saved in shell history. The plugin README documents `openclaw apify setup` as an interactive configuration alternative; this method was not reported as tested by the project owner. The README also says `tools.alsoAllow` can include `apify` to make the tool available to agents. This configuration step has not been tested in this project: inspect the current configuration first, then merge `apify` into the existing `alsoAllow` values if needed. Do not replace an existing list blindly. The project owner reports configuring the key through the CLI and seeing `openclaw apify status` report a successful connection; this is an account-specific report, not a universal guarantee. This guide does not include key setup commands or inspect any credentials.
+## Instagram Transcript Extractor
 
-## Discover-only check
+Instagram Transcript Extractor is separately available on [ClawHub](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) as version **1.0.0**. Its GitHub [v0.2.0 ZIP package](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.0/instagram-transcript-extractor-v0.2.0.zip) is a separate distribution method for platforms that support Skill package uploads; it is not an OpenClaw installation route. Before installing from ClawHub, confirm the publisher is `apismith-labs` and review the [Skill's security audit](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor/security-audit).
 
-This request asks only for Actor discovery/schema information; it must not start an Actor:
+For Transcript Extractor, choose one source: Control UI, OpenClaw CLI from ClawHub, Vercel Skills CLI from GitHub, or the local repository directory. Do not install multiple copies of the same Skill, which can create duplicate entries or version confusion.
 
-```text
-Use Instagram Transcript Extractor in OpenClaw. Use the Apify plugin's apify tool with the discover action to look up the Actor apple_yang~instagram-transcripts-scraper and retrieve its current input schema. Do not use start or collect and do not run an Actor.
+In the project Gateway, GitHub-source and local-directory installation have been reported to make this Skill visible to the Agent, but do not confirm a completed transcript task through Apify. Control UI and ClawHub CLI installation have not been confirmed there.
+
+### Install from the Control UI
+
+In OpenClaw Control UI, open **Plugins → Skills** and select the Agent that will use the Skill. Search for `instagram-transcript-extractor`, confirm the publisher, review the security audit linked above, and add it using the UI's ClawHub flow. Then check the Gateway and select `$instagram-transcript-extractor` in a new session.
+
+### Install with the OpenClaw CLI from ClawHub
+
+Run this command in the environment connected to your OpenClaw Gateway:
+
+```sh
+openclaw skills install @apismith-labs/instagram-transcript-extractor
 ```
 
-The project owner reports that the Gateway was running, its connectivity check was OK, `/health` returned a live status, the Apify plugin connection status succeeded, and an Actor `discover` query succeeded. The available report does not independently establish that this `discover` query was executed through the plugin's `apify` tool, so treat it as a reported discovery result, not an independently verified plugin tool call.
+This installs into the active workspace's `skills/` directory. Add `--global` to install into the shared managed Skills directory:
 
-## Request a transcript
-
-After the Skill and Apify plugin are available, start a new session, type `$` and select `instagram-transcript-extractor`, then replace the placeholder with a public Instagram link:
-
-```text
-$instagram-transcript-extractor Get the original-language transcript for this public Instagram Reel. Include only timestamps actually returned; do not invent them.
-PUBLIC_INSTAGRAM_URL
+```sh
+openclaw skills install @apismith-labs/instagram-transcript-extractor --global
 ```
 
-This request asks OpenClaw to start an Apify Actor run and collect its result. It may use the connected Apify account. The plugin uses its `apify` tool and `discover` → `start` → `collect` flow; it is not an Apify MCP `call-actor`/`get-dataset-items` flow. Before any start, the Skill must obtain the current Actor schema and form input from it. If the plugin tool, authentication, Actor, or schema is unavailable or unclear, stop and report the issue; do not switch to shell, direct REST calls, another Actor, or another URL. Do not automatically retry.
+Then run `openclaw skills check` (or `openclaw skills check --agent YOUR_AGENT_ID`) and select `$instagram-transcript-extractor` in a new session. See the [OpenClaw Skills CLI documentation](https://docs.openclaw.ai/cli/skills) for install and check options.
 
-The plugin's `collect` pagination/completeness evidence has not been verified for this Skill. If complete dataset reading cannot be established from the returned evidence, matched results must remain provisional/pending. A transcript without timestamps can still be a transcript result; never invent timestamps. Batch completeness and subtitle file creation have not been tested in OpenClaw.
+### Install from GitHub source with Vercel Skills CLI
 
-## Evidence boundary
+The [Vercel Skills CLI](https://skills.sh/docs/cli) can install the Skill from this repository. It requires [Node.js 22.20.0 or later](https://github.com/vercel-labs/skills#install-a-skill). Run from the active OpenClaw workspace on the same machine or container as the Gateway:
 
-Gateway health, plugin connection status, Actor discovery, actual transcript extraction, and batch completeness are separate stages. Only the first status checks and a reported `discover` query are currently documented for OpenClaw; the `apify` tool-call trace for that query is not independently confirmed. `start`, `collect`, a real transcript, batch completeness, and subtitle export remain untested.
+```sh
+npx skills add apismith-labs/instagram-ai-agent-skills \
+  --skill instagram-transcript-extractor \
+  -a openclaw
+```
+
+When prompted, choose **Project** scope. Then run `openclaw skills check` and select the Skill in a new session. This is a GitHub source installation route; do not confuse it with the v0.2.0 ZIP package or the ClawHub listing.
+
+### Install from a local repository directory
+
+If you have cloned this repository, run the following from its root to install the Skill into the shared managed directory:
+
+```sh
+openclaw skills install ./skills/instagram-transcript-extractor --global
+```
+
+For an active-workspace installation, omit `--global`. After installation, run `openclaw skills check` and select the Skill in a new session.
+
+### Request a transcript
+
+Connect the Apify plugin, start a new session, and select `$instagram-transcript-extractor`. Replace the placeholder with a public Instagram Reel or video URL:
+
+```text
+$instagram-transcript-extractor Get the transcript actually returned for this public Instagram Reel. Include timestamps only if they are returned; do not invent transcript text or timestamps.
+[PUBLIC_INSTAGRAM_URL]
+```
+
+The Skill analyzes returned speech text; it does not establish what appears in the video. A transcript match means the returned transcript was matched to the submitted URL, not that every result page or post was retrieved. If the host cannot provide reliable results or the transcript is incomplete, report that limitation accurately.
+
+## Further help
+
+For OpenClaw command options, see the [Skills CLI documentation](https://docs.openclaw.ai/cli/skills). For installation or visibility problems with this project, [open a GitHub issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues).

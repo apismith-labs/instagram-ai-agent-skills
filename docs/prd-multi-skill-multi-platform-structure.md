@@ -14,13 +14,13 @@ This PRD defines repository organization and user-facing project documentation. 
 
 ## 2. Product context
 
-**Status note (2026-11-06):** This structure PRD records the repository state and sequencing decision as of 2026-10-28. The project owner has since approved development of Instagram Creator Reels Insights under the current [v0.8 PRD](instagram-creator-reels-insights-prd-v0.8.md). The second Skill has an in-development source and Codex mirror, but its Actor output contract and host integration remain unverified; it is not a validated or publishable capability. This note supersedes the former sequencing prohibition below without changing this document's repository-structure requirements.
+**Historical status note (2026-11-06):** This structure PRD records the repository state and sequencing decision as of 2026-10-28. At the time of this status note, Instagram Creator Reels Insights had an in-development source and Codex mirror; its Actor output contract and host integration were described as unverified, so it was then characterized as not validated or publishable. See the [project README](../README.md) for current distribution status. This note supersedes the former sequencing prohibition below without changing this document's repository-structure requirements.
 
 When this document was drafted, the repository contained one implemented skill, `instagram-transcript-extractor`. It accepts public Instagram video links and supports transcript retrieval, with optional summaries, translations, or analysis based on the returned text. The longer-term project is a set of focused skills that may use one or more Apify Actors each.
 
 Potential future skills discussed so far include Instagram Reels Analyzer, Creator Analysis, Competitor Monitor, and comment analysis. These are roadmap candidates only. Their scope, data inputs, and implementation have not been approved as current features.
 
-The sequencing rule above described the project decision at this document's original date. The owner has since authorized a second Skill's development; that does not establish its implementation, host integration, or release readiness as verified.
+The sequencing rule above described the project decision at this document's original date. The owner's later authorization of a second Skill's development did not, by itself, establish its implementation, host integration, or release readiness; see the [project README](../README.md) for current distribution status.
 
 ## 3. Problem statement
 
