@@ -6,7 +6,7 @@ A collection of independent AI agent Skills for working with public Instagram vi
 
 | Skill | What it does | Distribution status | Start here |
 | --- | --- | --- | --- |
-| **Instagram Transcript Extractor** (`instagram-transcript-extractor`) | Gets spoken-word transcripts from public Instagram Reels and videos. You can request translation, summaries, text-based analysis, or subtitles when the host supports file export and valid timestamps are returned. | The GitHub v0.2.0 ZIP and the separate ClawHub 1.0.0 listing are both available. | [Choose a platform below](#install-by-platform), see the [OpenClaw guide](docs/platforms/openclaw.md#instagram-transcript-extractor), or inspect the [Skill source](skills/instagram-transcript-extractor/SKILL.md). |
+| **Instagram Transcript Extractor** (`instagram-transcript-extractor`) | Gets spoken-word transcripts from public Instagram Reels and videos. You can request translation, summaries, text-based analysis, or subtitles when the host supports file export and valid timestamps are returned. | The GitHub v0.2.1 ZIP and the separate ClawHub 1.0.0 listing are both available. | [Choose a platform below](#install-by-platform), see the [OpenClaw guide](docs/platforms/openclaw.md#instagram-transcript-extractor), or inspect the [Skill source](skills/instagram-transcript-extractor/SKILL.md). |
 | **Instagram Creator Reels Insights** (`instagram-creator-reels-insights`) | Reviews recent public videos for one or more creators and builds source-linked Daily Scan or Weekly Review reports from returned transcripts. | ClawHub v1.0.1 is public. A separate GitHub v1.0.1 ZIP is available for platforms that accept Skill uploads. | [ClawHub page](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) · [v1.0.1 ZIP package](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.1/instagram-creator-reels-insights-v1.0.1.zip) · [OpenClaw install guide](docs/platforms/openclaw.md#instagram-creator-reels-insights). |
 
 ## Install by platform
@@ -21,7 +21,7 @@ Skill availability depends on your ChatGPT plan and workspace; see the [ChatGPT 
 
 | Skill | Package |
 | --- | --- |
-| Instagram Transcript Extractor | [instagram-transcript-extractor-v0.2.0.zip](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.0/instagram-transcript-extractor-v0.2.0.zip) · GitHub v0.2.0 |
+| Instagram Transcript Extractor | [instagram-transcript-extractor-v0.2.1.zip](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.1/instagram-transcript-extractor-v0.2.1.zip) · GitHub v0.2.1 |
 | Instagram Creator Reels Insights | [instagram-creator-reels-insights-v1.0.1.zip](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.1/instagram-creator-reels-insights-v1.0.1.zip) · GitHub v1.0.1 |
 
 ### Claude Web
@@ -30,7 +30,7 @@ In Claude Web, connect the Apify Web Connector and complete OAuth, then upload t
 
 | Skill | Package |
 | --- | --- |
-| Instagram Transcript Extractor | [instagram-transcript-extractor-v0.2.0.zip](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.0/instagram-transcript-extractor-v0.2.0.zip) · GitHub v0.2.0 |
+| Instagram Transcript Extractor | [instagram-transcript-extractor-v0.2.1.zip](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.1/instagram-transcript-extractor-v0.2.1.zip) · GitHub v0.2.1 |
 | Instagram Creator Reels Insights | [instagram-creator-reels-insights-v1.0.1.zip](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.1/instagram-creator-reels-insights-v1.0.1.zip) · GitHub v1.0.1 |
 
 ### OpenClaw

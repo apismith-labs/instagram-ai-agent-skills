@@ -58,7 +58,7 @@ Follow the plugin's [setup instructions](https://github.com/apify/apify-openclaw
 
 ## Instagram Transcript Extractor
 
-Instagram Transcript Extractor is separately available on [ClawHub](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) as version **1.0.0**. Its GitHub [v0.2.0 ZIP package](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.0/instagram-transcript-extractor-v0.2.0.zip) is a separate distribution method for platforms that support Skill package uploads; it is not an OpenClaw installation route. Before installing from ClawHub, confirm the publisher is `apismith-labs` and review the [Skill's security audit](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor/security-audit).
+Instagram Transcript Extractor is separately available on [ClawHub](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) as version **1.0.0**. Its GitHub [v0.2.1 ZIP package](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.1/instagram-transcript-extractor-v0.2.1.zip) is a separate distribution method for platforms that support Skill package uploads; it is not an OpenClaw installation route. Before installing from ClawHub, confirm the publisher is `apismith-labs` and review the [Skill's security audit](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor/security-audit).
 
 For Transcript Extractor, choose one source: Control UI, OpenClaw CLI from ClawHub, Vercel Skills CLI from GitHub, or the local repository directory. Do not install multiple copies of the same Skill, which can create duplicate entries or version confusion.
 
@@ -94,7 +94,7 @@ npx skills add apismith-labs/instagram-ai-agent-skills \
   -a openclaw
 ```
 
-When prompted, choose **Project** scope. Then run `openclaw skills check` and select the Skill in a new session. This is a GitHub source installation route; do not confuse it with the v0.2.0 ZIP package or the ClawHub listing.
+When prompted, choose **Project** scope. Then run `openclaw skills check` and select the Skill in a new session. This is a GitHub source installation route; do not confuse it with the v0.2.1 ZIP package or the ClawHub listing.
 
 ### Install from a local repository directory
 
