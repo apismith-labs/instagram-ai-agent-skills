@@ -85,6 +85,8 @@ Choose the route for your platform. These install paths do not imply that the fu
 
 Apify connection steps vary by platform: use the [ChatGPT MCP setup](docs/platforms/chatgpt.md#1-connect-and-authorize-apify), [Claude Web setup](docs/platforms/claude-web.md), [Codex setup](docs/platforms/codex.md), or [Manus setup](docs/platforms/manus.md). OpenClaw uses its separately installed [Apify plugin](docs/platforms/openclaw.md#set-up-the-apify-plugin). Never paste credentials into chat. Runs use your Apify account and the Actors' current billing rules. More creators or videos may increase usage; check actual usage in [Apify Console](https://console.apify.com/). No fixed fee or fee cap is promised.
 
+Transcript processing in both Skills uses the [Instagram Transcripts Scraper on Apify](https://apify.com/apple_yang/instagram-transcripts-scraper).
+
 ## Copy-ready prompts
 
 Replace each placeholder with a public Instagram URL or creator username that you want to use.
