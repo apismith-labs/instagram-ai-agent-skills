@@ -7,7 +7,7 @@ A collection of independent AI agent Skills for working with public Instagram vi
 | Skill | What it does | Distribution status | Start here |
 | --- | --- | --- | --- |
 | **Instagram Transcript Extractor** (`instagram-transcript-extractor`) | Gets spoken-word transcripts from public Instagram Reels and videos. You can request translation, summaries, text-based analysis, or subtitles when the host supports file export and valid timestamps are returned. | The GitHub v0.2.0 ZIP and the separate ClawHub 1.0.0 listing are both available. | [Choose a platform below](#availability-and-installation), see the [OpenClaw guide](docs/platforms/openclaw.md#instagram-transcript-extractor), or inspect the [Skill source](skills/instagram-transcript-extractor/SKILL.md). |
-| **Instagram Creator Reels Insights** (`instagram-creator-reels-insights`) | Reviews recent public videos for one or more creators and builds source-linked Daily Scan or Weekly Review reports from returned transcripts. | ClawHub v1.0.1 is public. A separate GitHub v1.0.0 ZIP is available for platforms that accept Skill uploads. | [ClawHub page](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) · [v1.0.0 ZIP package](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.0/instagram-creator-reels-insights-v1.0.0.zip) · [OpenClaw install guide](docs/platforms/openclaw.md#instagram-creator-reels-insights). |
+| **Instagram Creator Reels Insights** (`instagram-creator-reels-insights`) | Reviews recent public videos for one or more creators and builds source-linked Daily Scan or Weekly Review reports from returned transcripts. | ClawHub v1.0.1 is public. A separate GitHub v1.0.1 ZIP is available for platforms that accept Skill uploads. | [ClawHub page](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) · [v1.0.1 ZIP package](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.1/instagram-creator-reels-insights-v1.0.1.zip) · [OpenClaw install guide](docs/platforms/openclaw.md#instagram-creator-reels-insights). |
 
 ## Availability and installation
 
@@ -51,11 +51,11 @@ openclaw skills check
 
 To check a specific Agent, use `openclaw skills check --agent YOUR_AGENT_ID`; omit `--agent` to check the default Agent. Then start a new session and enter `$instagram-creator-reels-insights` to select the Skill.
 
-ClawHub v1.0.1 is public; this ClawHub installation and full task flow have not yet been confirmed in this project's Gateway environment. The GitHub ZIP is a separate v1.0.0 upload package for ChatGPT and Claude Web. You can inspect the [source directory](skills/instagram-creator-reels-insights/) or [`SKILL.md`](skills/instagram-creator-reels-insights/SKILL.md).
+ClawHub v1.0.1 is public; this ClawHub installation and full task flow have not yet been confirmed in this project's Gateway environment. The GitHub ZIP is a separate v1.0.1 upload package for ChatGPT and Claude Web. You can inspect the [source directory](skills/instagram-creator-reels-insights/) or [`SKILL.md`](skills/instagram-creator-reels-insights/SKILL.md).
 
 #### ChatGPT and Claude Web (ZIP upload)
 
-Download the named GitHub Release asset [`instagram-creator-reels-insights-v1.0.0.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.0/instagram-creator-reels-insights-v1.0.0.zip), not GitHub's automatically generated **Source code (zip)**. Upload the ZIP intact using the [ChatGPT guide](docs/platforms/chatgpt.md) or [Claude Web guide](docs/platforms/claude-web.md). This ZIP is for upload platforms, not an OpenClaw installation route.
+Download the named GitHub Release asset [`instagram-creator-reels-insights-v1.0.1.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.1/instagram-creator-reels-insights-v1.0.1.zip), not GitHub's automatically generated **Source code (zip)**. Upload the ZIP intact using the [ChatGPT guide](docs/platforms/chatgpt.md) or [Claude Web guide](docs/platforms/claude-web.md). This ZIP is for upload platforms, not an OpenClaw installation route.
 
 ## Setup requirements
 
