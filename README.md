@@ -14,7 +14,7 @@ Browse the [user guide and platform installation index](docs/README.md) for all 
 **Instagram Creator Reels Insights** (`instagram-creator-reels-insights`) reviews recent public videos and creates source-linked Daily Scan or Weekly Review reports from returned transcripts.
 
 - **Available:** [GitHub ZIP v1.0.1](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.1/instagram-creator-reels-insights-v1.0.1.zip) · [ClawHub 1.0.1](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights)
-- **Start here:** [Platform instructions](#install-by-platform) · [Creator installation entry](#instagram-creator-reels-insights) · [Copy-ready examples](#instagram-creator-reels-insights-prompts)
+- **Start here:** [Platform instructions](#install-by-platform) · [Creator installation entry](#instagram-creator-reels-insights) · [User guide](docs/README.md) · [Copy-ready examples](#instagram-creator-reels-insights-prompts)
 
 ## Install by platform
 
