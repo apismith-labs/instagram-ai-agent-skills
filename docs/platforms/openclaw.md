@@ -6,7 +6,7 @@ This guide covers Instagram Creator Reels Insights and Instagram Transcript Extr
 
 Use this Skill to review one or more public creator accounts through their returned transcripts and identify topics, opening hooks, and speaking structures. Daily Scan covers the most recent 24 hours; Weekly Review covers the most recent 7 days. Reports keep findings separate by creator.
 
-The Skill is available on [ClawHub](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights), version **1.0.1**. The OpenClaw CLI documents this ClawHub install command:
+The Skill is available on [ClawHub](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights), version **1.0.2**. The OpenClaw CLI documents this ClawHub install command:
 
 ```sh
 openclaw skills install @apismith-labs/instagram-creator-reels-insights

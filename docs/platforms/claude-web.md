@@ -8,7 +8,7 @@ You need an Apify account. Actor runs use that account's plan allowance; check t
 
 1. In Claude Web, open **Customize → Connectors**, find the official **Apify Web Connector**, and add it.
 2. Complete the Apify OAuth flow and confirm that the Connector is connected.
-3. Open **Customize → Skills → Add → Upload skill** and upload the ZIP package for the Skill you want to use. For Transcript Extractor, download [`instagram-transcript-extractor-v0.2.1.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.1/instagram-transcript-extractor-v0.2.1.zip); for Creator Reels Insights, download [`instagram-creator-reels-insights-v1.0.1.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.1/instagram-creator-reels-insights-v1.0.1.zip). Do not use GitHub's automatically generated **Source code (zip)**. Keep the ZIP intact, review its preview, and enable that Skill.
+3. Open **Customize → Skills → Add → Upload skill** and upload the ZIP package for the Skill you want to use. For Transcript Extractor, download [`instagram-transcript-extractor-v0.2.1.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.1/instagram-transcript-extractor-v0.2.1.zip); for Creator Reels Insights, download [`instagram-creator-reels-insights-v1.0.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip). Do not use GitHub's automatically generated **Source code (zip)**. Keep the ZIP intact, review its preview, and enable that Skill.
 
 Connecting Apify provides access to external Apify tools; uploading a Skill provides that Skill's workflow instructions. They are separate setup steps, and both are needed to use a Skill with Apify.
 
@@ -66,7 +66,7 @@ See Anthropic's [Skills guide](https://code.claude.com/docs/en/skills) and [MCP 
 
 ### Creator Reels Insights in Claude Code
 
-The account-sync route applies to a Skill enabled in Claude Web when Claude Code is signed into the same `claude.ai` account. For a local installation instead, use the top-level `instagram-creator-reels-insights/` directory from the [Creator Reels Insights v1.0.1 ZIP](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.1/instagram-creator-reels-insights-v1.0.1.zip) in the personal skills directory documented above. After installation, use `/skills` to check visibility and invoke the displayed slash command. The project has not confirmed this Creator installation path or its full task workflow in Claude Code.
+The account-sync route applies to a Skill enabled in Claude Web when Claude Code is signed into the same `claude.ai` account. For a local installation instead, use the top-level `instagram-creator-reels-insights/` directory from the [Creator Reels Insights v1.0.2 ZIP](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) in the personal skills directory documented above. After installation, use `/skills` to check visibility and invoke the displayed slash command. The project has not confirmed this Creator installation path or its full task workflow in Claude Code.
 
 ## Copyable requests for Claude Web and Desktop chat
 

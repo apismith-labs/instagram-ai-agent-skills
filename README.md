@@ -13,7 +13,7 @@ Browse the [user guide and platform installation index](docs/README.md) for all 
 
 **Instagram Creator Reels Insights** (`instagram-creator-reels-insights`) reviews recent public videos and creates source-linked Daily Scan or Weekly Review reports from returned transcripts.
 
-- **Available:** [GitHub ZIP v1.0.1](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.1/instagram-creator-reels-insights-v1.0.1.zip) · [ClawHub 1.0.1](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights)
+- **Available:** [GitHub ZIP v1.0.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) · [ClawHub 1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights)
 - **Start here:** [Platform instructions](#install-by-platform) · [Creator installation entry](#instagram-creator-reels-insights) · [User guide](docs/skills/instagram-creator-reels-insights.md) · [Copy-ready examples](#instagram-creator-reels-insights-prompts)
 
 ## Install by platform
@@ -27,7 +27,7 @@ For the ChatGPT and Claude Web upload steps below, choose the package for the Sk
 | Skill | GitHub Release ZIP |
 | --- | --- |
 | Instagram Transcript Extractor | [`instagram-transcript-extractor-v0.2.1.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.1/instagram-transcript-extractor-v0.2.1.zip) · [Release v0.2.1](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v0.2.1) |
-| Instagram Creator Reels Insights | [`instagram-creator-reels-insights-v1.0.1.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.1/instagram-creator-reels-insights-v1.0.1.zip) · [Release v1.0.1](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v1.0.1) |
+| Instagram Creator Reels Insights | [`instagram-creator-reels-insights-v1.0.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) · [Release v1.0.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v1.0.2) |
 
 ### ChatGPT
 
@@ -73,13 +73,13 @@ Choose the route for your platform. These install paths do not imply that the fu
 
 | Platform | Creator Reels Insights entry |
 | --- | --- |
-| ChatGPT | Upload [`instagram-creator-reels-insights-v1.0.1.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.1/instagram-creator-reels-insights-v1.0.1.zip) using the [ChatGPT steps](#chatgpt). |
-| Claude Web | Upload [`instagram-creator-reels-insights-v1.0.1.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.1/instagram-creator-reels-insights-v1.0.1.zip) using [Creator steps](docs/platforms/claude-web.md#use-creator-reels-insights-in-claude-web). |
-| OpenClaw | ClawHub 1.0.1: [`@apismith-labs/instagram-creator-reels-insights`](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) · `openclaw skills install @apismith-labs/instagram-creator-reels-insights`. [Details](docs/platforms/openclaw.md#instagram-creator-reels-insights). |
+| ChatGPT | Upload [`instagram-creator-reels-insights-v1.0.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) using the [ChatGPT steps](#chatgpt). |
+| Claude Web | Upload [`instagram-creator-reels-insights-v1.0.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) using [Creator steps](docs/platforms/claude-web.md#use-creator-reels-insights-in-claude-web). |
+| OpenClaw | ClawHub 1.0.2: [`@apismith-labs/instagram-creator-reels-insights`](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) · `openclaw skills install @apismith-labs/instagram-creator-reels-insights`. [Details](docs/platforms/openclaw.md#instagram-creator-reels-insights). |
 | Codex desktop app / CLI | Use the separate GitHub [`skills/instagram-creator-reels-insights`](https://github.com/apismith-labs/instagram-ai-agent-skills/tree/main/skills/instagram-creator-reels-insights) folder with [Creator install instructions](docs/platforms/codex.md#install-creator-reels-insights). |
 | Manus | Import the separate GitHub folder [`skills/instagram-creator-reels-insights`](https://github.com/apismith-labs/instagram-ai-agent-skills/tree/main/skills/instagram-creator-reels-insights) using [Creator import instructions](docs/platforms/manus.md#use-creator-reels-insights). The report workflow is not confirmed in Manus. |
 | Claude Desktop regular chat | Enable Creator in Claude Web, sign in to Desktop with the same account, and select `instagram-creator-reels-insights`; the report workflow is not confirmed there. See [Creator Desktop steps](docs/platforms/claude-web.md#use-creator-reels-insights-in-claude-desktop-regular-chat). |
-| Claude Code | Same-account sync or extract the top-level folder from the [v1.0.1 ZIP](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.1/instagram-creator-reels-insights-v1.0.1.zip); see [Creator Claude Code steps](docs/platforms/claude-web.md#creator-reels-insights-in-claude-code). Installation and task flow are not confirmed there. |
+| Claude Code | Same-account sync or extract the top-level folder from the [v1.0.2 ZIP](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip); see [Creator Claude Code steps](docs/platforms/claude-web.md#creator-reels-insights-in-claude-code). Installation and task flow are not confirmed there. |
 
 ## Connect Apify and check usage
 

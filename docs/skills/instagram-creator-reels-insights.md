@@ -18,7 +18,7 @@ Choose your platform's setup guide:
 
 An installation route or visible Skill does not by itself mean that the complete report workflow has been verified on that platform. See the [Creator-specific installation table](../../README.md#instagram-creator-reels-insights) for the current route and distribution details.
 
-The GitHub [ZIP v1.0.1](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.1/instagram-creator-reels-insights-v1.0.1.zip) and the separate [ClawHub listing v1.0.1](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) are different distribution channels. Use the ZIP only with a platform route that supports it; OpenClaw uses the ClawHub route.
+The GitHub [ZIP v1.0.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) and the separate [ClawHub listing v1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) are different distribution channels. Use the ZIP only with a platform route that supports it; OpenClaw uses the ClawHub route.
 
 ## What to ask
 

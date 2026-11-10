@@ -34,7 +34,13 @@ Keep the downloaded ZIP intact; do not unzip it before upload. In ChatGPT, open 
 
 ### Upload Creator Reels Insights
 
-Download the named GitHub Release asset [`instagram-creator-reels-insights-v1.0.1.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.1/instagram-creator-reels-insights-v1.0.1.zip), not GitHub's automatically generated **Source code (zip)**. Keep it intact. In ChatGPT, use **Plugins → Plugin Directory → Skills → Create → Upload from your computer** and select this ZIP. Check the upload scan: it may be **Available**, **Needs Review**, or **Blocked**, as described above. Using the Creator report workflow through ChatGPT and Apify has not been confirmed in this project.
+Download the named GitHub Release asset [`instagram-creator-reels-insights-v1.0.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip), not GitHub's automatically generated **Source code (zip)**. Keep it intact. In ChatGPT, use **Plugins → Plugin Directory → Skills → Create → Upload from your computer** and select this ZIP. Check the upload scan: it may be **Available**, **Needs Review**, or **Blocked**, as described above. Using the Creator report workflow through ChatGPT and Apify has not been confirmed in this project.
+
+Optional SHA-256 for the Creator Reels Insights v1.0.2 ZIP:
+
+```text
+714de0c189e915f8555d055e54fb88f8796f030f2b3be6c031acb0525306b99b
+```
 
 ## 3. Use a Skill in a new conversation
 
