@@ -36,7 +36,7 @@ openclaw config get agents.defaults.workspace
 
 If the command reports that the runtime default applies instead of printing a path, use the runtime default; do not treat an undisplayed path as a fixed location. Also confirm that the install went to the active workspace or shared managed directory. If it still does not appear, [report the issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues).
 
-Connect the Apify plugin separately as described in [Set up the Apify plugin](#set-up-the-apify-plugin). For a multi-creator weekly review, you can ask:
+Before your first Creator report, complete the shared Apify setup below. After setup, start a new session or refresh the available tools, then select Creator Reels Insights. For a multi-creator weekly review, you can ask:
 
 ```text
 $instagram-creator-reels-insights Review these public creator accounts for the most recent 7 days: [CREATOR_1], [CREATOR_2], and [CREATOR_3]. Process up to [VIDEO_LIMIT] eligible videos per creator. Give each creator a separate summary, then compare topics, hooks, speaking structures, and CTAs only where the returned transcripts support it. Link each insight to its source post and short transcript evidence. Separate observations from interpretation. If results are partial or unknown, explain that they may be incomplete. Do not say no posts were made just because none were returned, and do not imply unreturned posts were reviewed.
@@ -48,15 +48,23 @@ Reports are based on posts and transcripts returned for the request; they do not
 
 ## Set up the Apify plugin
 
-Apify is a separate prerequisite for both Skills. The [Apify OpenClaw plugin README](https://github.com/apify/apify-openclaw-plugin) documents this OpenClaw CLI install command:
+Apify is a separate prerequisite for both Skills. If you do not have an Apify account, [create one in the Apify Console](https://console.apify.com/sign-up). Choose one way to install the Apify OpenClaw plugin:
+
+- Run the OpenClaw CLI command:
 
 ```sh
 openclaw plugins install @apify/apify-openclaw-plugin
 ```
 
-Restart the OpenClaw Gateway after installing the plugin, as directed by the [official plugin README](https://github.com/apify/apify-openclaw-plugin#install).
+- Or, if your OpenClaw Control UI shows the plugin catalog, open **Plugins**, search for **Apify**, and install the Apify listing from ClawHub. If it is not available there, use the CLI command above.
 
-Follow the plugin's [setup instructions](https://github.com/apify/apify-openclaw-plugin) to connect your Apify account securely. Never paste an API key, password, cookie, or other credential into chat. If the Apify tool is unavailable to your Agent, review OpenClaw's tool permissions and allow the plugin as needed without replacing existing settings.
+Restart the OpenClaw Gateway after installing the plugin, as directed by the [official plugin README](https://github.com/apify/apify-openclaw-plugin#install). First, prepare an Apify API Key. The [official plugin README](https://github.com/apify/apify-openclaw-plugin) explains how to create and configure it. Then run the plugin's setup wizard and follow its prompts to connect your account:
+
+```sh
+openclaw apify setup
+```
+
+The plugin supports providing an API Key through its configuration or the `APIFY_API_KEY` environment variable; prefer the setup wizard where possible. Never send an API Key, password, cookie, or other credential in chat or commit it to the repository. See the [official plugin README](https://github.com/apify/apify-openclaw-plugin) for the wizard and other supported configuration options. After setup, start a new OpenClaw session or refresh the available tools. If the Apify tool is still unavailable to your Agent, review OpenClaw's tool permissions and allow the plugin as needed without replacing existing settings.
 
 ## Instagram Transcript Extractor
 
