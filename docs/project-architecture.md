@@ -1,5 +1,7 @@
 # Project architecture
 
+**阶段状态（2026-11-10）：** 第三个 Skill `Instagram Media Links & Post Insights` 已进入实现阶段，详见[专属 PRD](instagram-media-links-and-post-insights-prd.md)。运行时验证与独立验收仍待完成；在完成前，不可标为已验证、可发布或已发布。本架构快照中其他历史状态按其记录日期理解。
+
 Instagram AI Agent Skills is one project containing independently maintained skills. The repository root is the project catalog and onboarding entry point; it is not itself an installable skill. Instagram Transcript Extractor is the first implemented and separately validated skill. At the time this architecture snapshot was written (2026-11-06), Instagram Creator Reels Insights was described as in development and not validated or publishable. See the [project README](../README.md) for its current distribution status. Its offline helper validates account and per-creator video-count settings, constructs time windows, selects candidates and coverage states, splits transcript batches, and reconciles results. It has no report-budget planner or run-option readback logic. Profile Posts public output field names/types are documented, while media type values, result semantics/order, and completeness remain unverified. Other Reels analysis, competitor research, and comment-analysis ideas remain unimplemented.
 
 Host-specific observations, including dated Codex live tool inventories and their limits, belong in [interface verification](interface-verification.md); a missing tool in one session does not characterize every Codex setup or local plugin/cache configuration.

@@ -2,21 +2,24 @@
 
 ## Before you start
 
-You need your own [Apify account](https://console.apify.com/). Actor runs use the allowance and billing terms of that account; the [Apify Console](https://console.apify.com/) shows current Runs and billing details.
+You need your own [Apify account](https://console.apify.com/). Actor runs use the allowance and billing terms of that account; the [Apify Console](https://console.apify.com/) shows current Runs and billing details. One Apify MCP connection can be shared by multiple Skills; you do not create a separate connection for each Skill.
 
 ChatGPT Skills availability depends on account, workspace, and product availability. OpenAI's [Skills in ChatGPT guide](https://help.openai.com/en/articles/20001066-skills-in-chatgpt) currently documents Skills for eligible Business, Enterprise, Healthcare, and Edu users. Check your account and workspace if the Skills page or upload option is unavailable.
 
-## 1. Connect and authorize Apify
+## 1. Add and authorize the Apify MCP connection
 
-Apify connection and Skill installation are separate steps. The Apify connection gives ChatGPT access to external Apify tools; the Skill supplies the transcript workflow.
+Apify connection and Skill installation are separate steps. The Apify connection gives ChatGPT access to external Apify tools; each Skill supplies its own task workflow.
 
 1. In ChatGPT, open **Plugins → + → Add custom MCP server**.
-2. Enter a name such as `Apify` and set the Server URL to `https://mcp.apify.com`.
-3. Choose **OAuth** in the authentication options and complete the Apify authorization.
-4. Review the risk notice and continue. Choose **Create as a plugin**.
-5. Review the discovered tools and metadata, then install the generated plugin.
+2. Set **Name** to `Apify MCP` and **Server URL** to `https://mcp.apify.com`.
+3. Choose **OAuth**, complete Apify authorization, and review the requested access.
+4. Review and acknowledge ChatGPT's risk notice, then choose **Create as a plugin**.
+5. Inspect the tools ChatGPT discovers. The actual tools vary by account, workspace, and current product state.
+6. Install the generated Apify MCP plugin/App in ChatGPT.
 
-These steps follow the current [OpenAI custom MCP server guide](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt). The interface and account/workspace permissions can change. OpenAI's current documentation says custom MCP server creation is available on ChatGPT web for Business and Enterprise/Edu, with workspace roles controlling who may create or publish connections. Business workspace creation is limited to admins and owners; Enterprise/Edu admins may grant selected members permission to create connections, while only admins or owners publish workspace apps. Personal plugin installation is not the same as publishing to a workspace. Plus custom MCP creation rights are not confirmed by this project. If the option is missing, check your plan and workspace permissions and ask your workspace administrator if needed.
+Before a task, confirm the current connection exposes the target Actor call, its live input schema, run-status information, and a way to read the Actor's Dataset results. Do not assume every account or workspace has the same tool list. If a required capability is missing, do not start the task through a different Actor or authentication route.
+
+These steps follow the current [OpenAI custom MCP server guide](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt) and [Apify MCP guide](https://docs.apify.com/mcp), which recommends hosted OAuth for remote connections. OpenAI's public documentation currently lists full custom MCP support for ChatGPT Business and Enterprise/Edu; Business creation is limited to admins and owners, while Enterprise/Edu admins can grant selected members permission to create connections. The same OpenAI guide says Pro users can connect custom MCP servers with read/fetch permissions. The public [Skills guide](https://help.openai.com/en/articles/20001066-skills-in-chatgpt) separately lists eligible Business, Enterprise, Healthcare, and Edu users, subject to workspace settings and product availability. This project has observed one successful custom Apify MCP connection and third-Skill task on its owner's ChatGPT Plus account under the product state at test time. That account-level observation differs from the plans explicitly listed in public documentation; it does not establish general Plus availability or override plan, workspace, region, administrator, or product-rollout restrictions. If the option is unavailable, check current account/workspace access and the official guides; do not assume every Plus account has the same capability.
 
 ## 2. Upload a Skill package
 
@@ -44,9 +47,13 @@ Optional SHA-256 for the Creator Reels Insights v1.0.2 ZIP:
 
 ## 3. Use a Skill in a new conversation
 
-Start a new conversation. In the message box, type **@** and select the installed Apify plugin. The connection may apply per message, so select it again in a later message if that message needs new Apify data.
+After installing the generated plugin/App and the Skill you need:
 
-After uploading the Skill you need, select the Apify plugin with **@** and name the Skill in your request. This guide does not assume a separate Skill-selection control in ChatGPT.
+1. Start a new chat.
+2. In the message box, type **@** and select `Apify MCP`.
+3. Name the Skill you want to use in your request.
+
+The connection may apply per message, so select it on messages that need new Apify data. Skill installation and MCP connection are separate steps; do not create a separate Apify MCP connection for each Skill. This guide does not assume a separate Skill-selection control in ChatGPT.
 
 For example, replace the sample URL with a real public Instagram Reel or supported video post link:
 
@@ -67,7 +74,7 @@ Analyze only content returned through your connected tools.
 
 ## Copyable requests
 
-Replace every placeholder shown, including each `PUBLIC_INSTAGRAM_URL` and `[TARGET_LANGUAGE]`, with an accessible public Instagram link or your target language. In a new conversation, select the Apify plugin with **@** and name Instagram Transcript Extractor in your request. These are request examples, not guarantees that every link will succeed.
+Replace every placeholder shown, including each `PUBLIC_INSTAGRAM_URL` and `[TARGET_LANGUAGE]`, with an accessible public Instagram link or your target language. In a new chat, type **@** in the message box, select `Apify MCP`, and name Instagram Transcript Extractor in your request. These are request examples, not guarantees that every link will succeed.
 
 **Single transcript**
 

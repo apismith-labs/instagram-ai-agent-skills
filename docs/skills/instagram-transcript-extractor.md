@@ -2,7 +2,7 @@
 
 This guide covers Instagram Transcript Extractor only. For Instagram Creator Reels Insights, start with its [dedicated user guide](instagram-creator-reels-insights.md); you can also see the [Creator request examples in the project README](../../README.md#instagram-creator-reels-insights-prompts) and its [SKILL.md](../../skills/instagram-creator-reels-insights/SKILL.md).
 
-Instagram Transcript Extractor is one of two Skills in this project. Give your agent one or more public Instagram Reel, video, or supported video post links to request spoken transcripts. You can also ask for a summary, translation, or analysis based on the returned text.
+Instagram Transcript Extractor is one of the two currently released Skills in this project. Give your agent one or more public Instagram Reel, video, or supported video post links to request spoken transcripts. You can also ask for a summary, translation, or analysis based on the returned text.
 
 ## Before using it
 
@@ -16,7 +16,7 @@ You need your own Apify account, and Apify must be connected in the platform whe
 
 For OpenClaw, install from the [ClawHub listing](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) with the OpenClaw CLI, use the Control UI, install from GitHub with Vercel Skills CLI, or install from a local repository directory. See the [OpenClaw guide](../platforms/openclaw.md#instagram-transcript-extractor) for steps and the distinct confirmation limits of these routes.
 
-Connecting Apify makes external Apify tools available to the platform. Installing this Skill provides the transcript workflow. They are separate steps.
+Connecting Apify makes external Apify tools available to the platform. Installing this Skill provides the transcript workflow. They are separate steps. In ChatGPT, one authorized `Apify MCP` custom connection can be shared across Skills; follow the [ChatGPT setup guide](../platforms/chatgpt.md#1-add-and-authorize-the-apify-mcp-connection) and confirm the tools available in your account. A separate reported ChatGPT Plus test covered only the third Skill's two-URL success path; it does not verify this Transcript Extractor workflow.
 
 ## What to ask
 

@@ -31,11 +31,11 @@ For the ChatGPT and Claude Web upload steps below, choose the package for the Sk
 
 ### ChatGPT
 
-**Connect Apify:** Add and authorize the Apify custom MCP server using the [ChatGPT connection steps](docs/platforms/chatgpt.md#1-connect-and-authorize-apify). This connects the plugin; it is separate from the Skills ZIP upload page.
+**Connect Apify:** Add and authorize the shared `Apify MCP` custom connection using the [ChatGPT connection steps](docs/platforms/chatgpt.md#1-add-and-authorize-the-apify-mcp-connection). It is separate from the Skills ZIP upload page and can be used by multiple Skills.
 
 **Upload a Skill ZIP:** At **Plugins → Plugin Directory → Skills → Create → Upload from your computer**, upload the named ZIP for the Skill you want. Follow the [ChatGPT upload steps](docs/platforms/chatgpt.md#2-upload-a-skill-package). Keep the ZIP intact; do not select GitHub's automatic **Source code (zip)**. After upload, check the scan result (**Available**, **Needs Review**, or **Blocked**).
 
-In a new conversation, select the Apify plugin with **@** and name the Skill in your request. Skills are documented for eligible ChatGPT Business, Enterprise, Healthcare, and Edu users, subject to workspace settings and product availability; see OpenAI's [Skills in ChatGPT guide](https://help.openai.com/en/articles/20001066-skills-in-chatgpt) and the [project ChatGPT guide](docs/platforms/chatgpt.md).
+In a new chat, type **@** in the message box and select `Apify MCP`, then name the Skill in your request. One connection can serve multiple Skills. Skills are documented for eligible ChatGPT Business, Enterprise, Healthcare, and Edu users, subject to workspace settings and product availability. The public custom MCP guide lists full support for Business and Enterprise/Edu and says Pro can connect custom MCP servers with read/fetch permissions. The project owner has also completed one third-Skill success-path test on a ChatGPT Plus account, which is account-level evidence only and not a general Plus availability guarantee. See OpenAI's [Skills in ChatGPT guide](https://help.openai.com/en/articles/20001066-skills-in-chatgpt), [custom MCP guide](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt), and the [project ChatGPT guide](docs/platforms/chatgpt.md).
 
 Use the [named ZIP package table](#named-github-skill-zips) above to download the GitHub Release ZIP for the Skill you want.
 
@@ -83,7 +83,7 @@ Choose the route for your platform. These install paths do not imply that the fu
 
 ## Connect Apify and check usage
 
-Apify connection steps vary by platform: use the [ChatGPT MCP setup](docs/platforms/chatgpt.md#1-connect-and-authorize-apify), [Claude Web setup](docs/platforms/claude-web.md), [Codex setup](docs/platforms/codex.md), or [Manus setup](docs/platforms/manus.md). OpenClaw uses its separately installed [Apify plugin](docs/platforms/openclaw.md#set-up-the-apify-plugin). Never paste credentials into chat. Runs use your Apify account and the Actors' current billing rules. More creators or videos may increase usage; check actual usage in [Apify Console](https://console.apify.com/). No fixed fee or fee cap is promised.
+Apify connection steps vary by platform: use the [ChatGPT Apify MCP custom-connection setup](docs/platforms/chatgpt.md#1-add-and-authorize-the-apify-mcp-connection), [Claude Web setup](docs/platforms/claude-web.md), [Codex setup](docs/platforms/codex.md), or [Manus setup](docs/platforms/manus.md). In ChatGPT, one Apify MCP connection can be shared by multiple Skills; a Skill install does not create or authorize that connection. OpenClaw uses its separately installed [Apify plugin](docs/platforms/openclaw.md#set-up-the-apify-plugin). Never paste credentials into chat. Runs use your Apify account and the Actors' current billing rules. More creators or videos may increase usage; check actual usage in [Apify Console](https://console.apify.com/). No fixed fee or fee cap is promised.
 
 Transcript processing in both Skills uses the [Instagram Transcripts Scraper on Apify](https://apify.com/apple_yang/instagram-transcripts-scraper).
 

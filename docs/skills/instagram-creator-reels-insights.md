@@ -6,6 +6,8 @@ Instagram Creator Reels Insights reviews recent public Reels for the creator acc
 
 You need your own Apify account and must connect or authorize Apify separately in the platform where you use the Skill. Installing a Skill does not connect Apify. Usage follows your Apify account and current service terms; check the [Apify Console](https://console.apify.com/) for actual usage. No fixed price or fee cap is promised.
 
+In ChatGPT, one authorized `Apify MCP` custom connection can be shared across Skills. Follow the [ChatGPT setup guide](../platforms/chatgpt.md#1-add-and-authorize-the-apify-mcp-connection) and confirm the tools currently exposed in your account. A separate reported ChatGPT Plus test covered only the third Skill's two-URL success path; it does not verify this Creator report workflow.
+
 Choose your platform's setup guide:
 
 - [ChatGPT Creator upload instructions](../platforms/chatgpt.md#upload-creator-reels-insights): the project has not confirmed the Creator report workflow through ChatGPT and Apify.

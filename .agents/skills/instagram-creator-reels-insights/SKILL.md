@@ -36,6 +36,44 @@ Run a Weekly Review for [CREATOR_1], [CREATOR_2], and [CREATOR_3] for the last 7
 Based on the available transcripts from [CREATOR_1], [CREATOR_2], and [CREATOR_3], suggest content angles for [MY_BRAND]. Link observations to source posts and distinguish transcript-supported observations from your suggestions.
 ```
 
+## First-use readiness and host-specific setup
+
+At the first real task request, check the current host's actually exposed Apify tools, live Actor schema, explicit host-visible authorization/readiness status, and the result-reading capability required for the task before promising to begin. If tools or authorization are missing, or readiness cannot be confirmed, stop before any Actor call. Clearly say that no Actor was started and no results were received; do not imply work is underway. An absent tool does not prove that a plugin is uninstalled. Then provide only the matching host guidance below. This is a session-level capability check, not an installer: do not inspect local plugin directories or infer settings. Never install plugins, change configuration, start OAuth, or authorize for the user.
+
+### ChatGPT first-use guidance
+
+Only when the host is explicitly identified as ChatGPT, and the current task must stop because no usable Apify tool is available, authorization is explicitly missing, or readiness cannot be confirmed, present this guidance verbatim. Do not show it when Apify is confirmed ready:
+
+> There's no confirmed usable Apify tool available to me in this ChatGPT session, so I can't start the task. This doesn't necessarily mean the plugin is uninstalled: the connection may be disabled, your Apify account may not be authorized, or this workspace may not expose those tools. I have not started any Actor, and no results were received.
+>
+> To connect Apify in ChatGPT:
+>
+> 1. Open **Plugins → + → Add custom MCP server**.
+> 2. Set **Name** to `Apify MCP` and **Server URL** to `https://mcp.apify.com`.
+> 3. Choose **OAuth** and complete the Apify authorization in the window ChatGPT opens.
+> 4. Review and acknowledge the risk notice, then choose **Create as a plugin**.
+> 5. **Install the generated Apify MCP plugin/App.**
+>
+> Then start a **new chat**, type **@** in the message box, select `Apify MCP`, and name this Skill in your request.
+>
+> Connecting Apify and installing a Skill are two separate steps. One `Apify MCP` connection can be shared by several Skills, so you don't need a separate connection for each one. Never send an Apify API key or any other credential in chat.
+>
+> If you don't have an Apify account, [create one in the Apify Console](https://console.apify.com/sign-up). If the custom MCP option is missing, your plan, workspace policy, admin permission, or product availability may be limiting it — check your account access and the [OpenAI custom MCP guide](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt).
+>
+> After setup, open a new conversation and retry your request. For the full steps, see the [project ChatGPT guide](https://github.com/apismith-labs/instagram-ai-agent-skills/blob/main/docs/platforms/chatgpt.md).
+
+### Other host setup guidance
+
+Show only the instructions for a clearly identified host, and use that host's existing guide:
+
+- **Codex desktop app or CLI:** follow the matching setup path in the [Codex guide](https://github.com/apismith-labs/instagram-ai-agent-skills/blob/main/docs/platforms/codex.md#choose-your-codex-environment-and-connect-apify). Do not use ChatGPT or OpenClaw instructions.
+- **Claude Web, Claude Desktop regular chat, or Claude Code:** these are distinct products. Use the matching section in the [Claude guide](https://github.com/apismith-labs/instagram-ai-agent-skills/blob/main/docs/platforms/claude-web.md); the guide distinguishes Web Connector setup, Desktop account sync, and Code environment setup. If the current Claude product is unclear, ask which one the user uses before giving steps.
+- **Manus:** follow the [Manus Apify Connector guide](https://github.com/apismith-labs/instagram-ai-agent-skills/blob/main/docs/platforms/manus.md#1-enable-apify-and-authorize-access). This is not ChatGPT custom MCP setup.
+- **OpenClaw:** use only the OpenClaw-specific section below, and only when OpenClaw is explicitly identified.
+- **Unknown host:** do not guess or show platform commands. Say Apify must be connected and authorized through that host's supported interface, ask which host the user uses, and stop.
+
+Never infer that an absent tool means a plugin is uninstalled. The Skill cannot inspect local plugin directories, install software, edit host settings, start or complete OAuth, or authorize on the user's behalf. After the user completes setup, have them open a new session or refresh the host's tools, then retry. Do not use shell commands, direct REST/API requests, tokens, cookies, session IDs, or a different Actor to bypass missing tools or authorization.
+
 ## OpenClaw first-time setup
 
 Show the following OpenClaw-specific guidance only when the selected host is OpenClaw and the user makes their first actual request for analysis, and only if the current session has no available Apify tool, the host explicitly reports missing authorization, or the host's available status cannot confirm that Apify is ready. Do not infer that the plugin is uninstalled. If the host is not OpenClaw, do not show OpenClaw commands; direct the user to the matching platform guide.
@@ -62,7 +100,7 @@ After the user completes setup, open a new OpenClaw conversation or refresh avai
 
 ## Before you start
 
-- **Connect Apify in your host.** The Skill uses Apify Actors to read public posts and transcripts. Installing the Skill and connecting Apify are separate steps, and both are needed. Use only tools actually exposed in the current session or explicit connection status from the host. At the first actual analysis request, if Apify is unavailable, the host reports missing authorization, or readiness cannot be confirmed from host-visible status, stop without starting an Actor. If the host cannot expose connection status, say it cannot be confirmed; do not infer it from Skill metadata. For OpenClaw, show the setup guidance above only when the host is identified as OpenClaw; for other hosts, direct the user to that platform's guide without showing OpenClaw commands. Do not install plugins or change host configuration automatically. After the user configures Apify, ask them to start a new session or refresh available tools and retry the request.
+- **Connect Apify in your host.** The Skill uses Apify Actors to read public posts and transcripts. Installing the Skill and connecting Apify are separate steps, and both are needed. Use only tools actually exposed in the current session or explicit connection status from the host. At the first actual analysis request, if Apify is unavailable, the host reports missing authorization, or readiness cannot be confirmed from host-visible status, stop without starting an Actor. Tell the user that no Actor was started and no results were received; explain what readiness condition could not be confirmed. If the host cannot expose connection status, say it cannot be confirmed; do not infer it from Skill metadata. For OpenClaw, show the setup guidance above only when the host is identified as OpenClaw; for other hosts, use only the matching platform-specific guidance in the first-use section, without showing OpenClaw commands. Do not install plugins, change host configuration, or use shell, direct REST/API, tokens, cookies, or session IDs to bypass missing tools or authorization. After the user configures Apify, ask them to start a new session or refresh available tools and retry the request.
 - **Set a per-creator video limit.** It caps how many eligible videos are processed for transcripts in each report. It is a processing limit, not a full-account scan, and it does not cap usage or cost.
 - **Check your Apify usage.** More creators or more videos can mean more usage on your own Apify account. Review current usage in the Apify Console; the Skill does not estimate a price or promise a fee cap.
 - **Never paste credentials.** Do not share Instagram passwords, API tokens, cookies, or session values in chat. The Skill reads public accounts only.

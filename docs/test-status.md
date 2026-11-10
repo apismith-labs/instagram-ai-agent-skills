@@ -16,6 +16,12 @@ Offline verification on 2026-11-07 after the `run_error`, duplicate-candidate re
 
 For host-by-host stages and interface-specific evidence, see the [platform support matrix](platform-support.md). Evidence from separate tests must not be combined into a single end-to-end result.
 
+## Instagram Media Links and Post Insights: ChatGPT Plus test (2026-11-10)
+
+**User-reported finite run; not independently replayed.** The project owner reports that, in their ChatGPT Plus account, they added a custom MCP server named `Apify MCP` at `https://mcp.apify.com`, completed OAuth authorization, and created it as a plugin/App. The owner then used the latest installed third Skill for one batch of two Instagram URLs. The reported Actor was `apple_yang/instagram-video-scraper-api`, the run status was `SUCCEEDED`, and the Dataset contained two rows; all two rows were read and each matched an input using the returned `url` field. The URLs and Dataset ID are omitted because they are not needed for the record.
+
+This records the successful path observed in one account under the product state at test time: custom MCP connection, Actor call/run, run-status/result access, complete two-row Dataset read, and URL matching. It does not guarantee availability to other Plus users, accounts, regions, or workspaces; OpenAI's current public custom MCP guide lists Business and Enterprise/Edu, while current Skills guidance lists eligible Business, Enterprise, Healthcare, and Edu users, each subject to workspace/product availability. The reported run did not test failures, partial results, nonterminal run handling, ambiguous/missing fields, or other platforms. It does not validate either Instagram Transcript Extractor or Instagram Creator Reels Insights. The third Skill still requires independent acceptance and the remaining necessary runtime validation before it can be described as validated or publishable.
+
 ## Recent tester reports
 
 The older OpenClaw installation and discovery notes below describe the first Skill, `instagram-transcript-extractor`, unless explicitly labeled otherwise. They are not test results for Creator Reels Insights.

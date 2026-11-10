@@ -14,6 +14,8 @@ This PRD defines repository organization and user-facing project documentation. 
 
 ## 2. Product context
 
+**阶段补充（2026-11-10）：** 第三个 Skill 已进入实现阶段，详细范围见 [Instagram Media Links & Post Insights PRD](instagram-media-links-and-post-insights-prd.md)。运行时验证与独立验收仍待完成；在完成前，不可标为已验证、可发布或已发布。本补充仅更新当前阶段状态，不改写下方历史正文及其原始约束。
+
 **Historical status note (2026-11-06):** This structure PRD records the repository state and sequencing decision as of 2026-10-28. At the time of this status note, Instagram Creator Reels Insights had an in-development source and Codex mirror; its Actor output contract and host integration were described as unverified, so it was then characterized as not validated or publishable. See the [project README](../README.md) for current distribution status. This note supersedes the former sequencing prohibition below without changing this document's repository-structure requirements.
 
 When this document was drafted, the repository contained one implemented skill, `instagram-transcript-extractor`. It accepts public Instagram video links and supports transcript retrieval, with optional summaries, translations, or analysis based on the returned text. The longer-term project is a set of focused skills that may use one or more Apify Actors each.

@@ -1,6 +1,6 @@
 # User guide
 
-This guide helps you choose between two Instagram Skills and find their platform setup instructions:
+This guide lists the two currently published Instagram Skills and their platform setup instructions:
 
 - [Instagram Transcript Extractor](skills/instagram-transcript-extractor.md) retrieves speech transcripts from public Instagram videos and supports transcript-based summaries, translations, and analysis.
   - Available as the separate [GitHub ZIP v0.2.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) for Skill-upload platforms and on [ClawHub 1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) for OpenClaw.
@@ -23,11 +23,11 @@ flowchart LR
 
 In words: choose a platform and Skill; create or sign in to your own Apify account; connect Apify and install or enable that Skill as supported in the environment; then start a conversation and make a request. Some clients reuse account-level setup. Follow the platform-specific guide because setup steps differ by environment.
 
-The Apify plugin/MCP connection provides access to external Apify tools and account authorization. Each Skill provides instructions for its own task workflow. Installing a Skill does not connect Apify, and connecting Apify does not install a Skill.
+The Apify connection provides access to external Apify tools and account authorization. In ChatGPT, the user can share one `Apify MCP` custom connection across multiple Skills. Each Skill provides instructions for its own task workflow. Installing a Skill does not connect Apify, and connecting Apify does not install a Skill.
 
 ## Choose a guide
 
-- [ChatGPT](platforms/chatgpt.md): connect and authorize Apify first, then upload the ZIP for the Skill you need.
+- [ChatGPT](platforms/chatgpt.md): add the Apify MCP custom server (`https://mcp.apify.com`) and authorize with OAuth, then upload the ZIP for the Skill you need. In a new chat, type **@** in the message box and select `Apify MCP`. One connection can serve multiple Skills; check the tools exposed in the current account/workspace.
 - [Codex](platforms/codex.md): separate instructions for the Codex desktop app and Codex CLI, followed by the Skill installation and discovery check.
 - [Manus](platforms/manus.md): enable the Apify Connector, import the Skill from GitHub, and select it in chat.
 - [Claude Web, Claude Desktop regular chat, and Claude Code](platforms/claude-web.md): set up Apify and upload the Skill in Claude Web, use the same account in Claude Desktop regular chat, or follow the separate Claude Code setup instructions.
