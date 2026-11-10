@@ -8,7 +8,7 @@ Browse the [user guide and platform installation index](docs/README.md) for all 
 
 **Instagram Transcript Extractor** (`instagram-transcript-extractor`) gets spoken-word transcripts from public Instagram Reels and videos, with transcript-based summaries, translation, and text analysis.
 
-- **Available:** [GitHub ZIP v0.2.1](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.1/instagram-transcript-extractor-v0.2.1.zip) · [ClawHub 1.0.1](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor)
+- **Available:** [GitHub ZIP v0.2.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) · [ClawHub 1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor)
 - **Start here:** [Platform instructions](#install-by-platform) · [Installation entry](#install-instagram-transcript-extractor) · [User guide](docs/skills/instagram-transcript-extractor.md) · [Copy-ready prompts](#instagram-transcript-extractor)
 
 **Instagram Creator Reels Insights** (`instagram-creator-reels-insights`) reviews recent public videos and creates source-linked Daily Scan or Weekly Review reports from returned transcripts.
@@ -26,7 +26,7 @@ For the ChatGPT and Claude Web upload steps below, choose the package for the Sk
 
 | Skill | GitHub Release ZIP |
 | --- | --- |
-| Instagram Transcript Extractor | [`instagram-transcript-extractor-v0.2.1.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.1/instagram-transcript-extractor-v0.2.1.zip) · [Release v0.2.1](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v0.2.1) |
+| Instagram Transcript Extractor | [`instagram-transcript-extractor-v0.2.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) · [Release v0.2.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v0.2.2) |
 | Instagram Creator Reels Insights | [`instagram-creator-reels-insights-v1.0.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) · [Release v1.0.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v1.0.2) |
 
 ### ChatGPT
@@ -59,13 +59,13 @@ Choose the route for your platform. GitHub ZIP and ClawHub versions are separate
 
 | Platform | Transcript Extractor entry |
 | --- | --- |
-| ChatGPT | Upload [`instagram-transcript-extractor-v0.2.1.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.1/instagram-transcript-extractor-v0.2.1.zip) using the [ChatGPT steps](#chatgpt). |
-| Claude Web | Upload [`instagram-transcript-extractor-v0.2.1.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.1/instagram-transcript-extractor-v0.2.1.zip) using the [Claude Web steps](#claude-web). |
-| OpenClaw | ClawHub 1.0.1: [`@apismith-labs/instagram-transcript-extractor`](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) · `openclaw skills install @apismith-labs/instagram-transcript-extractor`. [Guide](docs/platforms/openclaw.md#instagram-transcript-extractor). |
+| ChatGPT | Upload [`instagram-transcript-extractor-v0.2.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) using the [ChatGPT steps](#chatgpt). |
+| Claude Web | Upload [`instagram-transcript-extractor-v0.2.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) using the [Claude Web steps](#claude-web). |
+| OpenClaw | ClawHub 1.0.2: [`@apismith-labs/instagram-transcript-extractor`](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) · `openclaw skills install @apismith-labs/instagram-transcript-extractor`. [Guide](docs/platforms/openclaw.md#instagram-transcript-extractor). |
 | Codex desktop app / CLI | Use the GitHub [`skills/instagram-transcript-extractor`](https://github.com/apismith-labs/instagram-ai-agent-skills/tree/main/skills/instagram-transcript-extractor) folder with [Codex install instructions](docs/platforms/codex.md#install-the-skill). |
 | Manus | Import the GitHub folder [`skills/instagram-transcript-extractor`](https://github.com/apismith-labs/instagram-ai-agent-skills/tree/main/skills/instagram-transcript-extractor) using [Transcript Extractor import steps](docs/platforms/manus.md#2-import-and-enable-the-skill). |
 | Claude Desktop regular chat | Enable in Claude Web, then sync through the same account; see [Transcript Extractor steps](docs/platforms/claude-web.md#use-instagram-transcript-extractor-in-claude-desktop-regular-chat). |
-| Claude Code | Same-account sync or extract the named [Transcript Extractor v0.2.1 ZIP](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.1/instagram-transcript-extractor-v0.2.1.zip) and follow the [Claude Code steps](docs/platforms/claude-web.md#claude-code). |
+| Claude Code | Same-account sync or extract the named [Transcript Extractor v0.2.2 ZIP](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) and follow the [Claude Code steps](docs/platforms/claude-web.md#claude-code). |
 
 ### Instagram Creator Reels Insights
 

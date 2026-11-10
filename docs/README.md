@@ -3,7 +3,7 @@
 This guide helps you choose between two Instagram Skills and find their platform setup instructions:
 
 - [Instagram Transcript Extractor](skills/instagram-transcript-extractor.md) retrieves speech transcripts from public Instagram videos and supports transcript-based summaries, translations, and analysis.
-  - Available as the separate [GitHub ZIP v0.2.1](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.1/instagram-transcript-extractor-v0.2.1.zip) for Skill-upload platforms and on [ClawHub 1.0.1](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) for OpenClaw.
+  - Available as the separate [GitHub ZIP v0.2.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) for Skill-upload platforms and on [ClawHub 1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) for OpenClaw.
 - [Instagram Creator Reels Insights](skills/instagram-creator-reels-insights.md) provides recent creator-video insights based on returned posts and transcripts.
   - Its [Creator installation table](../README.md#instagram-creator-reels-insights) lists distinct routes for ChatGPT, Claude Web, OpenClaw, Codex, Manus, Claude Desktop, and Claude Code.
   - The [GitHub ZIP v1.0.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) is for platforms that accept Skill package uploads; the separate [ClawHub listing v1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) is the OpenClaw route.

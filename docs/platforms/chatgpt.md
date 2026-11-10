@@ -20,13 +20,13 @@ These steps follow the current [OpenAI custom MCP server guide](https://help.ope
 
 ## 2. Upload a Skill package
 
-Download `instagram-transcript-extractor-v0.2.1.zip` from the [v0.2.1 Release asset](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.1/instagram-transcript-extractor-v0.2.1.zip), or open the [v0.2.1 Release page](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v0.2.1) and choose that named file under **Assets**. Do not download GitHub's automatically generated **Source code (zip)**. Optional SHA-256 check:
+Download `instagram-transcript-extractor-v0.2.2.zip` from the [v0.2.2 Release asset](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip), or open the [v0.2.2 Release page](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v0.2.2) and choose that named file under **Assets**. Do not download GitHub's automatically generated **Source code (zip)**. Optional SHA-256 for the Transcript Extractor v0.2.2 ZIP:
 
 ```text
-91f642d5605760ef7ddc02a834f105ed82d1a8c43dd5e0decbf0618c37a86781
+2bea93a3ffe3802acd302a2788ef03d07e1933dbb2ea66b57d97f24cf6f04f41
 ```
 
-Keep the downloaded ZIP intact; do not unzip it before upload. In ChatGPT, open **Plugins → Plugin Directory → Skills → Create → Upload from your computer**, then select `instagram-transcript-extractor-v0.2.1.zip`. Wait for the upload scan. The Skill may become **Available**, show **Needs Review**, or show **Blocked**:
+Keep the downloaded ZIP intact; do not unzip it before upload. In ChatGPT, open **Plugins → Plugin Directory → Skills → Create → Upload from your computer**, then select `instagram-transcript-extractor-v0.2.2.zip`. Wait for the upload scan. The Skill may become **Available**, show **Needs Review**, or show **Blocked**:
 
 - **Available:** continue to a new conversation.
 - **Needs Review:** read the displayed prompt and follow the review step before using it.
