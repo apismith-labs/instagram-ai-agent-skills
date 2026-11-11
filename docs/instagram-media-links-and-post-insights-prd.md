@@ -89,6 +89,7 @@ Post Insights 仅整理或比较 Actor 实际返回的原始计数及其他已�
 验收需覆盖两个模式、单条与批量、输入输出匹配、URL 失效/不可访问、Apify 未授权及工具不可用，以及下列具体情况：
 
 - 在向用户承诺“将开始处理”前完成内部 preflight；preflight 未通过时不得暗示 Actor 已启动，并明确说明缺少的能力、未启动 Actor、未取得结果。
+- ChatGPT 首次使用：若没有可用 Apify 工具、授权明确缺失或就绪状态无法确认，应停止 Actor，并显示 Skill 中完整的 ChatGPT 自定义 MCP 设置指引；不得用泛化的 Settings/Plugins 搜索说法、仅给链接或其他通用连接话术替代。不得声称可检查 ChatGPT 内部 Skill 加载状态，也不得仅凭引导未显示就断言 Skill 未加载。
 - 专用 Actor 工具路径：必须从实时工具描述/schema 精确确认 owner 与 Actor 名称对应 `apple_yang/instagram-video-scraper-api`；名称相似、泛 Instagram 描述或身份含糊不够。身份不符/不明时仅在通用路径完整可用时回退，否则停止。
 - 通用 Actor 调用路径：要求同时具备可读取 Actor 当前 schema 的工具（如 `fetch-actor-details` 等效项）和通用 Actor 调用工具；Actor identifier 格式及调用参数由当前工具 schema/权威文档确定，不从 Store URL 推断。
 - 通用调用若返回 run 状态和 Dataset 标识，需据实记录并通过 `get-dataset-items` 或宿主等效能力读取结果行；按 live pagination 信息继续读取，直至有证据表明读全。缺少 Dataset 读取工具或无法核实分页完整性时，报告结果不可确认/部分，不称 Actor 无数据。

@@ -1,10 +1,9 @@
-# PRD：Instagram Creator Reels Insights
+# PRD：Instagram Creator Video Insights
 
 **文档状态：** 产品需求草案，供产品范围确认与实现准备
 **项目：** Instagram AI Agent Skills
-**工作名称：** Instagram Creator Reels Insights
-**展示名称候选：** Instagram Creator Reels Insights（需在发布前检查搜索词与目录命名；“competitor analysis”保留为常见使用场景和搜索词，不限定用户只能研究竞品）
-**建议 Skill slug：** `instagram-creator-reels-insights`（待搜索与可用性核查）
+**当前用户可见名称：** Instagram Creator Video Insights
+**保留 Skill slug：** `instagram-creator-reels-insights`（为避免路径迁移，目录、canonical/mirror 和打包路径继续使用此 slug）
 **版本：** 0.8
 **日期：** 2026-11-06
 **目标用户：** 会重复研究一组公开 Instagram 账号的创作者、品牌营销人员、社媒运营和代理机构
@@ -25,7 +24,7 @@
 
 产品价值应能用一句普通用户听得懂的话说明：
 
-> 关注你指定的 Instagram 创作者，获取近期 Reels 的口播转录，并按天或按周整理可追溯的内容洞察。
+> 分析你指定的 Instagram 创作者近期公开视频（包括 Reels 和普通视频帖）的口播转录，并按天或按周整理可追溯的创作者视频洞察。
 
 本项目从四个目标评估设计：
 
@@ -36,7 +35,7 @@
 
 ## 2. 产品假设与成功观察
 
-核心假设：当用户能以简单请求反复获得指定账号近期 Reels 的口播证据和实用分析时，他们会继续运行 Daily Scan 或 Weekly Review，并形成可持续的 Transcript Actor 使用。
+核心假设：当用户能以简单请求反复获得指定账号近期公开视频的口播证据和实用分析时，他们会继续运行 Daily Scan 或 Weekly Review，并形成可持续的 Transcript Actor 使用。
 
 在小规模试用中观察：
 
@@ -60,7 +59,7 @@
 
 ### 3.2 主要任务
 
-- “扫描这些账号过去 24 小时的 Reels，转录后告诉我每条视频如何开场、讲了什么、怎样收尾。”
+- “扫描这些账号过去 24 小时的视频，转录后告诉我每条视频如何开场、讲了什么、怎样收尾。”
 - “复盘这些账号最近 7 天的口播，找出重复出现的主题、Hook、结构和 CTA，并链接到原帖。”
 
 V1 不提供独立的指定视频 URL 分析模式，也不提供跳过转录的“仅看帖子数据”模式。所有日报和周报都以账号扫描为入口，并默认包含符合范围的视频转录和基于 transcript 的内容分析。
@@ -69,9 +68,9 @@ V1 不提供独立的指定视频 URL 分析模式，也不提供跳过转录的
 
 ### 4.1 目标
 
-1. 提供用户发起的 Daily Scan 与 Weekly Review，两者默认包含候选发现、视频转录和口播分析。
+1. 提供用户发起的 Daily Scan 与 Weekly Review，两者默认包含公开视频发现、视频转录和口播分析。
 2. 用户提供至少一个公开账号；未指定周期时默认 Daily Scan（最近 24 小时滚动窗口），明确要求 Weekly Review 时使用最近 7 天。只在账号或授权等关键输入缺失时追问。
-3. 将每条帖子、转录和洞察对应到实际账号、帖子 URL 与发布时间。
+3. 将每条视频帖、转录和洞察对应到实际账号、帖子 URL 与发布时间。
 4. 默认简洁呈现转录要点和分析；用户需要时可展开完整转录。
 5. 处理部分成功、失败和限制时保留有效结果，说明覆盖范围和下一步。
 6. 支持用户低摩擦重复运行；在宿主支持且用户同意时保存账号清单和每位作者作品上限等运行设置，但不保存 transcript 库或历史报告。明确说明没有内容历史时窗口重叠和重复内容的可能性。
@@ -91,7 +90,7 @@ V1 不提供独立的指定视频 URL 分析模式，也不提供跳过转录的
 
 用户路径应尽量短且每一步给出明确下一步：
 
-1. **发现：** 在平台目录、README 或 Skill 列表中，通过清晰名称和自然语言简介判断“这是用来研究指定 Instagram 创作者 Reels 口播的 Skill”。发布前检查用户实际会搜索的词，如 Instagram competitor analysis、Reels transcript、creator content research；不得堆砌关键词或声称搜索排名。
+1. **发现：** 在平台目录、README 或 Skill 列表中，通过清晰名称和自然语言简介判断“这是用来分析指定 Instagram 创作者公开视频口播的 Skill”。发布前检查用户实际会搜索的词，如 Instagram creator video insights、video transcript、creator content research；不得堆砌关键词或声称搜索排名。
 2. **理解：** 页面说明用户需要公开账号、报告时间窗和可用的 Apify 连接；输出是带来源的转录摘要、Hook、主题、结构和 CTA 分析。
 3. **安装/选择：** 安装方法跟随所选宿主指南。不要暗示安装 Skill 会自动配置 Apify。
 4. **首次使用：** 一次简短设置只确认用户要监测的公开账号、每位作者每份报告最多处理多少条视频，以及是否保存账号清单和该数量设置。确认后启动默认日报；说“周报”或给出时间范围即可切换。后续报告复用已确认设置，不重复询问，也不要求预算或 run 级费用参数。
@@ -101,9 +100,9 @@ V1 不提供独立的指定视频 URL 分析模式，也不提供跳过转录的
 
 ### 5.1 Skill 名称与简介要求
 
-- 名称先表达 Instagram/Reels 和 competitor/creator research 的任务，不用只有“Insights”这类抽象词。
-- 简介应说明：用户指定公开账号；支持日报/周报；默认提取近期 Reels 口播并给出可追溯分析；需要宿主可用的 Apify 连接。
-- 简介包含可触发的自然语言意图，例如“分析这些 Instagram 创作者近期 Reels 的转录和口播结构”。
+- 名称表达 Instagram 创作者公开视频研究任务，不用只有“Insights”这类抽象词。
+- 简介应说明：用户指定公开账号；支持日报/周报；分析近期公开 Reels 与普通视频帖的口播并给出可追溯分析；需要宿主可用的 Apify 连接。
+- 简介包含可触发的自然语言意图，例如“分析这些 Instagram 创作者近期公开视频的转录和口播结构”。
 - 发布前在目标目录核查类似名称和搜索词；核查结果用于取舍，不能据此承诺会被搜到。
 
 ## 6. 报告模式和输入
@@ -128,6 +127,8 @@ V1 不提供独立的指定视频 URL 分析模式，也不提供跳过转录的
 | Weekly Review | 请求时点前最近 7 天 | 基于本周实际取得的转录归纳重复主题、Hook、表达结构、CTA 和差异 |
 
 默认是滚动窗口，不是自然日或自然周。用户说“今天”“上周”等自然周期时，按用户时区解释并展示具体起止时间。宿主不能确认时区时，询问或明确使用 UTC。Actor 的日期筛选按 live schema 实际行为转换；结果侧仍按用户要求的窗口校验。
+
+发布时间以发现 Actor 的帖子时间字段为主要来源。仅当项目已确认数值字段单位为 `unix_seconds` 时，才将其按 Unix 秒转换为 UTC instant；单位未知时保留原值、标为未核实，并不据此进行窗口筛选。窗口筛选使用 UTC instant；本地显示从同一 instant 转换并标明时区。这里的单位确认属于项目字段映射/运行观察，不是 Actor schema 对单位的保证。Transcript Actor 的字符串 `timestamp` 是运行时间，不是帖子发布时间；其 `createTime` 仅在 URL/ID 对账确认是同一帖子后用于交叉核对。
 
 ## 7. 默认调用与候选选择
 
@@ -156,14 +157,16 @@ V1 不提供独立的指定视频 URL 分析模式，也不提供跳过转录的
 
 | 名称 | 拟议职责 | 当前证据状态 |
 |---|---|---|
-| `apple_yang/instagram-post-scraper`（Profile Posts Actor） | 按用户指定公开账号和报告窗口发现候选帖子/视频并返回可用 URL、作者、发布时间、类型及实际字段 | 当前公开输入页将 `usernames` 与 `resultsLimit` 标为必填，后者描述为返回结果的最大数量；没有明确单/多用户名计数范围、排序、非视频占额或完整性行为。每作者产品上限由 Skill 在实际发现结果后应用，不直接映射为 `resultsLimit`。批量账号行为、身份字段和分页完整性仍待验证 |
+| `apple_yang/instagram-post-scraper`（Profile Posts Actor） | 按用户指定公开账号和报告窗口发现近期帖子/视频并返回可用 URL、作者、发布时间、type 及实际字段 | 公共输入 schema 将 `usernames` 与 `resultsLimit` 标为必填，后者描述为最大结果数，但未定义单/多用户名范围、排序、非视频占额或完整性保证。输出 `type` 是普通 string、无 enum；因此项目采用负责人确认的精确处理规则：只有 `type == "Video"` 且存在可用帖子 URL 才进入 Transcript Actor。此为项目处理策略，不是 Actor schema 明文枚举；`productType` 不参与门槛。`resultsLimit=50` 是项目默认值，依据负责人此前运行观察其为每位 Creator 的结果/预算上限；公共 schema 并未保证每位 Creator 语义。它与本地 `per_creator_limit` 不同，后者绝不传给 Actor。批量账号行为、身份字段和分页完整性仍待验证 |
 | `apple_yang/instagram-transcripts-scraper`（Transcript Actor） | 对账号发现得到、经时间窗和每作者上限筛选的公开视频执行转录，返回 Actor 实际提供的文本、时间戳、状态或错误 | 公开输入页列有 `bulkUrls`，但实际可用输入、最大批次、账户限制和字段对应行为会变化；实现前从当前宿主/live schema 重新核验。PRD 不固化套餐条数、固定费用或 `enhancedcrawl` 的计费承诺 |
 
 Transcript Actor 只负责其实际 schema 支持的转录处理和返回数据。Hook、主题、结构、CTA、摘要与创作启发由 Skill 基于实际 transcript 生成，不能归为 Actor 输出。
 
 ### 8.2 实现前需要核实
 
-重新检查两个 Actor 的 live 输入/输出 schema、账号身份匹配字段、时间筛选行为、多账号/多 URL 批量支持、分页读取和 Dataset 完整性信号、状态/错误字段、授权与当前宿主实际暴露的工具。验证 `resultsLimit` 在单/多用户名时的作用范围、排序与媒体占额；它与每作者报告处理上限是不同参数。选择一个经证据支持的发现策略，再由 Skill 对实际返回候选应用每作者上限。不得根据旧文档猜测字段名、批量条数、Actor 限制、固定费用或可用工具。
+继续检查两个 Actor 的 live 输入/输出 schema、账号匹配字段、时间筛选行为、批量支持、分页/读取状态、错误字段、授权与宿主工具。Profile Posts Actor、授权、输入 schema、run 状态查询及 Dataset 读取能力通过预检后，先运行并读取原始帖子；不能因缺少 `type` 枚举、`productType` 映射、分页元数据或额外完整性标记而阻止读取或处理已确认的 `type="Video"` 记录。项目规则为 `type` 必须精确等于大小写敏感字符串 `"Video"` 且 `url` 可用；这是负责人确认的项目筛选规则，Actor schema 仍只是无 enum 的 string。`productType` 不作为转录门槛。其他、缺失、null、非字符串的 `type` 原样保留为未知，不分类为视频，不送入 Transcript Actor；图片/carousel 不从字段名推断。Transcript Actor 可处理 Reels 和普通视频帖，无需 `isReel`。
+
+`resultsLimit=50` 作为项目默认值，证据来源是负责人此前的运行观察；当前公开 schema 仅定义最大结果数，未保证每位 Creator 的语义。继续核验单/多用户名作用范围、排序、媒体占额和截断行为。若 live schema 不支持该值，按实际 schema 处理并报告契约不符；`per_creator_limit` 是本地转录处理上限，绝不映射到 Actor input。不得根据旧文档猜测字段名、批量条数、Actor 限制、固定费用或可用工具。
 
 本 PRD 不要求实现或验证 run 级费用参数（包括 `callOptions.maxTotalChargeUsd`、`maxItems` 或等效字段），也不要求预算分配或 run 选项读回。Apify 实际费用仍按用户账户、Actor 当前计费规则及宿主行为产生；产品不得承诺费用封顶、估算固定费用或将账号视频数量上限称为费用控制。目标宿主是否能调用 Actor、是否已授权，以及 Actor 结果是否符合报告需要，仍须按宿主与真实接口证据核实。
 
@@ -177,9 +180,10 @@ Transcript Actor 只负责其实际 schema 支持的转录处理和返回数据�
 识别账号、模式、时间窗和用户偏好
 → 首次使用时确认每位作者视频处理上限及设置保存方式
 → 确认 Apify 授权与宿主可用调用方式
-→ 运行 Profile Posts Actor 发现候选并完整读取
-→ 按实际账号身份、URL、时间窗和内容类型核验结果
-→ 按保存的每作者上限选取最新候选
+→ 预检 Profile Posts Actor、授权、输入、run 状态查询和原始结果读取能力
+→ 运行 Profile Posts Actor 并读取原始帖子结果，保留状态、原始值和完整性证据
+→ 在数据读取后仅按精确 `type="Video"` 与可用帖子 URL 确认转录候选；其他类型原样保留为未知
+→ 按精确 `type="Video"` 规则、时间窗和保存的每作者处理上限选择候选
 → 调用 Transcript Actor 并完整读取
 → 按确切 URL/可靠身份关联 transcript
 → 基于实际 transcript 生成报告，列出覆盖/未处理情况和下次可复制请求
@@ -248,14 +252,21 @@ Transcript Actor 只负责其实际 schema 支持的转录处理和返回数据�
 
 ### 14.1 发现与首次成功
 
-- 未接触项目的新用户可从简介理解这是用于分析指定 Instagram 创作者 Reels 口播的 Skill，并能找到可复制的日报/周报请求。
+- 未接触项目的新用户可从简介理解这是用于分析指定 Instagram 创作者公开视频口播的 Skill，并能找到可复制的日报/周报请求。
 - 安装和 Apify 授权步骤区分清楚；未连接时给出宿主对应的下一步，不要求用户把凭据粘贴到聊天。
-- 以一条或一组公开账号发起 Daily Scan/Weekly Review 后，用户收到来源链接、实际转录状态和至少一项有据可查的口播分析，或清楚的失败状态。
+- 以一条或一组公开账号发起 Daily Scan/Weekly Review 后，用户收到名为“创作者视频洞察”的报告、来源链接、实际转录状态和至少一项有据可查的口播分析，或清楚的失败状态。
 
 ### 14.2 调用与覆盖
 
 - 首次使用前确认每位作者每份报告的视频处理数量上限；用户同意保存后，后续报告自动复用设置，不在发现与转录之间中途询问。
-- Actor 的 `resultsLimit` 语义与每作者产品上限必须经实测确认；只有证明确实执行了每作者上限，才能通过该验收项。不能把本地处理上限描述成 Actor 发现上限或完整账号覆盖。
+- 每次 `apple_yang/instagram-post-scraper` Profile Posts 请求均显式传入 JSON 布尔值 `skipPinnedPosts: true`；live schema 必须确认该字段及布尔类型，否则停止该调用。它只用于 Profile Posts，不传给 Transcript Actor。该值会排除置顶帖子，包括目标时间窗内的置顶帖；不得声称涵盖所有符合时间条件的帖子，只有 Actor 提供可核验排除数量时才报告具体数值。项目未定义用户覆盖机制。
+- Actor `resultsLimit` 是单独的检索结果上限；项目默认 50 依据负责人先前运行观察，但公开 schema 不承诺每位 Creator 语义。`per_creator_limit` 由本地 helper 在筛选后实施，不能传给 Actor。低于上限本身不证明时间范围完整。
+- Profile Posts 的 Actor、授权、必需输入 schema、run 状态查询和结果读取能力通过预检后，即使 `type` schema 没有 enum，也必须先运行并读取原始帖子结果。项目处理规则仅接受大小写敏感的 `type == "Video"` 字符串且有可用 Instagram 帖子 URL 的行；该规则来自负责人确认，不是 Actor schema 的枚举保证。`productType`、`isReel`、字段名称和 URL 外观均不替代该检查。缺失、null、非字符串和其他值原样标记未知，不送入 Transcript Actor；不推断照片或 carousel。Transcript Actor 可处理 Reels 与普通视频帖，因此不做 isReel 区分。
+- 未知媒体值、缺少 Reel 枚举、分页元数据或额外完整性标记不得阻止已确认 `type="Video"` 行的后续处理。报告逐 Creator 显示 Actor raw 行数、`discovered_returned_in_window`、`type_video_candidates`、`unknown_media_type`、已选/已处理数与 run 状态；不得把其中任一计数笼统标作“目标期原始记录”。`discovered_returned_in_window` 统计窗口内可归属且 URL 可用的原始行，包含重复项并不限于某种媒体类型；`unknown_media_type` 统计窗口内可归属且类型缺失、为 null、非字符串或不精确等于 `"Video"` 的原始行，包含重复项且不要求 URL 可用；它是未知类型行计数，不是接口错误计数。`type_video_candidates` 是去重后、URL 可用且 `type == "Video"` 精确匹配的候选数，在 `per_creator_limit` 截取前统计。`returned_raw_rows` 在单 Creator run 中为 Dataset 总行数，多 Creator 行无法归属时为 `null`。未知行的 unresolved 结果保留 `type` 字段名、`field_present` 和实际 `value`。仅未知类型不得增加 `row_interface_error_count` 或单独导致 `partial_interface_error`；未知类型仍须披露，不能当作零视频。确认的 `"Video"` 行缺少可用 URL 才属于结构性接口错误。
+- 仅当 run 状态为 `SUCCEEDED`、Dataset 有完整读取证据且该 Creator 的原始返回行数低于 `resultsLimit` 时，报告“已读完 Actor 返回的数据，配置的结果上限未达到”。这不是时间范围全覆盖保证；返回数达到上限时提示可能受上限截断。
+- 仅当存在已提交 Transcript Actor 的 exact-Video 候选并已有该 run 结果/状态时调用 `reconcile`；空候选或全未知不调用 Transcript Actor 或 `reconcile`。不得为此放宽 helper 对 `type == "Video"` 的契约。
+
+- 缺少请求中的 `per_creator_limit` 且无现存用户授权设置时，先询问该转录处理上限；未经明确同意不保存。`per_creator_limit` 只控制转录/分析选择，不映射到 `resultsLimit`。`resultsLimit` 与 `per_creator_limit` 分离：前者按 live schema 支持值使用，项目默认 50 依据负责人此前运行观察（非 Actor schema 对每位 Creator 语义的保证）；后者只控制本地转录/分析选择，永不作为 Actor input。
 - 达到每作者作品上限时按已确认规则取最近作品，并在报告中说明返回候选数、选取数和因上限未处理数；这是用户首次设置的预期行为，不触发再次审批。Actor 的批次大小等技术限制若可通过拆分 run 满足，应由 Skill 内部处理。无法完成时，停止受影响的后续调用并报告部分结果，不在处理中途要求用户重新配置。
 - Skill 不收集、不分配、不验证报告总预算或 run 级费用限制；不声称设置了费用封顶。实际用量遵循用户 Apify 账户与 Actor 当前计费规则，并建议用户在 Apify Console 查看。
 - Actor 角色与 Skill 分析分开描述；未核实的 Post Actor 字段/能力不作事实承诺。
@@ -270,7 +281,7 @@ Transcript Actor 只负责其实际 schema 支持的转录处理和返回数据�
 
 ## 15. 实施和验证计划
 
-1. **接口核验：** 重新核对两个 Actor 的 live schema、账号发现到 Reel URL 的输入/输出字段、批量方式、分页、状态、权限及宿主连接。核实 Profile Posts Actor 的 `resultsLimit` 是总体还是每用户名限制，并验证每作者视频处理上限的执行策略。
+1. **接口核验：** 重新核对两个 Actor 的 live schema、账号发现到视频帖 URL 的输入/输出字段、批量方式、分页、状态、权限及宿主连接。核实 Profile Posts Actor 的 `resultsLimit` 是总体还是每用户名限制，并验证每作者视频处理上限的执行策略。
 2. **设计/离线验证：** 为时间窗、账号和 URL 匹配、每作者视频上限、批次拆分、部分结果、缺失指标和失败状态编写离线场景。run 级预算规划与选项读回不属于本 Skill 的实现要求。
 3. **真实功能验证：** 在开发完成后，再从 Codex、OpenClaw 或 ChatGPT 等宿主中选择一个最适合的环境；先确认工具、授权、输入/输出合同和测试范围，再验证两个 Actor 的完整默认流程。一个平台通过不代表其他平台通过。实际费用依照账户和 Actor 的当前规则；验证前说明可能发生的 Apify 用量，不声称有硬性费用上限。
 4. **用户试用：** 观察第 2 节指标与首次设置/日常复用路径；在用户知情授权范围内记录，试用结论归因于实际证据。
@@ -287,7 +298,7 @@ Transcript Actor 只负责其实际 schema 支持的转录处理和返回数据�
 ## 17. 实现前待验证事项
 
 1. `instagram-post-scraper` 的 live 输入/输出字段、账号识别、URL 类型、时间过滤、批量行为和 Dataset 完整性信号；
-2. `instagram-transcripts-scraper` 处理从账号发现结果得到的 Reel URL、批量输入限制和结果对应字段；
+2. `instagram-transcripts-scraper` 处理从账号发现结果得到的 视频帖 URL、批量输入限制和结果对应字段；
 3. 两个 Actor 分别或连续调用时的宿主工具暴露、Apify 授权、审批及用量行为；
 4. `resultsLimit` 对多个用户名的作用范围及实现每作者作品上限的方式；
 5. 用户设置的每作者视频处理上限如何映射到发现候选和 transcript 处理；

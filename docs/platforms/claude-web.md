@@ -4,17 +4,21 @@ This guide covers Claude Web, regular chat in Claude Desktop, and Claude Code. S
 
 You need an Apify account. Actor runs use that account's plan allowance; check the [Apify Console](https://console.apify.com/) for current Runs and billing details.
 
-## Set up once in Claude Web
+## Connect Apify and install a Skill
 
-1. In Claude Web, open **Customize → Connectors**, find the official **Apify Web Connector**, and add it.
-2. Complete the Apify OAuth flow and confirm that the Connector is connected.
-3. Open **Customize → Skills → Add → Upload skill** and upload the ZIP package for the Skill you want to use. For Transcript Extractor, download [`instagram-transcript-extractor-v0.2.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip); for Creator Reels Insights, download [`instagram-creator-reels-insights-v1.0.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip). Do not use GitHub's automatically generated **Source code (zip)**. Keep the ZIP intact, review its preview, and enable that Skill.
+Apify's current Claude integration offers an Apify Plugin in Claude Web and a hosted Apify MCP connector that also works in Claude Desktop. UI labels are rolling from **Customize** to **Plugins**; if the documented tab is not visible, consult the linked official guide instead of guessing another path.
 
-Connecting Apify provides access to external Apify tools; uploading a Skill provides that Skill's workflow instructions. They are separate setup steps, and both are needed to use a Skill with Apify.
+1. Open the left sidebar's **Plugins** page if the unified interface has reached your account, filter to **Connectors** and open **Discover**; in the earlier interface use **Customize → Connectors → Discover**. Find the official Apify entry labeled **Plugin** and select **Add**. Do not select the separate Desktop extension for web chat.
+2. Open the Apify Plugin page's **Connectors** tab and choose **Connect** for `apify`; select **Continue → Add**.
+3. In the browser, sign into the correct Apify account, review the permissions, and select **Allow access**. Check that `apify` shows connected.
+4. Upload the Skill separately: open **Plugins → Skills** in the unified interface, or **Customize → Skills** in the earlier one; select **+ → Create skill → Upload a skill**, choose the named ZIP, finish the scan, and enable it. Keep the ZIP intact; do not upload GitHub's auto-generated **Source code (zip)**.
+5. In a new Claude Web chat, enable the Apify connector using the **+** menu → **Connectors**. Type `/` to choose the Skill if it appears in the chooser, or name it explicitly in your request. Confirm the Skill is enabled and Apify is available before starting a task.
+
+The Claude account's settings also appear in regular chat on Claude Desktop when signed into the same account. Skill upload and Apify authorization are separate steps. Plans and organization policies can hide skills, connectors, or upload controls; check the [Anthropic Skills guide](https://support.claude.com/en/articles/12512180-use-skills-in-claude) and [custom remote MCP guide](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp). The Apify setup steps are in its [Claude.ai guide](https://docs.apify.com/integrations/claude-ai).
 
 ## Use Instagram Transcript Extractor in Claude Web
 
-In a Claude Web conversation, select `instagram-transcript-extractor` from the available Skills controls. Confirm the Apify Web Connector is enabled in **Connectors**, then send a request such as:
+In a Claude Web conversation, type `/` to select `instagram-transcript-extractor` if the current Skills menu offers it, or name it in your request. Confirm the Apify connector is enabled from **+ → Connectors**, then send a request such as:
 
 ```text
 Use instagram-transcript-extractor to return the original-language transcript for this public Instagram Reel. Include timestamps only if the tool returns them.
@@ -23,9 +27,9 @@ PUBLIC_INSTAGRAM_URL
 
 Replace `PUBLIC_INSTAGRAM_URL` with an accessible public Instagram link. You can use the copyable transcript, batch, translation, summary, subtitle, and text-analysis requests below in either chat interface.
 
-## Use Creator Reels Insights in Claude Web
+## Use Creator Video Insights in Claude Web
 
-In a Claude Web conversation, select `instagram-creator-reels-insights` from the available Skills controls and enable the Apify Web Connector. Ask for a multi-creator review such as:
+In a Claude Web conversation, type `/` to select `instagram-creator-reels-insights` if available, and enable Apify from **+ → Connectors**. Ask for a multi-creator review such as:
 
 ```text
 Use instagram-creator-reels-insights to review these public creator accounts for the most recent 7 days: CREATOR_1, CREATOR_2, and CREATOR_3. Process up to VIDEO_LIMIT eligible videos per creator. Give me a separate summary for each creator, then compare patterns only when supported by returned transcripts. Include source links and disclose when results are partial or unknown; do not imply that unreturned posts were reviewed.
@@ -37,15 +41,15 @@ The ZIP upload steps are documented, but this project has not confirmed end-to-e
 
 ## Use Instagram Transcript Extractor in Claude Desktop regular chat
 
-1. Sign into Claude Desktop with the same Claude account used for the Web setup. Account sync and Connector availability can depend on your Claude setup.
-2. Open a regular chat, not Claude Code. Select `instagram-transcript-extractor` from the available Skills controls and confirm the Apify Connector is enabled in **Connectors**.
+1. Sign into Claude Desktop with the same Claude account used for Web setup; remote connector and Skills account sync are separate from Claude Code CLI.
+2. Open the **Chat** tab (regular chat), not the Code tab. Type `/` to select the Skill if offered, otherwise name it explicitly, then use **+ → Connectors** to enable Apify.
 3. Send the same request format shown above, replacing the URL with a public Instagram link.
 
 Claude Desktop regular chat is separate from Claude Code. If the Skill or Connector is not available in Desktop, complete setup in Claude Web and check the account signed in to Desktop.
 
-## Use Creator Reels Insights in Claude Desktop regular chat
+## Use Creator Video Insights in Claude Desktop regular chat
 
-Enable Instagram Creator Reels Insights in Claude Web, then sign in to Claude Desktop with the same Claude account. In a regular chat, select `instagram-creator-reels-insights` from the available Skills controls and enable the Apify Web Connector. The project has not confirmed the full Creator report workflow in Claude Desktop.
+Enable Instagram Creator Video Insights in Claude Web, then sign in to Claude Desktop with the same Claude account. In a regular chat, type `/` to select `instagram-creator-reels-insights` if available, and enable Apify from **+ → Connectors**. The project has not confirmed the full Creator report workflow in Claude Desktop.
 
 ## Claude Code
 
@@ -64,13 +68,13 @@ PUBLIC_INSTAGRAM_URL
 
 See Anthropic's [Skills guide](https://code.claude.com/docs/en/skills) and [MCP guide](https://code.claude.com/docs/en/mcp) for current details.
 
-### Creator Reels Insights in Claude Code
+### Creator Video Insights in Claude Code
 
-The account-sync route applies to a Skill enabled in Claude Web when Claude Code is signed into the same `claude.ai` account. For a local installation instead, use the top-level `instagram-creator-reels-insights/` directory from the [Creator Reels Insights v1.0.2 ZIP](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) in the personal skills directory documented above. After installation, use `/skills` to check visibility and invoke the displayed slash command. The project has not confirmed this Creator installation path or its full task workflow in Claude Code.
+The account-sync route applies to a Skill enabled in Claude Web when Claude Code is signed into the same `claude.ai` account. For a local installation instead, use the top-level `instagram-creator-reels-insights/` directory from the [Creator Video Insights v1.0.2 ZIP](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) in the personal skills directory documented above. After installation, use `/skills` to check visibility and invoke the displayed slash command. The project has not confirmed this Creator installation path or its full task workflow in Claude Code.
 
 ## Copyable requests for Claude Web and Desktop chat
 
-Replace every placeholder shown, including each `PUBLIC_INSTAGRAM_URL` and `[TARGET_LANGUAGE]`, with an accessible public Instagram link or your target language. In Claude Web or Desktop chat, select the Skill from the available Skills controls and enable Apify in the **Connectors** menu before sending a request. These are request examples, not guarantees that every link will succeed.
+Replace every placeholder shown, including each `PUBLIC_INSTAGRAM_URL` and `[TARGET_LANGUAGE]`, with an accessible public Instagram link or your target language. In Claude Web or Desktop Chat, type `/` and select the Skill if the current menu offers it (otherwise name it explicitly), then use **+ → Connectors** to enable Apify before sending a request. These are request examples, not guarantees that every link will succeed.
 
 **Single transcript**
 

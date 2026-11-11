@@ -1,17 +1,21 @@
 # Use Instagram Skills in Manus
 
-This guide explains how to connect Apify and import either Instagram Transcript Extractor or Instagram Creator Reels Insights from its own GitHub folder. Connector access and results can vary by account and request; the two Skills have separate paths and task scopes.
+This guide explains how to connect Apify and import either Instagram Transcript Extractor or Instagram Creator Video Insights from its own GitHub folder. Connector access and results can vary by account and request; the two Skills have separate paths and task scopes.
 
 ## Before you start
 
 You need a Manus account and your own [Apify account](https://console.apify.com/). Apify runs use your Apify account's plan allowance, and Manus tasks that use the Connector may consume Manus credits. See the [Apify Console](https://console.apify.com/) for current Runs and billing details, and check Manus for current credit information. No specific cost is estimated here. See the [Apify Manus integration guide](https://docs.apify.com/integrations/manus) for current platform information.
 
-## 1. Enable Apify and authorize access
+## 1. Connect Apify and authorize access
 
-1. In Manus, open the **Plugins / Connectors** directory and find the official **Apify Connector**. If multiple entries appear, review their details and select the official Apify Connector.
-2. Click the **+** on that Connector. Manus redirects to Apify for OAuth; sign in if prompted and approve the authorization.
+Apify MCP is a custom connector in Manus; do not search the prebuilt connector directory for a packaged Apify connector.
 
-Use the existing Apify Connector from the directory; this flow does not require creating a Custom MCP server. Names and labels may vary by account or interface version.
+1. Open **Settings → Connectors → + Add connectors**.
+2. Select **Custom MCP → + Add custom MCP → Direct configuration**.
+3. Set **Server name** to `Apify`, **Transport type** to `HTTP`, and **Server URL** to `https://mcp.apify.com`; select **Save**.
+4. In the first chat that calls an Apify tool, sign in to Apify in the OAuth prompt and approve access. Do not paste an API token into chat.
+
+For each new chat, use the connector toggle below the input to enable Apify. Confirm the connector is enabled and Apify tools are available before asking for a task. Apify's guide says MCP access is available on all Manus plans, including Free, but individual account or workspace controls may still affect access. See the [official Apify Manus guide](https://docs.apify.com/integrations/manus).
 
 ## 2. Import and enable the Skill
 
@@ -25,7 +29,7 @@ Select **Import**. Confirm that `instagram-transcript-extractor` appears in your
 
 ## 3. Request a transcript
 
-In a Manus conversation, type `/` and select `instagram-transcript-extractor`. Also check that the Apify Connector icon below the message input is enabled. Then request one public Reel, replacing the example with a real link:
+In a new Manus conversation, type `/` and select `instagram-transcript-extractor`. Also enable Apify using the connector toggle below the message input and confirm Apify tools are available. Then request one public Reel, replacing the example with a real link:
 
 ```text
 Use instagram-transcript-extractor to get the transcript of this public Instagram Reel:
@@ -34,9 +38,9 @@ https://www.instagram.com/reels/REPLACE_WITH_A_REAL_LINK/
 
 The result depends on the requested public link and the connected tools. A restricted or inaccessible post, or a video without detectable speech, may not yield a transcript. Review the status shown for each requested link; do not assume that success for one link establishes batch behavior or results for other accounts.
 
-## Use Creator Reels Insights
+## Use Creator Video Insights
 
-Creator Reels Insights is a separate Skill. After enabling the Apify Connector as described above, import this Skill from its own GitHub folder:
+Creator Video Insights is a separate Skill. After enabling the Apify Connector as described above, import this Skill from its own GitHub folder:
 
 ```text
 https://github.com/apismith-labs/instagram-ai-agent-skills/tree/main/skills/instagram-creator-reels-insights

@@ -5,6 +5,7 @@ import re
 import sys
 from datetime import datetime, timedelta, timezone
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 class ContractError(ValueError):
     pass
@@ -44,11 +45,12 @@ def validate_settings(settings):
     return {"per_creator_limit": cap, "accounts": normalized,
             "save_consent": settings.get("save_consent") is True}
 
-def parse_time(value):
+def parse_time(value, numeric_unit=None):
     if isinstance(value, (int, float)) and not isinstance(value, bool):
+        if numeric_unit != "unix_seconds":
+            return None
         try:
-            seconds = value / 1000 if value > 100_000_000_000 else value
-            return datetime.fromtimestamp(seconds, tz=timezone.utc)
+            return datetime.fromtimestamp(value, tz=timezone.utc)
         except (OverflowError, OSError, ValueError):
             return None
     if not isinstance(value, str):
@@ -96,14 +98,12 @@ def require_post_contract(contract):
     keys = ("creator", "url", "timestamp", "type", "id")
     if not isinstance(contract, dict) or any(not isinstance(contract.get(k), str) or not contract[k] for k in keys):
         raise ContractError("interface_error: exact Profile Posts output field contract is missing")
-    if not isinstance(contract.get("video_values"), list) or not contract["video_values"]:
-        raise ContractError("interface_error: verified video type values are missing")
-    if not isinstance(contract.get("non_video_values"), list):
-        raise ContractError("interface_error: verified non-video type values are missing")
+    if contract.get("video_values") != ["Video"]:
+        raise ContractError('interface_error: only the exact type value "Video" is eligible for transcription')
+    if contract.get("non_video_values") != []:
+        raise ContractError("interface_error: additional non-video type mappings are not supported")
     if any(not isinstance(value, str) or not value for value in contract["video_values"] + contract["non_video_values"]):
         raise ContractError("interface_error: media type values must be verified non-empty strings")
-    if {value.casefold() for value in contract["video_values"]} & {value.casefold() for value in contract["non_video_values"]}:
-        raise ContractError("interface_error: video and non-video type values overlap")
     if contract.get("id_kind") not in {"code", "pk"}:
         raise ContractError("interface_error: verified stable ID kind must be code or pk")
 
@@ -111,12 +111,13 @@ def _selection_metadata_error(accounts, code, missing, detail):
     counts = {}
     for account in accounts if isinstance(accounts, list) else []:
         if isinstance(account, str) and account:
-            counts[account.lower()] = {"discovered_returned_in_window": 0, "selected": 0,
-                "returned_raw_rows": 0, "omitted_by_cap_observed": 0,
+            counts[account.lower()] = {"returned_raw_rows": None,
+                "discovered_returned_in_window": 0, "type_video_candidates": 0,
+                "selected": 0, "omitted_by_cap_observed": 0,
                 "coverage_status": "unknown", "additional_candidates_unknown": True,
                 "possible_results_limit_reached": None, "results_limit_scope_unknown": True,
-                "run_coverage": [], "out_of_window": 0, "non_video": 0,
-                "unknown_media_type": 0, "missing_timestamp": 0,
+                "run_coverage": [], "out_of_window": 0,
+                "unknown_media_type": 0, "timestamp_unverified": 0,
                 "multi_username_run_observed": False,
                 "results_limit_per_creator_unattributed": False,
                 "row_issue_count": 0}
@@ -140,7 +141,7 @@ def _verified_retrieval_completeness(bundle):
         return False, {"status": "explicitly_incomplete"}
     return None, {"status": "not_provided"}
 
-def select_posts(runs, accounts, cap, start, end, contract):
+def select_posts(runs, accounts, cap, start, end, contract, display_timezone="UTC"):
     """Select posts from per-run bundles; limit checks always use pre-filter run rows."""
     require_post_contract(contract)
     if not isinstance(accounts, list) or any(not isinstance(a, str) or not a for a in accounts):
@@ -154,13 +155,21 @@ def select_posts(runs, accounts, cap, start, end, contract):
     lo, hi = parse_time(start), parse_time(end)
     if lo is None or hi is None or hi <= lo:
         raise ContractError("invalid half-open report window")
+    if not isinstance(display_timezone, str) or not display_timezone.strip():
+        raise ContractError("display_timezone must be a non-empty IANA timezone name")
+    display_timezone = display_timezone.strip()
+    try:
+        display_tz = ZoneInfo(display_timezone)
+    except (ZoneInfoNotFoundError, ValueError):
+        raise ContractError("display_timezone must be a valid IANA timezone name")
     by_creator = {a: [] for a in wanted}
     unresolved, seen, seen_ids = [], {}, {}
     row_error_count = 0
     identity_conflict_count = 0
     unattributed_issue_count = 0
-    classifications = {a: {"out_of_window": 0, "non_video": 0, "unknown_media_type": 0,
-                           "missing_timestamp": 0, "returned_raw_rows": 0,
+    classifications = {a: {"out_of_window": 0, "unknown_media_type": 0,
+                           "discovered_returned_in_window": 0,
+                           "timestamp_unverified": 0, "returned_raw_rows": 0,
                            "additional_candidates_unknown": False, "run_coverage": [],
                            "multi_username_run_observed": False,
                            "results_limit_per_creator_unattributed": False,
@@ -193,7 +202,12 @@ def select_posts(runs, accounts, cap, start, end, contract):
                 "run_id": run_record["run_id"],
                 "status": "run_username_mapping_missing",
                 "run_status": run_record["run_status"],
+                "results_limit": run_record["results_limit"],
+                "raw_returned_rows": run_record["raw_returned_rows"],
+                "possible_results_limit_reached": run_record["possible_results_limit_reached"],
+                "retrieval_complete": run_record["retrieval_complete"],
                 "attributed_via": "row_creator_field"})
+            classifications[creator]["returned_raw_rows"] = None
         classifications[creator]["additional_candidates_unknown"] = True
         classifications[creator]["results_limit_scope_unknown"] = True
         classifications[creator]["possible_results_limit_reached"] = None
@@ -307,7 +321,18 @@ def select_posts(runs, accounts, cap, start, end, contract):
                                  "status_message": bundle.get("status_message"),
                                  "coverage_status": coverage})
         for creator in mapped:
-            classifications[creator]["run_coverage"].append({"run_id": run_id, "status": coverage})
+            classifications[creator]["run_coverage"].append({
+                "run_id": run_id, "status": coverage, "run_status": normalized_status,
+                "results_limit": limit, "raw_returned_rows": len(raw_posts),
+                "possible_results_limit_reached": reached,
+                "retrieval_complete": retrieval_complete,
+                "retrieval_completeness_evidence": completeness_evidence})
+            if len(mapped) == 1 and classifications[creator]["returned_raw_rows"] is not None:
+                classifications[creator]["returned_raw_rows"] += len(raw_posts)
+            else:
+                # The run rows cannot be apportioned to individual creators from
+                # a multi-username run without per-creator grouping evidence.
+                classifications[creator]["returned_raw_rows"] = None
             if len(mapped) > 1:
                 classifications[creator]["multi_username_run_observed"] = True
                 classifications[creator]["results_limit_per_creator_unattributed"] = True
@@ -343,9 +368,9 @@ def select_posts(runs, accounts, cap, start, end, contract):
         # Continue processing identifiable bundles, while preserving the
         # missing-run metadata error and forcing unknown aggregate coverage.
 
-    video_values = {value.casefold() for value in contract["video_values"]}
-    non_video_values = {value.casefold() for value in contract["non_video_values"]}
-    required = [contract[k] for k in ("creator", "url", "timestamp", "type", "id")]
+    video_values = set(contract["video_values"])
+    required = [contract[k] for k in ("creator", "timestamp", "id")]
+    media_type_field = contract["type"]
     raw_index = 0
     for run_record, run_usernames, raw_posts in normalized_runs:
         row_identity_fallback = run_record["run_id"] in row_identity_fallback_run_ids
@@ -363,28 +388,30 @@ def select_posts(runs, accounts, cap, start, end, contract):
                     continue
                 raise ContractError(f"interface_error: Profile Posts row {raw_index} lacks a required contracted field")
             creator = row[contract["creator"]]
-            url = row[contract["url"]]
-            stamp = parse_time(row[contract["timestamp"]])
-            kind = row[contract["type"]]
+            url = row.get(contract["url"])
+            raw_stamp = row[contract["timestamp"]]
+            stamp = parse_time(raw_stamp, numeric_unit=contract.get("timestamp_unit"))
+            media_type_present = media_type_field in row
+            kind = row.get(media_type_field)
             stable_id = row[contract["id"]]
-            if not isinstance(creator, str) or not isinstance(url, str) or not isinstance(kind, str):
+            if not isinstance(creator, str):
                 if row_identity_fallback:
                     unresolved.append({"row": row, **row_source,
                                        "status": "interface_error",
-                                       "reason": "creator, URL, or media type has an invalid contracted type"})
+                                       "reason": "creator has an invalid contracted type"})
                     row_error_count += 1
                     unattributed_issue_count += 1
                     raw_index += 1
                     continue
-                raise ContractError(f"interface_error: Profile Posts row {raw_index} has invalid contracted field types")
+                raise ContractError(f"interface_error: Profile Posts row {raw_index} has an invalid creator field type")
             creator = creator.lower()
             canon = canonical_post_url(url)
             ident = str(stable_id) if stable_id not in (None, "") else None
             creator_matches_request = creator in wanted
             creator_matches_run = creator in run_usernames
-            if (not creator_matches_run and not (row_identity_fallback and creator_matches_request)) or canon is None:
+            if not creator_matches_run and not (row_identity_fallback and creator_matches_request):
                 unresolved.append({"row": row, **row_source, "status": "interface_error",
-                                   "reason": "creator cannot be verified against the missing run mapping or public post URL is invalid"})
+                                   "reason": "creator cannot be verified against the missing run mapping"})
                 row_error_count += 1
                 if creator in classifications:
                     classifications[creator]["row_issue_count"] += 1
@@ -392,7 +419,44 @@ def select_posts(runs, accounts, cap, start, end, contract):
                     unattributed_issue_count += 1
                 raw_index += 1
                 continue
-            classifications[creator]["returned_raw_rows"] += 1
+            is_video_type = media_type_present and isinstance(kind, str) and kind == "Video"
+            if stamp is None:
+                classifications[creator]["timestamp_unverified"] += 1
+                issue = {"row": row, **row_source, "status": "timestamp_unverified",
+                         "field": contract["timestamp"], "field_present": True,
+                         "value": raw_stamp,
+                         "reason": "timestamp type, unit, or timezone is not verified or parseable"}
+                if not is_video_type:
+                    issue.update({"field": media_type_field, "field_present": media_type_present,
+                                  "value": kind})
+                unresolved.append(issue)
+                raw_index += 1
+                continue
+            if not lo <= stamp < hi:
+                classifications[creator]["out_of_window"] += 1
+                issue = {"row": row, **row_source, "status": "out_of_window"}
+                if not is_video_type:
+                    issue.update({"field": media_type_field, "field_present": media_type_present,
+                                  "value": kind})
+                unresolved.append(issue)
+                raw_index += 1
+                continue
+            if canon is not None:
+                classifications[creator]["discovered_returned_in_window"] += 1
+            if not is_video_type:
+                classifications[creator]["unknown_media_type"] += 1
+                unresolved.append({"row": row, **row_source, "status": "unknown_media_type",
+                                   "field": media_type_field, "field_present": media_type_present,
+                                   "value": kind})
+                raw_index += 1
+                continue
+            if canon is None:
+                unresolved.append({"row": row, **row_source, "status": "interface_error",
+                                   "reason": "confirmed Video row has no usable Instagram post URL"})
+                row_error_count += 1
+                classifications[creator]["row_issue_count"] += 1
+                raw_index += 1
+                continue
             key = ("url", canon)
             if key in seen:
                 prior = seen[key]
@@ -408,7 +472,7 @@ def select_posts(runs, accounts, cap, start, end, contract):
                         classifications[prior_creator]["row_issue_count"] += 1
                 else:
                     if (row_identity_fallback and creator_matches_request and stamp is not None
-                            and lo <= stamp < hi and kind.casefold() in video_values):
+                            and lo <= stamp < hi and isinstance(kind, str) and kind in video_values):
                         record_row_attributed_fallback_run(run_record, creator)
                     unresolved.append({"row": row, **row_source, "status": "duplicate_candidate", "duplicate_of": prior["index"]})
                 raw_index += 1
@@ -426,30 +490,19 @@ def select_posts(runs, accounts, cap, start, end, contract):
                 raw_index += 1
                 continue
             if (row_identity_fallback and creator_matches_request and stamp is not None
-                    and lo <= stamp < hi and kind.casefold() in video_values):
+                    and lo <= stamp < hi and isinstance(kind, str) and kind in video_values):
                 record_row_attributed_fallback_run(run_record, creator)
             seen[key] = {"creator": creator, "stable_id": ident, "timestamp": stamp, "index": raw_index}
             if ident:
                 seen_ids[ident] = {"url": canon, "index": raw_index, "creator": creator}
-            if stamp is None:
-                classifications[creator]["missing_timestamp"] += 1
-                unresolved.append({"row": row, **row_source, "status": "missing_timestamp"})
-            elif not lo <= stamp < hi:
-                classifications[creator]["out_of_window"] += 1
-                unresolved.append({"row": row, **row_source, "status": "out_of_window"})
-            elif kind.casefold() in non_video_values:
-                classifications[creator]["non_video"] += 1
-                unresolved.append({"row": row, **row_source, "status": "non_video"})
-            elif kind.casefold() in video_values:
+            if kind in video_values:
                 by_creator[creator].append({"row": row, "creator": creator, "url": canon, "stable_id": ident,
                                            "stable_id_kind": contract["id_kind"], "timestamp": stamp,
+                                           "published_at_utc": stamp.isoformat().replace("+00:00", "Z"),
+                                           "published_at_local": stamp.astimezone(display_tz).isoformat(),
+                                           "display_timezone": display_timezone,
                                            "source_run_id": run_record["run_id"],
                                            "source_run_index": run_record["run_index"]})
-            else:
-                classifications[creator]["unknown_media_type"] += 1
-                unresolved.append({"row": row, **row_source, "status": "unknown_media_type", "value": kind})
-                row_error_count += 1
-                classifications[creator]["row_issue_count"] += 1
             raw_index += 1
     at_limit_possible = any(record["possible_results_limit_reached"] for record, _, _ in normalized_runs)
     unknown_scope = any(record["limit_scope_unknown"] for record, _, _ in normalized_runs)
@@ -457,6 +510,8 @@ def select_posts(runs, accounts, cap, start, end, contract):
     for creator, rows in by_creator.items():
         rows.sort(key=lambda x: x["timestamp"], reverse=True)
         chosen = rows[:cap]
+        for item in chosen:
+            item.pop("timestamp", None)
         selected.extend(chosen)
         creator_run_records = classifications[creator]["run_coverage"]
         creator_unknown = (classifications[creator].get("results_limit_scope_unknown", False)
@@ -466,13 +521,14 @@ def select_posts(runs, accounts, cap, start, end, contract):
                            or classifications[creator]["additional_candidates_unknown"]
                            or len(rows) > len(chosen)
                            or classifications[creator]["unknown_media_type"] > 0
-                           or classifications[creator]["missing_timestamp"] > 0
+                           or classifications[creator]["timestamp_unverified"] > 0
                            or bool(classifications[creator].get("possible_results_limit_reached")))
         creator_partial = creator_partial or any(item["status"] not in {
             "returned_below_run_limit", "possible_results_limit_reached",
             "unknown_multi_username_limit_scope", "possible_results_limit_reached_scope_unknown"
         } for item in creator_run_records)
-        counts[creator] = {"discovered_returned_in_window": len(rows),
+        counts[creator] = {"discovered_returned_in_window": classifications[creator]["discovered_returned_in_window"],
+                           "type_video_candidates": len(rows),
                            "returned_raw_rows": classifications[creator]["returned_raw_rows"], "selected": len(chosen),
                            "omitted_by_cap_observed": max(0, len(rows)-len(chosen)),
                            "coverage_status": "unknown" if creator_unknown else ("partial" if creator_partial or len(rows) > len(chosen) else "complete"),
@@ -483,11 +539,11 @@ def select_posts(runs, accounts, cap, start, end, contract):
                            **classifications[creator]}
     unknown_types = any(counts[a]["unknown_media_type"] for a in counts)
     omitted = any(counts[a]["omitted_by_cap_observed"] for a in counts)
-    missing_times = any(counts[a]["missing_timestamp"] for a in counts)
+    unverified_times = any(counts[a]["timestamp_unverified"] for a in counts)
     run_incomplete = any(not (record["run_status"] == "SUCCEEDED" and record["retrieval_complete"])
                          for record, _, _ in normalized_runs)
     row_issues = identity_conflict_count > 0 or row_error_count > 0
-    incomplete = (unknown_scope or at_limit_possible or omitted or missing_times or unknown_types
+    incomplete = (unknown_scope or at_limit_possible or omitted or unverified_times or unknown_types
                   or run_incomplete
                   or any(counts[a]["row_issue_count"] for a in counts)
                   or unattributed_issue_count > 0 or bool(missing_run_fields))
@@ -520,6 +576,8 @@ def reconcile_transcripts(submitted, rows, run_status, dataset_complete, post_co
         raise ContractError("interface_error: exact Transcript output field contract is missing")
     if not isinstance(submitted, list) or not isinstance(rows, list):
         raise ContractError("interface_error: submitted candidates and transcript rows must be arrays")
+    if not submitted:
+        raise ContractError("interface_error: reconcile requires at least one submitted Video candidate")
     if dataset_complete is not None and type(dataset_complete) is not bool:
         raise ContractError("dataset_complete must be true, false, or unknown/null")
     if isinstance(run_status, str):
@@ -677,7 +735,7 @@ def main():
         op = req.get("operation")
         if op == "settings": result = validate_settings(req.get("settings"))
         elif op == "window": result = window(req.get("now"), req.get("mode"))
-        elif op == "select": result = select_posts(req.get("runs"), req.get("accounts"), req.get("per_creator_limit"), req.get("start"), req.get("end_exclusive"), req.get("post_contract"))
+        elif op == "select": result = select_posts(req.get("runs"), req.get("accounts"), req.get("per_creator_limit"), req.get("start"), req.get("end_exclusive"), req.get("post_contract"), req.get("display_timezone", "UTC"))
         elif op == "split": result = {"batches": split_batches(req.get("urls"), req.get("batch_size"))}
         elif op == "reconcile":
             result = {"results": reconcile_transcripts(req.get("submitted"), req.get("rows"), req.get("run_status"), req.get("dataset_complete"), req.get("post_contract"), req.get("transcript_contract"), req.get("run_error"))}

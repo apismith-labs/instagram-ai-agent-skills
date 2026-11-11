@@ -1,8 +1,8 @@
 # Instagram Skills in OpenClaw
 
-This guide covers Instagram Creator Reels Insights and Instagram Transcript Extractor. Install the Skill you need, then connect the Apify plugin separately using [Set up the Apify plugin](#set-up-the-apify-plugin).
+This guide covers Instagram Creator Video Insights and Instagram Transcript Extractor, plus local-source setup for the unpublished Instagram Media Links & Post Insights Skill. Install the Skill you need, then connect the Apify plugin separately using [Set up the Apify plugin](#set-up-the-apify-plugin).
 
-## Instagram Creator Reels Insights
+## Instagram Creator Video Insights
 
 Use this Skill to review one or more public creator accounts through their returned transcripts and identify topics, opening hooks, and speaking structures. Daily Scan covers the most recent 24 hours; Weekly Review covers the most recent 7 days. Reports keep findings separate by creator.
 
@@ -36,7 +36,7 @@ openclaw config get agents.defaults.workspace
 
 If the command reports that the runtime default applies instead of printing a path, use the runtime default; do not treat an undisplayed path as a fixed location. Also confirm that the install went to the active workspace or shared managed directory. If it still does not appear, [report the issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues).
 
-Before your first Creator report, complete the shared Apify setup below. After setup, start a new session or refresh the available tools, then select Creator Reels Insights. For a multi-creator weekly review, you can ask:
+Before your first Creator report, complete the shared Apify setup below. After setup, start a new session or refresh the available tools, then select Creator Video Insights. For a multi-creator weekly review, you can ask:
 
 ```text
 $instagram-creator-reels-insights Review these public creator accounts for the most recent 7 days: [CREATOR_1], [CREATOR_2], and [CREATOR_3]. Process up to [VIDEO_LIMIT] eligible videos per creator. Give each creator a separate summary, then compare topics, hooks, speaking structures, and CTAs only where the returned transcripts support it. Link each insight to its source post and short transcript evidence. Separate observations from interpretation. If results are partial or unknown, explain that they may be incomplete. Do not say no posts were made just because none were returned, and do not imply unreturned posts were reviewed.
@@ -46,9 +46,19 @@ $instagram-creator-reels-insights Review these public creator accounts for the m
 
 Reports are based on posts and transcripts returned for the request; they do not guarantee that every post in the period was found. The ClawHub copy is listed under MIT-0; the repository uses MIT.
 
+## Instagram Media Links & Post Insights
+
+This Skill is not published on ClawHub. Do not install the GitHub release ZIP through OpenClaw. Clone the repository into the environment used by the OpenClaw Gateway, then from the repository root install the local Skill folder:
+
+```sh
+openclaw skills install ./skills/instagram-media-links-and-post-insights --global
+```
+
+Omit `--global` to install only into the active workspace. Run `openclaw skills check`, open a new session, and select `$instagram-media-links-and-post-insights`. Confirm the selected Agent can see the Skill and the `apify` tool. The OpenClaw [Skills CLI guide](https://docs.openclaw.ai/cli/skills) documents local-folder installation and readiness checks.
+
 ## Set up the Apify plugin
 
-Apify is a separate prerequisite for both Skills. If you do not have an Apify account, [create one in the Apify Console](https://console.apify.com/sign-up). Choose one way to install the Apify OpenClaw plugin:
+Use OpenClaw 2026.1.0 or later with Node.js 22+. Apify is a separate prerequisite for both Skills. If you do not have an Apify account, [create one in the Apify Console](https://console.apify.com/sign-up). Choose one way to install the Apify OpenClaw plugin:
 
 - Run the OpenClaw CLI command:
 
@@ -64,7 +74,7 @@ Restart the OpenClaw Gateway after installing the plugin, as directed by the [of
 openclaw apify setup
 ```
 
-The plugin supports providing an API Key through its configuration or the `APIFY_API_KEY` environment variable; prefer the setup wizard where possible. Never send an API Key, password, cookie, or other credential in chat or commit it to the repository. See the [official plugin README](https://github.com/apify/apify-openclaw-plugin) for the wizard and other supported configuration options. After setup, start a new OpenClaw session or refresh the available tools. If the Apify tool is still unavailable to your Agent, review OpenClaw's tool permissions and allow the plugin as needed without replacing existing settings.
+The plugin supports providing an API Key through its configuration or the `APIFY_API_KEY` environment variable; prefer the setup wizard where possible. Never send an API Key, password, cookie, or other credential in chat or commit it to the repository. See the [official plugin README](https://github.com/apify/apify-openclaw-plugin) for the wizard and other supported configuration options. After setup, run `openclaw gateway restart`, then `openclaw apify status`. Start a new OpenClaw session or refresh the available tools. If the Apify tool is still unavailable to your Agent, review OpenClaw's tool permissions and allow the plugin as needed without replacing existing settings.
 
 ## Instagram Transcript Extractor
 

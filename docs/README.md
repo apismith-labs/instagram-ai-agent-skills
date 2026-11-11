@@ -4,10 +4,10 @@ This guide lists the two currently published Instagram Skills and their platform
 
 - [Instagram Transcript Extractor](skills/instagram-transcript-extractor.md) retrieves speech transcripts from public Instagram videos and supports transcript-based summaries, translations, and analysis.
   - Available as the separate [GitHub ZIP v0.2.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) for Skill-upload platforms and on [ClawHub 1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) for OpenClaw.
-- [Instagram Creator Reels Insights](skills/instagram-creator-reels-insights.md) provides recent creator-video insights based on returned posts and transcripts.
-  - Its [Creator installation table](../README.md#instagram-creator-reels-insights) lists distinct routes for ChatGPT, Claude Web, OpenClaw, Codex, Manus, Claude Desktop, and Claude Code.
+- [Instagram Creator Video Insights](skills/instagram-creator-reels-insights.md) provides recent creator-video insights based on returned posts and transcripts.
+  - Its [Creator installation table](../README.md#instagram-creator-video-insights) lists distinct routes for ChatGPT, Claude Web, OpenClaw, Codex, Manus, Claude Desktop, and Claude Code.
   - The [GitHub ZIP v1.0.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) is for platforms that accept Skill package uploads; the separate [ClawHub listing v1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) is the OpenClaw route.
-  - The ClawHub installation and full task flow have not been confirmed in the project's OpenClaw Gateway; see the [OpenClaw instructions](platforms/openclaw.md#instagram-creator-reels-insights).
+  - The ClawHub installation and full task flow have not been confirmed in the project's OpenClaw Gateway; see the [OpenClaw instructions](platforms/openclaw.md#instagram-creator-video-insights).
 
 Each Skill has its own installation path. Connecting Apify is a separate setup step from installing a Skill.
 
@@ -27,15 +27,15 @@ The Apify connection provides access to external Apify tools and account authori
 
 ## Choose a guide
 
-- [ChatGPT](platforms/chatgpt.md): add the Apify MCP custom server (`https://mcp.apify.com`) and authorize with OAuth, then upload the ZIP for the Skill you need. In a new chat, type **@** in the message box and select `Apify MCP`. One connection can serve multiple Skills; check the tools exposed in the current account/workspace.
+- [ChatGPT](platforms/chatgpt.md): install the Skill ZIP and add/authorize the `Apify MCP` custom server separately. Ordinary chat uses an explicit Skill name (Skills may auto-select when relevant); the tested Work mode's **@** picker is account-level evidence only. One connection can serve multiple Skills; confirm tools exposed to the current account/workspace.
 - [Codex](platforms/codex.md): separate instructions for the Codex desktop app and Codex CLI, followed by the Skill installation and discovery check.
-- [Manus](platforms/manus.md): enable the Apify Connector, import the Skill from GitHub, and select it in chat.
-- [Claude Web, Claude Desktop regular chat, and Claude Code](platforms/claude-web.md): set up Apify and upload the Skill in Claude Web, use the same account in Claude Desktop regular chat, or follow the separate Claude Code setup instructions.
+- [Manus](platforms/manus.md): add the Apify MCP endpoint as a custom connector, authorize through OAuth on first use, import the Skill from GitHub, and enable both in chat.
+- [Claude Web, Claude Desktop regular chat, and Claude Code CLI](platforms/claude-web.md): Web/Desktop use the account's Apify Plugin/remote connector and separate Skill upload; Claude Code CLI uses its own plugin and MCP setup. The unified Plugins interface is still rolling out.
 - [OpenClaw](platforms/openclaw.md):
   - **Instagram Transcript Extractor:** choose its [ClawHub route](platforms/openclaw.md#install-with-the-openclaw-cli-from-clawhub), Control UI, GitHub-source, Vercel Skills CLI, or local-directory route.
-  - **Instagram Creator Reels Insights:** use its separate [ClawHub v1.0.2 route](platforms/openclaw.md#instagram-creator-reels-insights); its GitHub ZIP is for package-upload platforms, not OpenClaw. The ClawHub installation and full task flow are not confirmed in the project Gateway.
+  - **Instagram Creator Video Insights:** use its separate [ClawHub v1.0.2 route](platforms/openclaw.md#instagram-creator-video-insights); its GitHub ZIP is for package-upload platforms, not OpenClaw. The ClawHub installation and full task flow are not confirmed in the project Gateway.
   - Install and connect the Apify plugin separately using [Set up the Apify plugin](platforms/openclaw.md#set-up-the-apify-plugin).
 - [Instagram Transcript Extractor](skills/instagram-transcript-extractor.md): what to request, what a result means, and common limitations.
-- [Instagram Creator Reels Insights](skills/instagram-creator-reels-insights.md): how to request Daily Scans or Weekly Reviews and understand transcript-based reports.
+- [Instagram Creator Video Insights](skills/instagram-creator-reels-insights.md): how to request Daily Scans or Weekly Reviews and understand transcript-based reports.
 
 Follow each platform guide for the Skill-specific setup steps. Installation and Apify authorization are separate.

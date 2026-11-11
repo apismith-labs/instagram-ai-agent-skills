@@ -4,18 +4,20 @@
 
 You need your own [Apify account](https://console.apify.com/). Actor runs use the allowance and billing terms of that account; the [Apify Console](https://console.apify.com/) shows current Runs and billing details. One Apify MCP connection can be shared by multiple Skills; you do not create a separate connection for each Skill.
 
-ChatGPT Skills availability depends on account, workspace, and product availability. OpenAI's [Skills in ChatGPT guide](https://help.openai.com/en/articles/20001066-skills-in-chatgpt) currently documents Skills for eligible Business, Enterprise, Healthcare, and Edu users. Check your account and workspace if the Skills page or upload option is unavailable.
+ChatGPT Skills availability depends on account, workspace, administrator settings, and product rollout. OpenAI currently lists eligible Business, Enterprise, Healthcare, and Edu users for Skills, subject to workspace settings and product availability; this project's reported Plus observation is account-level evidence only. If the Skills page or upload option is unavailable, check the [official Skills guide](https://help.openai.com/en/articles/20001066-skills-in-chatgpt) and your workspace administrator.
 
 ## 1. Add and authorize the Apify MCP connection
 
 Apify connection and Skill installation are separate steps. The Apify connection gives ChatGPT access to external Apify tools; each Skill supplies its own task workflow.
 
-1. In ChatGPT, open **Plugins → + → Add custom MCP server**.
-2. Set **Name** to `Apify MCP` and **Server URL** to `https://mcp.apify.com`.
-3. Choose **OAuth**, complete Apify authorization, and review the requested access.
-4. Review and acknowledge ChatGPT's risk notice, then choose **Create as a plugin**.
-5. Inspect the tools ChatGPT discovers. The actual tools vary by account, workspace, and current product state.
-6. Install the generated Apify MCP plugin/App in ChatGPT.
+1. 在 ChatGPT 打开 **Plugins（插件）→ + → Add custom MCP server（添加自定义 MCP 服务器）**。
+2. 填写 **Name（名称）** `Apify MCP` 和 **Server URL（服务器地址）** `https://mcp.apify.com`。
+3. 选择 **OAuth**。
+4. 阅读风险提示、勾选确认框，然后选择 **Create as a plugin（创建为插件）**。
+5. 随后按 ChatGPT 提示登录 Apify 并批准授权。
+6. 检查发现的工具，再安装生成的 **Apify MCP** 插件/App。
+
+该 Apify MCP 连接可供多个 Skill 共用；每个 Skill 仍需单独安装。不要在聊天中发送 API Key 或其他凭据。
 
 Before a task, confirm the current connection exposes the target Actor call, its live input schema, run-status information, and a way to read the Actor's Dataset results. Do not assume every account or workspace has the same tool list. If a required capability is missing, do not start the task through a different Actor or authentication route.
 
@@ -35,25 +37,23 @@ Keep the downloaded ZIP intact; do not unzip it before upload. In ChatGPT, open 
 - **Needs Review:** read the displayed prompt and follow the review step before using it.
 - **Blocked:** the Skill cannot be used in that state. The scan status alone does not show that the ZIP is damaged. Avoid repeatedly uploading the same ZIP. Note the release version and scan message, then [open a GitHub issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues) for help. Do not include credentials or personal sensitive information.
 
-### Upload Creator Reels Insights
+### Upload Creator Video Insights
 
 Download the named GitHub Release asset [`instagram-creator-reels-insights-v1.0.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip), not GitHub's automatically generated **Source code (zip)**. Keep it intact. In ChatGPT, use **Plugins → Plugin Directory → Skills → Create → Upload from your computer** and select this ZIP. Check the upload scan: it may be **Available**, **Needs Review**, or **Blocked**, as described above. Using the Creator report workflow through ChatGPT and Apify has not been confirmed in this project.
 
-Optional SHA-256 for the Creator Reels Insights v1.0.2 ZIP:
+Optional SHA-256 for the Creator Video Insights v1.0.2 ZIP:
 
 ```text
 714de0c189e915f8555d055e54fb88f8796f030f2b3be6c031acb0525306b99b
 ```
 
-## 3. Use a Skill in a new conversation
+## 3. 在新聊天中使用 Skill
 
-After installing the generated plugin/App and the Skill you need:
+**普通聊天：**OpenAI 官方说明已安装的 Skill 可在相关时自动使用；为明确表达意图，请在请求中写出 Skill 名称及任务。官方文档没有规定普通聊天必须使用 `@` 选择 Skill。
 
-1. Start a new chat.
-2. In the message box, type **@** and select `Apify MCP`.
-3. Name the Skill you want to use in your request.
+**ChatGPT 工作模式：**本项目收到过一次账号级验证，观察到在输入框键入 **@** 可选择 `Apify MCP`，并在请求中点名 Skill。官方公开说明没有保证所有账号、工作区或产品状态都提供此选择器，所以只在界面实际出现时使用。
 
-The connection may apply per message, so select it on messages that need new Apify data. Skill installation and MCP connection are separate steps; do not create a separate Apify MCP connection for each Skill. This guide does not assume a separate Skill-selection control in ChatGPT.
+两种模式都应在发出任务前确认该 Skill 已启用，Apify 连接已授权，当前会话显示可用工具。ChatGPT 的普通聊天和工作模式不能假定共享完全相同的选择流程。
 
 For example, replace the sample URL with a real public Instagram Reel or supported video post link:
 
@@ -62,19 +62,19 @@ Use Instagram Transcript Extractor to get the transcript of this public Instagra
 https://www.instagram.com/reel/REPLACE_WITH_A_REAL_LINK/
 ```
 
-### Creator Reels Insights
+### Creator Video Insights
 
 For a multi-creator review, use this request:
 
 ```text
-Use Instagram Creator Reels Insights to review [CREATOR_1] and [CREATOR_2] for the most recent 7 days. Give each creator a separate section. Base findings only on transcripts actually returned and link each finding to its source post. Compare creators only where the returned transcripts support it. If results are partial or unknown, explain that they may be incomplete; do not treat no returned posts as proof that no posts were published.
+Use Instagram Creator Video Insights to review [CREATOR_1] and [CREATOR_2] for the most recent 7 days. Give each creator a separate section. Base findings only on transcripts actually returned and link each finding to its source post. Compare creators only where the returned transcripts support it. If results are partial or unknown, explain that they may be incomplete; do not treat no returned posts as proof that no posts were published.
 ```
 
 Analyze only content returned through your connected tools.
 
 ## Copyable requests
 
-Replace every placeholder shown, including each `PUBLIC_INSTAGRAM_URL` and `[TARGET_LANGUAGE]`, with an accessible public Instagram link or your target language. In a new chat, type **@** in the message box, select `Apify MCP`, and name Instagram Transcript Extractor in your request. These are request examples, not guarantees that every link will succeed.
+Replace every placeholder shown, including each `PUBLIC_INSTAGRAM_URL` and `[TARGET_LANGUAGE]`, with an accessible public Instagram link or your target language. In regular chat, explicitly name Instagram Transcript Extractor in your request; in Work mode, use the **@** `Apify MCP` picker only if it appears in your account. These examples are not guarantees that every link will succeed.
 
 **Single transcript**
 

@@ -5,19 +5,20 @@ import pathlib
 import subprocess
 import sys
 import unittest
+from datetime import datetime, timezone
 
 PATH = pathlib.Path(__file__).parents[1] / "skills/instagram-creator-reels-insights/scripts/workflow.py"
 SPEC = importlib.util.spec_from_file_location("creator_workflow", PATH)
 wf = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(wf)
 
-POST_CONTRACT = {"creator":"creator","url":"url","timestamp":"created","type":"kind","id":"stable","id_kind":"pk","video_values":["reel","video"],"non_video_values":["image","carousel"]}
+POST_CONTRACT = {"creator":"creator","url":"url","timestamp":"created","timestamp_unit":"unix_seconds","type":"kind","id":"stable","id_kind":"pk","video_values":["Video"],"non_video_values":[]}
 TRANSCRIPT_CONTRACT = {"url":"url","code":"code","pk":"pk","creator":"userName","text":"text","segments":"segments","error":"errMsg","segment_text":"text","post_id_kind":"pk"}
 START, END = "2026-11-05T00:00:00Z", "2026-11-06T00:00:00Z"
 
 def post(code, creator="a", created=START, url=None, stable=None):
     return {"creator":creator,"url":url or f"https://www.instagram.com/reel/{code}/",
-            "created":created,"kind":"reel","stable":stable or code}
+            "created":created,"kind":"Video","stable":stable or code}
 
 def synthetic_run(run_id, usernames, posts, results_limit, retrieval_complete=True, **extra):
     """Synthetic Profile Posts run envelope for offline tests; not Actor evidence."""
@@ -28,16 +29,64 @@ def synthetic_run(run_id, usernames, posts, results_limit, retrieval_complete=Tr
             "retrieval_complete":retrieval_complete,"run_status":"SUCCEEDED",**extra}
 
 def select(posts, accounts, cap, contract=POST_CONTRACT, retrieval_complete=True,
-           results_limit=None, usernames=None, run_id="synthetic-run", **run_extra):
+           results_limit=None, usernames=None, run_id="synthetic-run", display_timezone="UTC", **run_extra):
     limit = results_limit if results_limit is not None else max(1,len(posts)+1)
     run = synthetic_run(run_id,usernames or accounts,posts,limit,retrieval_complete,**run_extra)
-    return wf.select_posts([run],accounts,cap,START,END,contract)
+    return wf.select_posts([run],accounts,cap,START,END,contract,display_timezone)
 
 class CreatorWorkflowTests(unittest.TestCase):
     def test_rolling_windows_use_exclusive_upper_bound(self):
         self.assertEqual(wf.window("2026-11-05T12:00:00+08:00", "daily"),
                          {"start_utc":"2026-11-04T04:00:00Z","end_utc_exclusive":"2026-11-05T04:00:00Z"})
         self.assertEqual(wf.window("2026-11-05T12:00:00+08:00", "weekly")["start_utc"], "2026-10-29T04:00:00Z")
+
+    def test_unix_seconds_publish_time_is_converted_to_utc_and_requested_timezone(self):
+        epoch = int(datetime.fromisoformat("2026-01-01T23:30:00+00:00").timestamp())
+        row = post("epoch", created=epoch)
+        run = synthetic_run("epoch-run", ["a"], [row], 5)
+        got = wf.select_posts([run], ["a"], 5, "2026-01-01T00:00:00Z",
+                              "2026-01-02T00:00:00Z", POST_CONTRACT, "Asia/Shanghai")
+        selected = got["selected"][0]
+        self.assertEqual(selected["published_at_utc"], "2026-01-01T23:30:00Z")
+        self.assertEqual(selected["published_at_local"], "2026-01-02T07:30:00+08:00")
+        self.assertEqual(selected["display_timezone"], "Asia/Shanghai")
+
+    def test_numeric_time_without_confirmed_unit_is_preserved_as_unverified(self):
+        row = post("unknown-unit", created=1_767_301_800)
+        contract = {key:value for key, value in POST_CONTRACT.items() if key != "timestamp_unit"}
+        got = select([row], ["a"], 5, contract=contract)
+        self.assertEqual(got["selected"], [])
+        issue = next(item for item in got["unresolved"] if item["status"] == "timestamp_unverified")
+        self.assertEqual(issue["field"], "created")
+        self.assertTrue(issue["field_present"])
+        self.assertEqual(issue["value"], 1_767_301_800)
+
+    def test_timezone_display_does_not_change_window_membership(self):
+        epoch = int(datetime.fromisoformat("2026-01-01T00:30:00+00:00").timestamp())
+        run = synthetic_run("timezone-run", ["a"], [post("cross-day", created=epoch)], 5)
+        utc = wf.select_posts([run], ["a"], 5, "2026-01-01T00:00:00Z",
+                              "2026-01-02T00:00:00Z", POST_CONTRACT, "UTC")
+        shanghai = wf.select_posts([run], ["a"], 5, "2026-01-01T00:00:00Z",
+                                   "2026-01-02T00:00:00Z", POST_CONTRACT, "Asia/Shanghai")
+        self.assertEqual([item["url"] for item in utc["selected"]],
+                         [item["url"] for item in shanghai["selected"]])
+        self.assertEqual(utc["selected"][0]["published_at_utc"],
+                         shanghai["selected"][0]["published_at_utc"])
+        self.assertEqual(shanghai["selected"][0]["published_at_local"], "2026-01-01T08:30:00+08:00")
+
+    def test_transcript_runtime_timestamp_is_not_used_as_post_publish_time(self):
+        epoch = int(datetime.fromisoformat("2026-01-01T23:30:00+00:00").timestamp())
+        selected = wf.select_posts(
+            [synthetic_run("publish-run", ["a"], [post("same-post", created=epoch)], 5)],
+            ["a"], 5, "2026-01-01T00:00:00Z", "2026-01-02T00:00:00Z",
+            POST_CONTRACT, "Asia/Shanghai")["selected"]
+        transcript = {"url":selected[0]["url"], "pk":"same-post", "userName":"a",
+                      "text":"spoken words", "createTime":epoch,
+                      "timestamp":"2026-11-11T05:00:00Z"}
+        result = wf.reconcile_transcripts(selected, [transcript], "SUCCEEDED", True,
+                                          POST_CONTRACT, TRANSCRIPT_CONTRACT)[0]
+        self.assertEqual(result["post"]["published_at_local"], "2026-01-02T07:30:00+08:00")
+        self.assertEqual(result["row"]["timestamp"], "2026-11-11T05:00:00Z")
 
     def test_settings_reject_invalid_creator_cap_and_dot_path(self):
         for amount in (0, -1, True, 1.5, "2", None):
@@ -90,11 +139,13 @@ class CreatorWorkflowTests(unittest.TestCase):
         rows = [post("in"), post("at-end", created=END),
                 post("outside", created="2026-11-06T00:00:01Z"),
                 post("photo", created="2026-11-05T12:00:00Z")]
-        rows[-1]["kind"] = "image"
+        rows[-1]["kind"] = "Image"
         got = select(rows, ["a"], 5)
         self.assertEqual([x["row"]["stable"] for x in got["selected"]], ["in"])
         self.assertEqual(got["counts"]["a"]["out_of_window"], 2)
-        self.assertEqual(got["counts"]["a"]["non_video"], 1)
+        self.assertEqual(got["counts"]["a"]["unknown_media_type"], 1)
+        self.assertEqual(got["counts"]["a"]["discovered_returned_in_window"], 2)
+        self.assertEqual(got["counts"]["a"]["type_video_candidates"], 1)
 
     def test_top_level_selection_status_distinguishes_empty_partial_and_interface_error(self):
         empty = select([], ["a"], 2)
@@ -428,7 +479,7 @@ class CreatorWorkflowTests(unittest.TestCase):
         bundle = synthetic_run("synthetic-missing-usernames", ["a"],
             [post("owned", creator="a"), post("outside", creator="not-requested"),
              {"url":"https://www.instagram.com/reel/no-owner/","created":START,
-              "kind":"reel","stable":"no-owner"}], 5)
+              "kind":"Video","stable":"no-owner"}], 5)
         del bundle["usernames"]
         got = wf.select_posts([bundle], ["a"], 3, START, END, POST_CONTRACT)
 
@@ -812,22 +863,32 @@ class CreatorWorkflowTests(unittest.TestCase):
         output = json.loads(proc.stdout)
         self.assertEqual(output["results"][0]["status"], "success")
         self.assertIsNone(output["results"][0]["dataset_complete"])
-    def test_media_values_are_case_insensitive_and_unknowns_are_auditable(self):
+    def test_exact_video_value_selects_and_other_media_values_remain_unknown(self):
         rows = [post("upper", created="2026-11-05T13:00:00Z"),
                 post("photo", created="2026-11-05T12:00:00Z"),
-                post("new", created="2026-11-05T11:00:00Z")]
-        rows[0]["kind"] = "REEL"
+                post("new", created="2026-11-05T11:00:00Z"),
+                post("null-type", created="2026-11-05T10:00:00Z"),
+                post("non-string-type", created="2026-11-05T09:00:00Z"),
+                post("missing-type", created="2026-11-05T08:00:00Z")]
+        rows[0]["kind"] = "Video"
         rows[1]["kind"] = "IMAGE"
         rows[2]["kind"] = "short_video_v2"
+        rows[3]["kind"] = None
+        rows[4]["kind"] = 7
+        rows[4]["url"] = None
+        del rows[5]["kind"]
         got = select(rows, ["a"], 5)
-        self.assertEqual(got["status"], "partial_interface_error")
+        self.assertEqual(got["status"], "partial")
         self.assertEqual(len(got["selected"]), 1)
-        self.assertEqual(got["counts"]["a"]["non_video"], 1)
-        self.assertEqual(got["counts"]["a"]["unknown_media_type"], 1)
+        self.assertEqual(got["row_interface_error_count"], 0)
+        self.assertEqual(got["counts"]["a"]["discovered_returned_in_window"], 5)
+        self.assertEqual(got["counts"]["a"]["unknown_media_type"], 5)
+        self.assertEqual(got["counts"]["a"]["type_video_candidates"], 1)
         self.assertFalse(got["counts"]["a"]["additional_candidates_unknown"])
-        self.assertEqual([u["status"] for u in got["unresolved"]], ["non_video", "unknown_media_type"])
-        self.assertEqual(got["unresolved"][1]["value"], "short_video_v2")
-        self.assertNotIn("reason", got["unresolved"][1])
+        self.assertEqual([u["status"] for u in got["unresolved"]], ["unknown_media_type"] * 5)
+        self.assertEqual([u["value"] for u in got["unresolved"]], ["IMAGE", "short_video_v2", None, 7, None])
+        self.assertEqual([u["field_present"] for u in got["unresolved"]], [True, True, True, True, False])
+        self.assertTrue(all("reason" not in u for u in got["unresolved"]))
 
     def test_cli_stdin_json_executes_report_chain_without_budget_operations(self):
         env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
