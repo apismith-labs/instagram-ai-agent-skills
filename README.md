@@ -4,21 +4,25 @@ A collection of independent AI agent Skills for working with public Instagram vi
 
 ## Choose a Skill
 
-Browse the [user guide and platform installation index](docs/README.md) for all setup guides.
+Browse the [user guide and platform installation index](docs/README.md) for all setup guides. Transcript Extractor and Media Links & Post Insights have current public ClawHub listings. Creator Video Insights has an older published package and listing, but its current workflow remains in development and unverified.
 
-**Instagram Transcript Extractor** (`instagram-transcript-extractor`) gets spoken-word transcripts from public Instagram Reels and videos, with transcript-based summaries, translation, and text analysis.
+**Instagram Transcript Extractor** (`instagram-transcript-extractor`) retrieves the spoken transcript actually returned for a public Instagram video or Reel. Ask for a summary, translation, or analysis of that transcript; success is not guaranteed for every video. See the [Instagram Transcripts Scraper Actor](https://apify.com/apple_yang/instagram-transcripts-scraper).
 
-- **Available:** [GitHub ZIP v0.2.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) · [ClawHub 1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor)
+- **Available:** [GitHub Release ZIP v0.2.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) · [ClawHub listing v1.0.4](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) (latest and moderation-clean when checked 2026-11-12)
 - **Start here:** [Platform instructions](#install-by-platform) · [Installation entry](#install-instagram-transcript-extractor) · [User guide](docs/skills/instagram-transcript-extractor.md) · [Copy-ready prompts](#instagram-transcript-extractor)
 
-**Instagram Creator Video Insights** (`instagram-creator-reels-insights`) reviews public Reels and regular video posts and creates source-linked Daily Scan or Weekly Review reports from returned transcripts.
+**Instagram Media Links & Post Insights** (`instagram-media-links-and-post-insights`) returns Actor-supplied video/audio links and post fields for public Instagram video posts and Reels. It only presents data the Actor actually returns; it does not download media or guarantee that every field is present. See the [Instagram Video Scraper API Actor](https://apify.com/apple_yang/instagram-video-scraper-api).
 
-- **Available:** [GitHub ZIP v1.0.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) · [ClawHub 1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights)
+- **Available:** [ClawHub listing v1.0.1](https://clawhub.ai/apismith-labs/skills/instagram-media-links-and-post-insights) (latest and moderation-clean when checked 2026-11-12). No named GitHub Release ZIP is available for this Skill.
+- **Start here:** [Platform instructions](#install-by-platform) · [Installation entry](#install-instagram-media-links-and-post-insights) · [User guide](docs/skills/instagram-media-links-and-post-insights.md)
+
+**Instagram Creator Video Insights** (`instagram-creator-reels-insights`) is intended to review public Reels and regular video posts through returned transcripts. **Current workflow status: in development and unverified; this update does not publish or update Creator.** The earlier [GitHub Release ZIP v1.0.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) and [ClawHub listing v1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) are existing distributions of an earlier snapshot, not validation of the current workflow.
+
 - **Start here:** [Platform instructions](#install-by-platform) · [Creator installation entry](#instagram-creator-video-insights) · [User guide](docs/skills/instagram-creator-reels-insights.md) · [Copy-ready examples](#instagram-creator-video-insights-prompts)
 
 ## Install by platform
 
-Choose one Skill, then follow its platform-specific setup. The steps below walk through ChatGPT, Claude Web, and OpenClaw; the Skill-specific route tables also point to Codex, Manus, Claude Desktop, and Claude Code instructions. Installing a Skill does not connect Apify. For direct routes, jump to [Transcript Extractor](#install-instagram-transcript-extractor) or [Creator Video Insights](#instagram-creator-video-insights).
+Choose one Skill, then follow its platform-specific setup. The steps below walk through ChatGPT, Claude Web, and OpenClaw; the Skill-specific route tables also point to Codex, Manus, Claude Desktop, and Claude Code instructions. Installing a Skill does not connect Apify. For direct routes, jump to [Transcript Extractor](#install-instagram-transcript-extractor), [Media Links & Post Insights](#install-instagram-media-links-and-post-insights), or [Creator Video Insights](#instagram-creator-video-insights).
 
 ### Named GitHub Skill ZIPs
 
@@ -27,7 +31,9 @@ For the ChatGPT and Claude Web upload steps below, choose the package for the Sk
 | Skill | GitHub Release ZIP |
 | --- | --- |
 | Instagram Transcript Extractor | [`instagram-transcript-extractor-v0.2.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) · [Release v0.2.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v0.2.2) |
-| Instagram Creator Video Insights | [`instagram-creator-reels-insights-v1.0.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) · [Release v1.0.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v1.0.2) |
+| Instagram Creator Video Insights (earlier package; current workflow unverified) | [`instagram-creator-reels-insights-v1.0.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) · [Release v1.0.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v1.0.2) |
+
+Media Links & Post Insights has no named GitHub Release ZIP. Its ClawHub version is a separate OpenClaw distribution and is not a ZIP version or a ChatGPT upload package.
 
 ### ChatGPT
 
@@ -37,17 +43,17 @@ For the ChatGPT and Claude Web upload steps below, choose the package for the Sk
 
 In a regular chat, name the Skill in your request; OpenAI says installed Skills can be selected automatically when relevant. In the ChatGPT Work mode tested for this project, the user could type **@** and select `Apify MCP`, then name the Skill. Treat that as account-level observation, not a guarantee that every account/surface has the same picker. One connection can serve multiple Skills. Skills are documented for eligible ChatGPT Business, Enterprise, Healthcare, and Edu users, subject to workspace settings and product availability. The public custom MCP guide lists full support for Business and Enterprise/Edu and says Pro can connect custom MCP servers with read/fetch permissions. The project owner has also completed one third-Skill success-path test on a ChatGPT Plus account, which is account-level evidence only and not a general Plus availability guarantee. See OpenAI's [Skills in ChatGPT guide](https://help.openai.com/en/articles/20001066-skills-in-chatgpt), [custom MCP guide](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt), and the [project ChatGPT guide](docs/platforms/chatgpt.md).
 
-Use the [named ZIP package table](#named-github-skill-zips) above to download the GitHub Release ZIP for the Skill you want.
+Use the [named ZIP package table](#named-github-skill-zips) above for Transcript Extractor or the earlier Creator package. Media Links & Post Insights currently has no named GitHub Release ZIP.
 
 ### Claude Web
 
 Install the official Apify Plugin or connect its hosted MCP connector, complete Apify OAuth, and upload/enable the Skill ZIP separately. In new chats, enable Apify from the connector menu and select the Skill with `/` when the menu offers it, or name it in the request. Claude is rolling out a unified Plugins page, so the visible label may still be Customize. See the [Claude guide](docs/platforms/claude-web.md).
 
-Upload the selected package from the [named ZIP package table](#named-github-skill-zips) above.
+Upload a package from the [named ZIP package table](#named-github-skill-zips) above only when a named GitHub Release ZIP exists for that Skill. Media Links & Post Insights currently has no such package.
 
 ### OpenClaw
 
-Install from ClawHub in the same environment as your OpenClaw Gateway (the service or environment running your OpenClaw agents). By default the OpenClaw CLI installs to the active workspace's `skills/` directory; add `--global` for the shared managed Skills directory. Check the default Agent with `openclaw skills check`, or specify one with `openclaw skills check --agent YOUR_AGENT_ID`. In a new session, select the Skill using its `$` name. Follow the [OpenClaw Skills CLI documentation](https://docs.openclaw.ai/cli/skills) and the [project OpenClaw guide](docs/platforms/openclaw.md) for workspace troubleshooting, the Apify plugin, and Transcript Extractor's other install sources.
+Install Transcript Extractor or Media Links & Post Insights from ClawHub in the same environment as your OpenClaw Gateway (the service or environment running your OpenClaw agents). Creator's existing ClawHub v1.0.2 listing is an earlier distribution; the current Creator workflow remains in development and unverified. By default the OpenClaw CLI installs to the active workspace's `skills/` directory; add `--global` for the shared managed Skills directory. Check the default Agent with `openclaw skills check`, or specify one with `openclaw skills check --agent YOUR_AGENT_ID`. In a new session, select the Skill using its `$` name. Follow the [OpenClaw Skills CLI documentation](https://docs.openclaw.ai/cli/skills) and the [project OpenClaw guide](docs/platforms/openclaw.md) for exact install routes and the separate Apify plugin setup.
 
 ## Skill-specific installation routes
 
@@ -61,7 +67,7 @@ Choose the route for your platform. GitHub ZIP and ClawHub versions are separate
 | --- | --- |
 | ChatGPT | Upload [`instagram-transcript-extractor-v0.2.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) using the [ChatGPT steps](#chatgpt). |
 | Claude Web | Upload [`instagram-transcript-extractor-v0.2.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) and separately connect Apify using the [Claude guide](docs/platforms/claude-web.md). |
-| OpenClaw | ClawHub 1.0.2: [`@apismith-labs/instagram-transcript-extractor`](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) · `openclaw skills install @apismith-labs/instagram-transcript-extractor`. [Guide](docs/platforms/openclaw.md#instagram-transcript-extractor). |
+| OpenClaw | ClawHub 1.0.4: [`@apismith-labs/instagram-transcript-extractor`](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) · `openclaw skills install @apismith-labs/instagram-transcript-extractor`. [Guide](docs/platforms/openclaw.md#instagram-transcript-extractor). |
 | Codex desktop app / CLI | Use the GitHub [`skills/instagram-transcript-extractor`](https://github.com/apismith-labs/instagram-ai-agent-skills/tree/main/skills/instagram-transcript-extractor) folder with [Codex install instructions](docs/platforms/codex.md#install-the-skill). |
 | Manus | Import the GitHub folder [`skills/instagram-transcript-extractor`](https://github.com/apismith-labs/instagram-ai-agent-skills/tree/main/skills/instagram-transcript-extractor) using [Transcript Extractor import steps](docs/platforms/manus.md#2-import-and-enable-the-skill). |
 | Claude Desktop regular chat | Sign into the same account; use the Chat tab, enable Apify through the connector menu, and choose the Skill with `/` if offered. See the [Claude guide](docs/platforms/claude-web.md). |
@@ -75,17 +81,30 @@ Choose the route for your platform. These install paths do not imply that the fu
 | --- | --- |
 | ChatGPT | Upload [`instagram-creator-reels-insights-v1.0.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) using the [ChatGPT steps](#chatgpt). |
 | Claude Web | Upload [`instagram-creator-reels-insights-v1.0.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) and separately connect Apify using the [Claude guide](docs/platforms/claude-web.md). |
-| OpenClaw | ClawHub 1.0.2: [`@apismith-labs/instagram-creator-reels-insights`](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) · `openclaw skills install @apismith-labs/instagram-creator-reels-insights`. [Details](docs/platforms/openclaw.md#instagram-creator-video-insights). |
+| OpenClaw | Existing ClawHub listing v1.0.2: [`@apismith-labs/instagram-creator-reels-insights`](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) · `openclaw skills install @apismith-labs/instagram-creator-reels-insights`. The current workflow remains in development and unverified. [Details](docs/platforms/openclaw.md#instagram-creator-video-insights). |
 | Codex desktop app / CLI | Use the separate GitHub [`skills/instagram-creator-reels-insights`](https://github.com/apismith-labs/instagram-ai-agent-skills/tree/main/skills/instagram-creator-reels-insights) folder with [Creator install instructions](docs/platforms/codex.md#install-creator-video-insights). |
 | Manus | Import the separate GitHub folder [`skills/instagram-creator-reels-insights`](https://github.com/apismith-labs/instagram-ai-agent-skills/tree/main/skills/instagram-creator-reels-insights) using [Creator import instructions](docs/platforms/manus.md#use-creator-video-insights). The report workflow is not confirmed in Manus. |
 | Claude Desktop regular chat | Sign into the same account; in the Chat tab, enable Apify through the connector menu and choose the Skill with `/` if offered. The report workflow is not confirmed there. See the [Claude guide](docs/platforms/claude-web.md). |
 | Claude Code | Same-account sync or extract the top-level folder from the [v1.0.2 ZIP](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip); see [Creator Claude Code steps](docs/platforms/claude-web.md#creator-video-insights-in-claude-code). Installation and task flow are not confirmed there. |
 
+<a id="install-instagram-media-links-and-post-insights"></a>
+
+### Install Instagram Media Links & Post Insights
+
+The current public distribution route is ClawHub for OpenClaw. ClawHub 1.0.1 and the GitHub Release ZIP channel are separate; no named GitHub Release ZIP is available for ChatGPT or other ZIP-upload platforms.
+
+| Platform | Media Links & Post Insights entry |
+| --- | --- |
+| OpenClaw | ClawHub 1.0.1: [`@apismith-labs/instagram-media-links-and-post-insights`](https://clawhub.ai/apismith-labs/skills/instagram-media-links-and-post-insights) · `openclaw skills install @apismith-labs/instagram-media-links-and-post-insights`. [OpenClaw setup](docs/platforms/openclaw.md#media-links-post-insights-installation). |
+| ChatGPT / Claude Web | No named GitHub Release ZIP is available. The ClawHub version is not an upload ZIP; do not treat it as one. |
+| Codex | The repository documents a general local Skill-directory installation route; see the [Codex guide](docs/platforms/codex.md). This is not a Media-specific end-to-end verification. |
+| Manus | No Media-specific Manus installation instructions are currently documented. The [Manus guide](docs/platforms/manus.md) covers only its documented platform setup; do not infer that this Skill's installation or workflow is supported there. |
+
 ## Connect Apify and check usage
 
 Apify connection steps vary by platform: use the [ChatGPT Apify MCP custom-connection setup](docs/platforms/chatgpt.md#1-add-and-authorize-the-apify-mcp-connection), [Claude Web setup](docs/platforms/claude-web.md), [Codex setup](docs/platforms/codex.md), or [Manus setup](docs/platforms/manus.md). In ChatGPT, one Apify MCP connection can be shared by multiple Skills; a Skill install does not create or authorize that connection. OpenClaw uses its separately installed [Apify plugin](docs/platforms/openclaw.md#set-up-the-apify-plugin). Never paste credentials into chat. Runs use your Apify account and the Actors' current billing rules. More creators or videos may increase usage; check actual usage in [Apify Console](https://console.apify.com/). No fixed fee or fee cap is promised.
 
-Transcript processing in both Skills uses the [Instagram Transcripts Scraper on Apify](https://apify.com/apple_yang/instagram-transcripts-scraper).
+Transcript Extractor and Creator Video Insights use the [Instagram Transcripts Scraper on Apify](https://apify.com/apple_yang/instagram-transcripts-scraper). Media Links & Post Insights uses the separate [Instagram Video Scraper API Actor](https://apify.com/apple_yang/instagram-video-scraper-api).
 
 ## Copy-ready prompts
 
@@ -133,9 +152,10 @@ For [CREATOR_1], [CREATOR_2], and [CREATOR_3], review the most recent 7 days usi
 ## Scope and limitations
 
 - Transcript Extractor analyzes returned speech text. It does not analyze video imagery, editing, audience response, or unreturned engagement metrics. Timestamps, subtitle files, and batch processing depend on the returned data and host capabilities.
+- Media Links & Post Insights reports only Actor-supplied media links and returned post fields. It does not download media, promise missing fields, or infer unverified counts or trends.
 - Creator Video Insights can accept multiple requested creators and keeps the report organized per creator. It sends a post for transcription only when the returned `type` is exactly `"Video"` and the Instagram post URL is usable; other or unknown type values are retained but not treated as videos. It analyzes only the posts and transcripts returned for the request; it does not guarantee that every post in a period was found or establish trends beyond the reviewed sample.
-- Neither Skill bypasses private, deleted, restricted, or otherwise inaccessible content. Do not provide Instagram passwords, cookies, or session credentials in chat.
+- These Skills do not bypass private, deleted, restricted, or otherwise inaccessible content. Do not provide Instagram passwords, cookies, or session credentials in chat.
 
 ## Help and license
 
-Questions or problems? [Open a GitHub issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues). The [Instagram Transcript Extractor user guide](docs/skills/instagram-transcript-extractor.md) covers that Skill only. Creator Video Insights users can start with its [user guide](docs/skills/instagram-creator-reels-insights.md), browse the [Creator prompt examples](#instagram-creator-video-insights-prompts), or inspect its [SKILL.md](skills/instagram-creator-reels-insights/SKILL.md). The repository and GitHub ZIP packages are licensed under [MIT](LICENSE); the ClawHub copies of both Skills are listed under [MIT-0](https://spdx.org/licenses/MIT-0.html).
+Questions or problems? [Open a GitHub issue](https://github.com/apismith-labs/instagram-ai-agent-skills/issues). See the [Transcript Extractor guide](docs/skills/instagram-transcript-extractor.md), [Media Links & Post Insights guide](docs/skills/instagram-media-links-and-post-insights.md), or [Creator Video Insights guide](docs/skills/instagram-creator-reels-insights.md). Creator users can also browse the [Creator prompt examples](#instagram-creator-video-insights-prompts) or inspect its [SKILL.md](skills/instagram-creator-reels-insights/SKILL.md). The repository and GitHub ZIP packages are licensed under [MIT](LICENSE); the published ClawHub copies are listed under [MIT-0](https://spdx.org/licenses/MIT-0.html).

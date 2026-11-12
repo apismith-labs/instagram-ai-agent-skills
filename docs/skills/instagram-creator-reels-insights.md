@@ -2,6 +2,8 @@
 
 Instagram Creator Video Insights reviews public videos—including Reels and regular video posts—for the creator accounts you name. Use Daily Scan for a recent-day review or Weekly Review to summarize the past week. Unlike [Instagram Transcript Extractor](instagram-transcript-extractor.md), which starts from video links you provide, this Skill starts from creator accounts and a time window, then analyzes transcripts returned for eligible videos.
 
+**Current workflow status: in development and unverified.** Existing GitHub Release ZIP v1.0.2 and ClawHub listing v1.0.2 are earlier distribution artifacts; they do not validate the current workflow, and Creator was not updated in this documentation change.
+
 ## Before using it
 
 You need your own Apify account and must connect or authorize Apify separately in the platform where you use the Skill. Installing a Skill does not connect Apify. Usage follows your Apify account and current service terms; check the [Apify Console](https://console.apify.com/) for actual usage. No fixed price or fee cap is promised.
@@ -20,7 +22,7 @@ Choose your platform's setup guide:
 
 A single user-reported successful run is not independent verification, a complete-coverage guarantee, or evidence of long-term stability. An installation route or visible Skill alone does not verify the complete report workflow. See the [Creator-specific installation table](../../README.md#instagram-creator-video-insights) for the current route and distribution details.
 
-The GitHub [ZIP v1.0.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) and the separate [ClawHub listing v1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) are different distribution channels. Use the ZIP only with a platform route that supports it; OpenClaw uses the ClawHub route.
+The earlier GitHub [ZIP v1.0.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) and separate [ClawHub listing v1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) are different distribution channels. Use the ZIP only with a platform route that supports it; OpenClaw uses the ClawHub route. Neither artifact should be read as verification of the current in-development workflow.
 
 ## What to ask
 

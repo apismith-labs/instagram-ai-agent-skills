@@ -10,20 +10,22 @@ ChatGPT Skills availability depends on account, workspace, administrator setting
 
 Apify connection and Skill installation are separate steps. The Apify connection gives ChatGPT access to external Apify tools; each Skill supplies its own task workflow.
 
-1. 在 ChatGPT 打开 **Plugins（插件）→ + → Add custom MCP server（添加自定义 MCP 服务器）**。
-2. 填写 **Name（名称）** `Apify MCP` 和 **Server URL（服务器地址）** `https://mcp.apify.com`。
-3. 选择 **OAuth**。
-4. 阅读风险提示、勾选确认框，然后选择 **Create as a plugin（创建为插件）**。
-5. 随后按 ChatGPT 提示登录 Apify 并批准授权。
-6. 检查发现的工具，再安装生成的 **Apify MCP** 插件/App。
+1. In ChatGPT, open **Plugins → + → Add custom MCP server**.
+2. Set **Name** to `Apify MCP` and **Server URL** to `https://mcp.apify.com`.
+3. Select **OAuth**.
+4. Read the risk notice, check the confirmation box, and select **Create as a plugin**.
+5. Follow ChatGPT's prompts to sign in to Apify and authorize access.
+6. Check the discovered tools, then install the generated **Apify MCP** plugin/App.
 
-该 Apify MCP 连接可供多个 Skill 共用；每个 Skill 仍需单独安装。不要在聊天中发送 API Key 或其他凭据。
+One Apify MCP connection can be shared by multiple Skills; each Skill must still be installed separately. Never send an API key or other credential in chat.
 
 Before a task, confirm the current connection exposes the target Actor call, its live input schema, run-status information, and a way to read the Actor's Dataset results. Do not assume every account or workspace has the same tool list. If a required capability is missing, do not start the task through a different Actor or authentication route.
 
 These steps follow the current [OpenAI custom MCP server guide](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt) and [Apify MCP guide](https://docs.apify.com/mcp), which recommends hosted OAuth for remote connections. OpenAI's public documentation currently lists full custom MCP support for ChatGPT Business and Enterprise/Edu; Business creation is limited to admins and owners, while Enterprise/Edu admins can grant selected members permission to create connections. The same OpenAI guide says Pro users can connect custom MCP servers with read/fetch permissions. The public [Skills guide](https://help.openai.com/en/articles/20001066-skills-in-chatgpt) separately lists eligible Business, Enterprise, Healthcare, and Edu users, subject to workspace settings and product availability. This project has observed one successful custom Apify MCP connection and third-Skill task on its owner's ChatGPT Plus account under the product state at test time. That account-level observation differs from the plans explicitly listed in public documentation; it does not establish general Plus availability or override plan, workspace, region, administrator, or product-rollout restrictions. If the option is unavailable, check current account/workspace access and the official guides; do not assume every Plus account has the same capability.
 
 ## 2. Upload a Skill package
+
+GitHub Release ZIPs and ClawHub listings are separate distribution channels with independent version numbers. The currently available Transcript Extractor GitHub ZIP is v0.2.2; its ClawHub listing is v1.0.4. Media Links & Post Insights has a ClawHub listing v1.0.1 but no named GitHub Release ZIP, so its ClawHub version is not a ChatGPT upload package. Creator's existing v1.0.2 ZIP is an earlier package; its current workflow remains in development and unverified.
 
 Download `instagram-transcript-extractor-v0.2.2.zip` from the [v0.2.2 Release asset](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip), or open the [v0.2.2 Release page](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v0.2.2) and choose that named file under **Assets**. Do not download GitHub's automatically generated **Source code (zip)**. Optional SHA-256 for the Transcript Extractor v0.2.2 ZIP:
 
@@ -39,7 +41,7 @@ Keep the downloaded ZIP intact; do not unzip it before upload. In ChatGPT, open 
 
 ### Upload Creator Video Insights
 
-Download the named GitHub Release asset [`instagram-creator-reels-insights-v1.0.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip), not GitHub's automatically generated **Source code (zip)**. Keep it intact. In ChatGPT, use **Plugins → Plugin Directory → Skills → Create → Upload from your computer** and select this ZIP. Check the upload scan: it may be **Available**, **Needs Review**, or **Blocked**, as described above. Using the Creator report workflow through ChatGPT and Apify has not been confirmed in this project.
+The existing GitHub Release asset [`instagram-creator-reels-insights-v1.0.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) is an earlier package, not an update to the current workflow. It may be uploaded using **Plugins → Plugin Directory → Skills → Create → Upload from your computer**; do not select GitHub's automatically generated **Source code (zip)**. The current Creator workflow remains in development and unverified, and its ChatGPT report workflow has not been confirmed in this project.
 
 Optional SHA-256 for the Creator Video Insights v1.0.2 ZIP:
 
@@ -47,13 +49,17 @@ Optional SHA-256 for the Creator Video Insights v1.0.2 ZIP:
 714de0c189e915f8555d055e54fb88f8796f030f2b3be6c031acb0525306b99b
 ```
 
-## 3. 在新聊天中使用 Skill
+### Instagram Media Links & Post Insights
 
-**普通聊天：**OpenAI 官方说明已安装的 Skill 可在相关时自动使用；为明确表达意图，请在请求中写出 Skill 名称及任务。官方文档没有规定普通聊天必须使用 `@` 选择 Skill。
+There is no named GitHub Release ZIP for this Skill, so this guide does not provide a package to upload to ChatGPT. Its ClawHub listing v1.0.1 is a separate OpenClaw distribution, not a ChatGPT upload ZIP. See the [Media Links & Post Insights user guide](../skills/instagram-media-links-and-post-insights.md) for its current scope and distribution details.
 
-**ChatGPT 工作模式：**本项目收到过一次账号级验证，观察到在输入框键入 **@** 可选择 `Apify MCP`，并在请求中点名 Skill。官方公开说明没有保证所有账号、工作区或产品状态都提供此选择器，所以只在界面实际出现时使用。
+## 3. Use a Skill in a new chat
 
-两种模式都应在发出任务前确认该 Skill 已启用，Apify 连接已授权，当前会话显示可用工具。ChatGPT 的普通聊天和工作模式不能假定共享完全相同的选择流程。
+**Regular chat:** OpenAI says an installed Skill may be selected automatically when relevant. To make your intent clear, name the Skill and task in your request. OpenAI's public documentation does not require using `@` to select a Skill in regular chat.
+
+**ChatGPT Work mode:** In one account-level project test, typing **@** in the input box showed `Apify MCP` as a selectable connection, which the user then named in the request. OpenAI's public documentation does not guarantee this picker is available in every account, workspace, or product state, so use it only when it appears in your interface.
+
+In either mode, before starting a task, confirm the Skill is enabled, the Apify connection is authorized, and the current chat exposes the needed tools. Do not assume regular chat and Work mode have the same selection flow.
 
 For example, replace the sample URL with a real public Instagram Reel or supported video post link:
 

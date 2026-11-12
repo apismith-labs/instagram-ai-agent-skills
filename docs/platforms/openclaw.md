@@ -1,12 +1,12 @@
 # Instagram Skills in OpenClaw
 
-This guide covers Instagram Creator Video Insights and Instagram Transcript Extractor, plus local-source setup for the unpublished Instagram Media Links & Post Insights Skill. Install the Skill you need, then connect the Apify plugin separately using [Set up the Apify plugin](#set-up-the-apify-plugin).
+This guide covers Instagram Transcript Extractor and Instagram Media Links & Post Insights, which have current ClawHub listings, and the existing Creator Video Insights listing. Creator's current workflow remains in development and unverified. Install the Skill you need, then connect the Apify plugin separately using [Set up the Apify plugin](#set-up-the-apify-plugin).
 
 ## Instagram Creator Video Insights
 
 Use this Skill to review one or more public creator accounts through their returned transcripts and identify topics, opening hooks, and speaking structures. Daily Scan covers the most recent 24 hours; Weekly Review covers the most recent 7 days. Reports keep findings separate by creator.
 
-The Skill is available on [ClawHub](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights), version **1.0.2**. The OpenClaw CLI documents this ClawHub install command:
+An existing [ClawHub listing v1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) is available. This is an earlier distribution; the current Creator workflow remains in development and unverified. The OpenClaw CLI documents this ClawHub install command:
 
 ```sh
 openclaw skills install @apismith-labs/instagram-creator-reels-insights
@@ -26,7 +26,7 @@ openclaw skills check
 
 To check a specific Agent, use `openclaw skills check --agent YOUR_AGENT_ID`, replacing `YOUR_AGENT_ID` with its ID; if you do not know the ID, omit `--agent`. Then open a new session and select `$instagram-creator-reels-insights`.
 
-The command follows the [OpenClaw Skills CLI documentation](https://docs.openclaw.ai/cli/skills). The ClawHub installation itself and an end-to-end task using this route have not yet been confirmed in this project's Gateway environment.
+The command follows the [OpenClaw Skills CLI documentation](https://docs.openclaw.ai/cli/skills). The ClawHub installation itself and an end-to-end task using this route have not yet been confirmed in this project's Gateway environment. The current in-development Creator workflow has not been updated through this listing.
 
 If the Skill is not listed, confirm you are checking the same Gateway where it was installed. You can inspect the active workspace setting with:
 
@@ -46,19 +46,21 @@ $instagram-creator-reels-insights Review these public creator accounts for the m
 
 Reports are based on posts and transcripts returned for the request; they do not guarantee that every post in the period was found. The ClawHub copy is listed under MIT-0; the repository uses MIT.
 
+<a id="media-links-post-insights-installation"></a>
+
 ## Instagram Media Links & Post Insights
 
-This Skill is not published on ClawHub. Do not install the GitHub release ZIP through OpenClaw. Clone the repository into the environment used by the OpenClaw Gateway, then from the repository root install the local Skill folder:
+The current [ClawHub listing is v1.0.1](https://clawhub.ai/apismith-labs/skills/instagram-media-links-and-post-insights). Install it in the environment used by your OpenClaw Gateway with:
 
 ```sh
-openclaw skills install ./skills/instagram-media-links-and-post-insights --global
+openclaw skills install @apismith-labs/instagram-media-links-and-post-insights
 ```
 
-Omit `--global` to install only into the active workspace. Run `openclaw skills check`, open a new session, and select `$instagram-media-links-and-post-insights`. Confirm the selected Agent can see the Skill and the `apify` tool. The OpenClaw [Skills CLI guide](https://docs.openclaw.ai/cli/skills) documents local-folder installation and readiness checks.
+By default, the CLI installs into the active workspace. Add `--global` for the shared managed Skills directory. Run `openclaw skills check`, open a new session, and select `$instagram-media-links-and-post-insights`. Confirm the selected Agent can see the Skill and the `apify` tool. The OpenClaw [Skills CLI guide](https://docs.openclaw.ai/cli/skills) documents installation and readiness checks. This ClawHub listing is not a GitHub Release ZIP; no named GitHub ZIP is currently available for this Skill. For behavior and limits, see the [Media Links & Post Insights user guide](../skills/instagram-media-links-and-post-insights.md) and the [Instagram Video Scraper API Actor](https://apify.com/apple_yang/instagram-video-scraper-api).
 
 ## Set up the Apify plugin
 
-Use OpenClaw 2026.1.0 or later with Node.js 22+. Apify is a separate prerequisite for both Skills. If you do not have an Apify account, [create one in the Apify Console](https://console.apify.com/sign-up). Choose one way to install the Apify OpenClaw plugin:
+Use OpenClaw 2026.1.0 or later with Node.js 22+. An Apify account and the Apify plugin are separate prerequisites for these Skills. If you do not have an Apify account, [create one in the Apify Console](https://console.apify.com/sign-up). Choose one way to install the Apify OpenClaw plugin:
 
 - Run the OpenClaw CLI command:
 
@@ -78,7 +80,7 @@ The plugin supports providing an API Key through its configuration or the `APIFY
 
 ## Instagram Transcript Extractor
 
-Instagram Transcript Extractor is separately available on [ClawHub](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) as version **1.0.2**. Its GitHub [v0.2.2 ZIP package](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) is a separate distribution method for platforms that support Skill package uploads; it is not an OpenClaw installation route. Before installing from ClawHub, confirm the publisher is `apismith-labs` and review the [Skill's security audit](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor/security-audit).
+Instagram Transcript Extractor is available on [ClawHub](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) as v1.0.4 (latest when checked 2026-11-12). Its GitHub [v0.2.2 ZIP package](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) is a separate distribution for platforms that support Skill package uploads; it is not an OpenClaw installation route. ClawHub and GitHub use independent version numbers. Before installing from ClawHub, confirm the publisher is `apismith-labs` and review the [Skill's security audit](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor/security-audit). The Actor used by this Skill is the [Instagram Transcripts Scraper](https://apify.com/apple_yang/instagram-transcripts-scraper).
 
 For Transcript Extractor, choose one source: Control UI, OpenClaw CLI from ClawHub, Vercel Skills CLI from GitHub, or the local repository directory. Do not install multiple copies of the same Skill, which can create duplicate entries or version confusion.
 

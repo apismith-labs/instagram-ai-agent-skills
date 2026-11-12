@@ -31,6 +31,32 @@ If the user requests both, return both sets of fields from one Actor result wher
 
 Installing this Skill and connecting Apify are separate steps. Before the first real task, inspect the Apify tools and live schemas actually exposed in the current session, along with any host-visible authorization or connection status. If a tool is unavailable, authorization is unconfirmed, or readiness cannot be established, stop first. Tell the user that no Actor was started and no results were received, then provide the instructions for the host you have identified below. Do not infer that a plugin is uninstalled, install anything, change host settings, start OAuth, or bypass the host with another Actor, HTTP/API, shell, token, or cookie. Do not repeat setup guidance once readiness is confirmed. After setup, proceed only when the current session exposes and confirms the required Actor call, schema, run-status, and result-reading capabilities; otherwise stop and explain the gap.
 
+### OpenClaw
+
+Install this Skill from ClawHub in the environment connected to your OpenClaw Gateway by running `openclaw skills install @apismith-labs/instagram-media-links-and-post-insights`. The CLI installs into the active workspace by default; add `--global` for the shared managed Skills directory. This installs the Skill only: an Apify account and a separately configured and authorized Apify plugin are required to run it, and Skill installation does not create, connect, or authorize either. OpenClaw 2026.1.0 or later and Node.js 22+ are required; see the [current Apify plugin requirements](https://docs.apify.com/integrations/openclaw). Run `openclaw skills check` to inspect the default Agent, open a new session, and use `$instagram-media-links-and-post-insights`. If you are unsure of your directory or Agent permissions, do not guess; see the [project's OpenClaw guide](https://github.com/apismith-labs/instagram-ai-agent-skills/blob/main/docs/platforms/openclaw.md) and the [OpenClaw Skills CLI documentation](https://docs.openclaw.ai/cli/skills). The Apify plugin uses OpenClaw's separate configuration flow, not OAuth. After completing the OpenClaw guidance below, confirm the `apify` tool is visible in a new session. Never send an API key in chat.
+
+### OpenClaw first-use setup guidance
+
+Only when the current host is explicitly identified as OpenClaw and Apify tools are unavailable, the host explicitly reports missing authorization, or readiness cannot be confirmed, present the OpenClaw setup block below verbatim. Stop the Actor call first and say no Actor was started and no results were received. Do not substitute OpenClaw commands for another host's setup; missing tools do not prove that a plugin is uninstalled.
+
+> There's no confirmed usable Apify tool available to me in this OpenClaw session, so I can't start the analysis. This doesn't necessarily mean the plugin is uninstalled: it may be disabled, your Apify account may not be configured, or this Agent may not have permission. I have not started any Actor.
+>
+> If you don't have an Apify account, [create one in the Apify Console](https://console.apify.com/sign-up).
+>
+> Choose one way to install the Apify OpenClaw plugin:
+> - Run `openclaw plugins install @apify/apify-openclaw-plugin`.
+> - Or, if your OpenClaw Control UI shows the plugin catalog, open **Plugins**, search for **Apify**, and install the Apify listing from ClawHub. If it is not available there, use the CLI command above.
+>
+> Restart the OpenClaw Gateway after installation.
+>
+> First, prepare an Apify API Key. The [official plugin README](https://github.com/apify/apify-openclaw-plugin) explains how to create and configure it. Then run `openclaw apify setup` and follow the wizard to finish configuration. Never send your API Key in chat.
+>
+> After setup, open a new conversation and try your request again.
+>
+> For detailed steps, see the [OpenClaw setup guide](https://github.com/apismith-labs/instagram-ai-agent-skills/blob/main/docs/platforms/openclaw.md#set-up-the-apify-plugin).
+
+Do not start an Actor until a usable Apify tool and required schema are visible and explicit host status does not report missing authorization. If readiness remains unclear, stop and direct the user to the corresponding setup guidance above. The Skill cannot install plugins or change host settings.
+
 ### ChatGPT: regular chat and work mode
 
 Unless the user has explicitly said they already have an Apify account, show this separate registration note:
@@ -72,35 +98,9 @@ Claude Code CLI and Claude Desktop chat are separate products. First install and
 
 **Install and invoke this Skill:** Open **Skills → + Add → Import from GitHub**, paste the public GitHub URL for this Skill folder, `https://github.com/apismith-labs/instagram-ai-agent-skills/tree/main/skills/instagram-media-links-and-post-insights`, and select **Import**. Confirm the Skill appears in your personal list and enable it. In a new task, enter `/` in the input box to select this Skill, and enable Apify with the connector button below the input area. Before proceeding, confirm the Skill is selectable and the Apify connection is enabled. Manus's official documentation says MCP is available on all plans, but account permissions, interface changes, and task outcomes may vary. See the [project's Manus guide](https://github.com/apismith-labs/instagram-ai-agent-skills/blob/main/docs/platforms/manus.md), [Apify Manus guide](https://docs.apify.com/integrations/manus), and [Manus Skills guide](https://help.manus.im/en/articles/14753565-how-to-share-and-use-skills-in-manus).
 
-### OpenClaw
-
-This Skill is not currently published on ClawHub. Clone the repository into the OpenClaw Gateway environment, then from the repository root run `openclaw skills install ./skills/instagram-media-links-and-post-insights --global`; omit `--global` for the current workspace only. OpenClaw 2026.1.0 or later and Node.js 22+ are required; see the [current Apify plugin requirements](https://docs.apify.com/integrations/openclaw). Run `openclaw skills check` to inspect the default Agent, open a new session, and use `$instagram-media-links-and-post-insights`. If you are unsure of your directory or Agent permissions, do not guess; see the [project's OpenClaw guide](https://github.com/apismith-labs/instagram-ai-agent-skills/blob/main/docs/platforms/openclaw.md) and its official references. The Apify plugin uses OpenClaw's separate configuration flow, not OAuth. After completing the OpenClaw guidance below, confirm the `apify` tool is visible in a new session. Never send an API key in chat.
-
 ### Other or unrecognized hosts
 
 If the host is unclear, ask the user which product surface they are using instead of guessing menus or commands. Show host-specific steps only after identifying that host. If an account or workspace lacks the relevant entry, point to the linked official platform documentation or suggest contacting an administrator. Do not treat MCP, Connectors, plugin catalogs, and CLI configuration as interchangeable.
-
-### OpenClaw first-use setup guidance
-
-Only when the current host is explicitly identified as OpenClaw and Apify tools are unavailable, the host explicitly reports missing authorization, or readiness cannot be confirmed, present the OpenClaw setup block below verbatim. Stop the Actor call first and say no Actor was started and no results were received. Do not substitute OpenClaw commands for another host's setup; missing tools do not prove that a plugin is uninstalled.
-
-> There's no confirmed usable Apify tool available to me in this OpenClaw session, so I can't start the analysis. This doesn't necessarily mean the plugin is uninstalled: it may be disabled, your Apify account may not be configured, or this Agent may not have permission. I have not started any Actor.
->
-> If you don't have an Apify account, [create one in the Apify Console](https://console.apify.com/sign-up).
->
-> Choose one way to install the Apify OpenClaw plugin:
-> - Run `openclaw plugins install @apify/apify-openclaw-plugin`.
-> - Or, if your OpenClaw Control UI shows the plugin catalog, open **Plugins**, search for **Apify**, and install the Apify listing from ClawHub. If it is not available there, use the CLI command above.
->
-> Restart the OpenClaw Gateway after installation.
->
-> First, prepare an Apify API Key. The [official plugin README](https://github.com/apify/apify-openclaw-plugin) explains how to create and configure it. Then run `openclaw apify setup` and follow the wizard to finish configuration. Never send your API Key in chat.
->
-> After setup, open a new conversation and try your request again.
->
-> For detailed steps, see the [OpenClaw setup guide](https://github.com/apismith-labs/instagram-ai-agent-skills/blob/main/docs/platforms/openclaw.md#set-up-the-apify-plugin).
-
-Do not start an Actor until a usable Apify tool and required schema are visible and explicit host status does not report missing authorization. If readiness remains unclear, stop and direct the user to the corresponding setup guidance above. The Skill cannot install plugins or change host settings.
 
 ## Actor preflight and input
 

@@ -2,11 +2,13 @@
 
 This guide covers Instagram Transcript Extractor only. For Instagram Creator Video Insights, start with its [dedicated user guide](instagram-creator-reels-insights.md); you can also see the [Creator request examples in the project README](../../README.md#instagram-creator-video-insights-prompts) and its [SKILL.md](../../skills/instagram-creator-reels-insights/SKILL.md).
 
-Instagram Transcript Extractor is one of the two currently released Skills in this project. Give your agent one or more public Instagram Reel, video, or supported video post links to request spoken transcripts. You can also ask for a summary, translation, or analysis based on the returned text.
+Instagram Transcript Extractor retrieves the spoken transcript actually returned for public Instagram video or Reel links. You can request a summary, translation, or analysis based on that text; a transcript is not guaranteed for every video. See the [Instagram Transcripts Scraper Actor on Apify](https://apify.com/apple_yang/instagram-transcripts-scraper).
+
+The current ClawHub listing is [v1.0.4](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) (latest and moderation-clean when checked 2026-11-12). The separate GitHub Release package is [ZIP v0.2.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip). ClawHub and GitHub ZIPs are separate distribution channels and use independent version numbers.
 
 ## Before using it
 
-You need your own Apify account, and Apify must be connected in the platform where you use the Skill. Runs use that account's plan allowance; check the [Apify Console](https://console.apify.com/) for current Runs and billing details. Follow the setup guide for your platform:
+To run this Skill, you need your own Apify account and an Apify MCP/plugin connection supported and authorized by your Agent host. Installing the Skill does not create an account or connect or authorize Apify; you can install it before completing that setup. Runs use your account's plan allowance; check the [Apify Console](https://console.apify.com/) for current Runs and billing details. Follow the setup guide for your platform:
 
 - [ChatGPT setup](../platforms/chatgpt.md)
 - [Codex setup](../platforms/codex.md)
@@ -16,7 +18,7 @@ You need your own Apify account, and Apify must be connected in the platform whe
 
 For OpenClaw, install from the [ClawHub listing](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) with the OpenClaw CLI, use the Control UI, install from GitHub with Vercel Skills CLI, or install from a local repository directory. See the [OpenClaw guide](../platforms/openclaw.md#instagram-transcript-extractor) for steps and the distinct confirmation limits of these routes.
 
-Connecting Apify makes external Apify tools available to the platform. Installing this Skill provides the transcript workflow. They are separate steps. In ChatGPT, install the Skill and connect `Apify MCP` separately. The [ChatGPT setup guide](../platforms/chatgpt.md#1-add-and-authorize-the-apify-mcp-connection) distinguishes regular chat from the Work mode picker observed in one account; the `@` picker is not guaranteed across accounts or surfaces. A separate reported ChatGPT Plus test covered only the third Skill's two-URL success path; it does not verify this Transcript Extractor workflow.
+Connecting Apify makes external Apify tools available to the platform. Installing this Skill provides the transcript workflow. They are separate steps. In ChatGPT, install the Skill and connect `Apify MCP` separately. The [ChatGPT setup guide](../platforms/chatgpt.md#1-add-and-authorize-the-apify-mcp-connection) distinguishes regular chat from the Work mode picker observed in one account; the `@` picker is not guaranteed across accounts or surfaces. A separate reported ChatGPT Plus test covered only the Media Links Skill's two-URL success path; it does not verify this Transcript Extractor workflow.
 
 ## What to ask
 
