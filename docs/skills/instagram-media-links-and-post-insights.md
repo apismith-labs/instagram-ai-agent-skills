@@ -2,7 +2,7 @@
 
 Instagram Media Links & Post Insights works with public Instagram video posts and Reels that you provide. It can return video/audio links supplied by its Actor or organize post fields that the Actor actually returns. It does not download media files, and it does not guarantee that every field will be present.
 
-The Skill uses the [Instagram Video Scraper API Actor on Apify](https://apify.com/apple_yang/instagram-video-scraper-api). Its current public ClawHub listing is [v1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-media-links-and-post-insights), latest and Moderate CLEAN when checked on 2026-11-12. There is no named GitHub Release ZIP for this Skill. The ClawHub listing is an OpenClaw distribution, not a ZIP package version or a ChatGPT upload package.
+The Skill uses the [Instagram Video Scraper API Actor on Apify](https://apify.com/apple_yang/instagram-video-scraper-api). Its current public ClawHub listing is [v1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-media-links-and-post-insights), latest and Moderate CLEAN when checked on 2026-11-12. The separate [GitHub Release ZIP v1.0.0](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/instagram-media-links-and-post-insights-v1.0.0/instagram-media-links-and-post-insights-release-v1.0.0.zip) is for ZIP-upload platforms. ClawHub and GitHub ZIPs use independent version numbers.
 
 ## Before using it
 
@@ -10,10 +10,10 @@ To run the Skill, you need your own Apify account and an Apify MCP/plugin connec
 
 Follow the setup guide for your host:
 
-- [ChatGPT](../platforms/chatgpt.md): this project does not currently provide a named GitHub Release ZIP for uploading this Skill.
+- [ChatGPT](../platforms/chatgpt.md): use the separate [GitHub Release ZIP v1.0.0](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/instagram-media-links-and-post-insights-v1.0.0/instagram-media-links-and-post-insights-release-v1.0.0.zip).
 - [Codex](../platforms/codex.md): the repository provides general local Skill-directory installation guidance; it is not a Media-specific end-to-end verification.
 - Manus: no Media-specific Manus installation route is documented. The [general Manus guide](../platforms/manus.md) covers only its documented platform setup and does not establish that this Skill is supported there.
-- [Claude](../platforms/claude-web.md): this project does not currently provide a named GitHub Release ZIP for uploading this Skill.
+- [Claude](../platforms/claude-web.md): use the separate [GitHub Release ZIP v1.0.0](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/instagram-media-links-and-post-insights-v1.0.0/instagram-media-links-and-post-insights-release-v1.0.0.zip).
 - [OpenClaw](../platforms/openclaw.md#media-links-post-insights-installation)
 
 ## Choose a mode

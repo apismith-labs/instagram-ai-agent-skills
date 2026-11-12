@@ -8,12 +8,12 @@ Browse the [user guide and platform installation index](docs/README.md) for all 
 
 **Instagram Transcript Extractor** (`instagram-transcript-extractor`) retrieves the spoken transcript actually returned for a public Instagram video or Reel. Ask for a summary, translation, or analysis of that transcript; success is not guaranteed for every video. See the [Instagram Transcripts Scraper Actor](https://apify.com/apple_yang/instagram-transcripts-scraper).
 
-- **Available:** [GitHub Release ZIP v0.2.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) · [ClawHub listing v1.0.5](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) (latest and Moderate CLEAN when checked 2026-11-12)
+- **Available:** [GitHub Release ZIP v0.2.3](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.3/instagram-transcript-extractor-release-v0.2.3.zip) · [ClawHub listing v1.0.5](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) (latest and Moderate CLEAN when checked 2026-11-12)
 - **Start here:** [Platform instructions](#install-by-platform) · [Installation entry](#install-instagram-transcript-extractor) · [User guide](docs/skills/instagram-transcript-extractor.md) · [Copy-ready prompts](#instagram-transcript-extractor)
 
 **Instagram Media Links & Post Insights** (`instagram-media-links-and-post-insights`) returns Actor-supplied video/audio links and post fields for public Instagram video posts and Reels. It only presents data the Actor actually returns; it does not download media or guarantee that every field is present. See the [Instagram Video Scraper API Actor](https://apify.com/apple_yang/instagram-video-scraper-api).
 
-- **Available:** [ClawHub listing v1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-media-links-and-post-insights) (latest and Moderate CLEAN when checked 2026-11-12). No named GitHub Release ZIP is available for this Skill.
+- **Available:** [GitHub Release ZIP v1.0.0](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/instagram-media-links-and-post-insights-v1.0.0/instagram-media-links-and-post-insights-release-v1.0.0.zip) · [ClawHub listing v1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-media-links-and-post-insights) (latest and Moderate CLEAN when checked 2026-11-12). These are separate distribution channels with independent version numbers.
 - **Start here:** [Platform instructions](#install-by-platform) · [Installation entry](#install-instagram-media-links-and-post-insights) · [User guide](docs/skills/instagram-media-links-and-post-insights.md) · [Copy-ready prompts](#instagram-media-links-and-post-insights-prompts)
 
 **Instagram Creator Video Insights** (`instagram-creator-reels-insights`) is intended to review public Reels and regular video posts through returned transcripts. **Current workflow status: in development and unverified; this update does not publish or update Creator.** The earlier [GitHub Release ZIP v1.0.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) and [ClawHub listing v1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) are existing distributions of an earlier snapshot, not validation of the current workflow.
@@ -30,10 +30,11 @@ For the ChatGPT and Claude Web upload steps below, choose the package for the Sk
 
 | Skill | GitHub Release ZIP |
 | --- | --- |
-| Instagram Transcript Extractor | [`instagram-transcript-extractor-v0.2.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) · [Release v0.2.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v0.2.2) |
+| Instagram Transcript Extractor | [`instagram-transcript-extractor-release-v0.2.3.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.3/instagram-transcript-extractor-release-v0.2.3.zip) · [Release v0.2.3](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v0.2.3) |
+| Instagram Media Links & Post Insights | [`instagram-media-links-and-post-insights-release-v1.0.0.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/instagram-media-links-and-post-insights-v1.0.0/instagram-media-links-and-post-insights-release-v1.0.0.zip) · [Release v1.0.0](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/instagram-media-links-and-post-insights-v1.0.0) |
 | Instagram Creator Video Insights (earlier package; current workflow unverified) | [`instagram-creator-reels-insights-v1.0.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) · [Release v1.0.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v1.0.2) |
 
-Media Links & Post Insights has no named GitHub Release ZIP. Its ClawHub version is a separate OpenClaw distribution and is not a ZIP version or a ChatGPT upload package.
+ClawHub and GitHub Release ZIPs are separate distribution channels with independent version numbers. ClawHub packages are not ZIP upload packages.
 
 ### ChatGPT
 
@@ -43,13 +44,13 @@ Media Links & Post Insights has no named GitHub Release ZIP. Its ClawHub version
 
 In a regular chat, name the Skill in your request; OpenAI says installed Skills can be selected automatically when relevant. In the ChatGPT Work mode tested for this project, the user could type **@** and select `Apify MCP`, then name the Skill. Treat that as account-level observation, not a guarantee that every account/surface has the same picker. One connection can serve multiple Skills. Skills are documented for eligible ChatGPT Business, Enterprise, Healthcare, and Edu users, subject to workspace settings and product availability. The public custom MCP guide lists full support for Business and Enterprise/Edu and says Pro can connect custom MCP servers with read/fetch permissions. The project owner has also completed one third-Skill success-path test on a ChatGPT Plus account, which is account-level evidence only and not a general Plus availability guarantee. See OpenAI's [Skills in ChatGPT guide](https://help.openai.com/en/articles/20001066-skills-in-chatgpt), [custom MCP guide](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt), and the [project ChatGPT guide](docs/platforms/chatgpt.md).
 
-Use the [named ZIP package table](#named-github-skill-zips) above for Transcript Extractor or the earlier Creator package. Media Links & Post Insights currently has no named GitHub Release ZIP.
+Use the [named ZIP package table](#named-github-skill-zips) above for Transcript Extractor, Media Links & Post Insights, or the earlier Creator package. ClawHub versions are separate from ZIP versions.
 
 ### Claude Web
 
 Install the official Apify Plugin or connect its hosted MCP connector, complete Apify OAuth, and upload/enable the Skill ZIP separately. In new chats, enable Apify from the connector menu and select the Skill with `/` when the menu offers it, or name it in the request. Claude is rolling out a unified Plugins page, so the visible label may still be Customize. See the [Claude guide](docs/platforms/claude-web.md).
 
-Upload a package from the [named ZIP package table](#named-github-skill-zips) above only when a named GitHub Release ZIP exists for that Skill. Media Links & Post Insights currently has no such package.
+For ZIP-upload platforms, use a named GitHub Release ZIP from the table above when one is available for the Skill. Media Links & Post Insights has a v1.0.0 ZIP; ClawHub versions remain a separate distribution channel.
 
 ### OpenClaw
 
@@ -65,13 +66,13 @@ Choose the route for your platform. GitHub ZIP and ClawHub versions are separate
 
 | Platform | Transcript Extractor entry |
 | --- | --- |
-| ChatGPT | Upload [`instagram-transcript-extractor-v0.2.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) using the [ChatGPT steps](#chatgpt). |
-| Claude Web | Upload [`instagram-transcript-extractor-v0.2.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) and separately connect Apify using the [Claude guide](docs/platforms/claude-web.md). |
+| ChatGPT | Upload [`instagram-transcript-extractor-release-v0.2.3.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.3/instagram-transcript-extractor-release-v0.2.3.zip) using the [ChatGPT steps](#chatgpt). |
+| Claude Web | Upload [`instagram-transcript-extractor-release-v0.2.3.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.3/instagram-transcript-extractor-release-v0.2.3.zip) and separately connect Apify using the [Claude guide](docs/platforms/claude-web.md). |
 | OpenClaw | ClawHub 1.0.5: [`@apismith-labs/instagram-transcript-extractor`](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) · `openclaw skills install @apismith-labs/instagram-transcript-extractor`. [Guide](docs/platforms/openclaw.md#instagram-transcript-extractor). |
 | Codex desktop app / CLI | Use the GitHub [`skills/instagram-transcript-extractor`](https://github.com/apismith-labs/instagram-ai-agent-skills/tree/main/skills/instagram-transcript-extractor) folder with [Codex install instructions](docs/platforms/codex.md#install-the-skill). |
 | Manus | Import the GitHub folder [`skills/instagram-transcript-extractor`](https://github.com/apismith-labs/instagram-ai-agent-skills/tree/main/skills/instagram-transcript-extractor) using [Transcript Extractor import steps](docs/platforms/manus.md#2-import-and-enable-the-skill). |
 | Claude Desktop regular chat | Sign into the same account; use the Chat tab, enable Apify through the connector menu, and choose the Skill with `/` if offered. See the [Claude guide](docs/platforms/claude-web.md). |
-| Claude Code | Same-account sync or extract the named [Transcript Extractor v0.2.2 ZIP](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) and follow the [Claude Code steps](docs/platforms/claude-web.md#claude-code). |
+| Claude Code | Same-account sync or extract the named [Transcript Extractor v0.2.3 ZIP](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.3/instagram-transcript-extractor-release-v0.2.3.zip) and follow the [Claude Code steps](docs/platforms/claude-web.md#claude-code). |
 
 ### Instagram Creator Video Insights
 
@@ -91,12 +92,12 @@ Choose the route for your platform. These install paths do not imply that the fu
 
 ### Install Instagram Media Links & Post Insights
 
-The current public distribution route is ClawHub 1.0.2 for OpenClaw. This ClawHub version and the GitHub Release ZIP channel are separate; no named GitHub Release ZIP is available for ChatGPT or other ZIP-upload platforms.
+The GitHub Release ZIP v1.0.0 is for ZIP-upload platforms; ClawHub v1.0.2 is the separate OpenClaw distribution. These channels use independent version numbers.
 
 | Platform | Media Links & Post Insights entry |
 | --- | --- |
 | OpenClaw | ClawHub 1.0.2 (latest and Moderate CLEAN when checked 2026-11-12): [`@apismith-labs/instagram-media-links-and-post-insights`](https://clawhub.ai/apismith-labs/skills/instagram-media-links-and-post-insights) · `openclaw skills install @apismith-labs/instagram-media-links-and-post-insights`. [OpenClaw setup](docs/platforms/openclaw.md#media-links-post-insights-installation). |
-| ChatGPT / Claude Web | No named GitHub Release ZIP is available. The ClawHub version is not an upload ZIP; do not treat it as one. |
+| ChatGPT / Claude Web | Upload the [GitHub Release ZIP v1.0.0](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/instagram-media-links-and-post-insights-v1.0.0/instagram-media-links-and-post-insights-release-v1.0.0.zip). ClawHub v1.0.2 is a separate OpenClaw distribution. |
 | Codex | The repository documents a general local Skill-directory installation route; see the [Codex guide](docs/platforms/codex.md). This is not a Media-specific end-to-end verification. |
 | Manus | No Media-specific Manus installation instructions are currently documented. The [Manus guide](docs/platforms/manus.md) covers only its documented platform setup; do not infer that this Skill's installation or workflow is supported there. |
 

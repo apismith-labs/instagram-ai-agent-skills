@@ -25,15 +25,15 @@ These steps follow the current [OpenAI custom MCP server guide](https://help.ope
 
 ## 2. Upload a Skill package
 
-GitHub Release ZIPs and ClawHub listings are separate distribution channels with independent version numbers. The currently available Transcript Extractor GitHub ZIP is v0.2.2; its ClawHub listing is v1.0.5. Media Links & Post Insights has a ClawHub listing v1.0.2 but no named GitHub Release ZIP, so its ClawHub version is not a ChatGPT upload package. Creator's existing v1.0.2 ZIP is an earlier package; its current workflow remains in development and unverified.
+GitHub Release ZIPs and ClawHub listings are separate distribution channels with independent version numbers. The Transcript Extractor GitHub ZIP is v0.2.3; its ClawHub listing is v1.0.5. The Media Links & Post Insights GitHub ZIP is v1.0.0; its ClawHub listing is v1.0.2. Creator's existing v1.0.2 ZIP is an earlier package; its current workflow remains in development and unverified.
 
-Download `instagram-transcript-extractor-v0.2.2.zip` from the [v0.2.2 Release asset](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip), or open the [v0.2.2 Release page](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v0.2.2) and choose that named file under **Assets**. Do not download GitHub's automatically generated **Source code (zip)**. Optional SHA-256 for the Transcript Extractor v0.2.2 ZIP:
+Download `instagram-transcript-extractor-release-v0.2.3.zip` from the [v0.2.3 Release asset](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.3/instagram-transcript-extractor-release-v0.2.3.zip), or open the [v0.2.3 Release page](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v0.2.3) and choose that named file under **Assets**. Do not download GitHub's automatically generated **Source code (zip)**. Optional SHA-256 for the Transcript Extractor v0.2.3 ZIP:
 
 ```text
-2bea93a3ffe3802acd302a2788ef03d07e1933dbb2ea66b57d97f24cf6f04f41
+71b7531bb0b7e5413d6afc0a1d3430f77f836a0e1ba82b52a057fd5175a78a66
 ```
 
-Keep the downloaded ZIP intact; do not unzip it before upload. In ChatGPT, open **Plugins → Plugin Directory → Skills → Create → Upload from your computer**, then select `instagram-transcript-extractor-v0.2.2.zip`. Wait for the upload scan. The Skill may become **Available**, show **Needs Review**, or show **Blocked**:
+Keep the downloaded ZIP intact; do not unzip it before upload. In ChatGPT, open **Plugins → Plugin Directory → Skills → Create → Upload from your computer**, then select `instagram-transcript-extractor-release-v0.2.3.zip`. Wait for the upload scan. The Skill may become **Available**, show **Needs Review**, or show **Blocked**:
 
 - **Available:** continue to a new conversation.
 - **Needs Review:** read the displayed prompt and follow the review step before using it.
@@ -51,7 +51,13 @@ Optional SHA-256 for the Creator Video Insights v1.0.2 ZIP:
 
 ### Instagram Media Links & Post Insights
 
-There is no named GitHub Release ZIP for this Skill, so this guide does not provide a package to upload to ChatGPT. Its ClawHub listing v1.0.2 is a separate OpenClaw distribution, not a ChatGPT upload ZIP. See the [Media Links & Post Insights user guide](../skills/instagram-media-links-and-post-insights.md) for its current scope and distribution details.
+Download the named [`instagram-media-links-and-post-insights-release-v1.0.0.zip` GitHub Release asset](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/instagram-media-links-and-post-insights-v1.0.0/instagram-media-links-and-post-insights-release-v1.0.0.zip), not GitHub's automatically generated **Source code (zip)**. Its optional SHA-256 is:
+
+```text
+e9d5d77b6e87a17cba91c4a170ef4b59e7179150b37bb1b0bc2d49854c5842f7
+```
+
+Upload the ZIP using **Plugins → Plugin Directory → Skills → Create → Upload from your computer**. This GitHub ZIP v1.0.0 is separate from the ClawHub v1.0.2 listing. See the [Media Links & Post Insights user guide](../skills/instagram-media-links-and-post-insights.md) for its scope and limitations.
 
 ## 3. Use a Skill in a new chat
 
