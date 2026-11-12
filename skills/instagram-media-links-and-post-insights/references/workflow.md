@@ -35,13 +35,13 @@ Apify currently documents the names `fetch-actor-details`, `call-actor`, `get-ac
 
 - Match only with returned `url` evidence that can be safely compared to the original input. Exact string equality is the default. If a host/tool documents a safe canonical comparison, apply only that documented rule and preserve both original strings.
 - `code`, `pk`, and `id` are not matching fallbacks unless a current, independently verified contract establishes their semantics.
-- Never assign rows by return order. If `url` is missing, conflicting, or yields multiple candidates, report the mapping as “对应关系待确认”. If no row can be reliably matched to an input, report “未收到可匹配的结果”.
+- Never assign rows by return order. If `url` is missing, conflicting, or yields multiple candidates, explain that the input-to-result mapping cannot be confirmed and cite the available evidence in the user's language. If no row can be reliably matched to an input, explain that no matching row was received and cite the evidence in the user's language.
 
 ## Classify each matched row
 
 - A non-empty string `errMsg` is the Actor's returned error text. Report it as returned; do not infer why it occurred.
 - If `errMsg` is empty or absent, report that state only. It does not prove success.
-- A missing, empty, or absent output field is “未返回/不可用”. This does not mean zero, absent media, or an unsuccessful post.
+- If an output field is missing, empty, or absent, explain that it was not returned or is unavailable in the user's language. This does not mean zero, absent media, or an unsuccessful post.
 - A returned `videoUrl` or `audioUrl` is a direct link supplied by the Actor, not a downloaded local file or a guarantee of future availability.
 - If the content type cannot be established from the user's stated intent and Actor output, say support cannot be confirmed. `/p/` alone is not video evidence. Do not make a photo/carousel support claim.
 - Treat `likeCount` and `commentCount` as returned raw counts. Do not calculate rates or infer trend, performance, audience response, or causation. Treat the output as a snapshot.
