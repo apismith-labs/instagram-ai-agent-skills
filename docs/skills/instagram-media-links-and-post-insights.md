@@ -2,7 +2,7 @@
 
 Instagram Media Links & Post Insights works with public Instagram video posts and Reels that you provide. It can return video/audio links supplied by its Actor or organize post fields that the Actor actually returns. It does not download media files, and it does not guarantee that every field will be present.
 
-The Skill uses the [Instagram Video Scraper API Actor on Apify](https://apify.com/apple_yang/instagram-video-scraper-api). Its current public ClawHub listing is [v1.0.1](https://clawhub.ai/apismith-labs/skills/instagram-media-links-and-post-insights), checked on 2026-11-12. There is no named GitHub Release ZIP for this Skill. The ClawHub listing is an OpenClaw distribution, not a ZIP package version or a ChatGPT upload package.
+The Skill uses the [Instagram Video Scraper API Actor on Apify](https://apify.com/apple_yang/instagram-video-scraper-api). Its current public ClawHub listing is [v1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-media-links-and-post-insights), latest and Moderate CLEAN when checked on 2026-11-12. There is no named GitHub Release ZIP for this Skill. The ClawHub listing is an OpenClaw distribution, not a ZIP package version or a ChatGPT upload package.
 
 ## Before using it
 

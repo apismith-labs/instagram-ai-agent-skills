@@ -25,7 +25,7 @@ These steps follow the current [OpenAI custom MCP server guide](https://help.ope
 
 ## 2. Upload a Skill package
 
-GitHub Release ZIPs and ClawHub listings are separate distribution channels with independent version numbers. The currently available Transcript Extractor GitHub ZIP is v0.2.2; its ClawHub listing is v1.0.4. Media Links & Post Insights has a ClawHub listing v1.0.1 but no named GitHub Release ZIP, so its ClawHub version is not a ChatGPT upload package. Creator's existing v1.0.2 ZIP is an earlier package; its current workflow remains in development and unverified.
+GitHub Release ZIPs and ClawHub listings are separate distribution channels with independent version numbers. The currently available Transcript Extractor GitHub ZIP is v0.2.2; its ClawHub listing is v1.0.5. Media Links & Post Insights has a ClawHub listing v1.0.2 but no named GitHub Release ZIP, so its ClawHub version is not a ChatGPT upload package. Creator's existing v1.0.2 ZIP is an earlier package; its current workflow remains in development and unverified.
 
 Download `instagram-transcript-extractor-v0.2.2.zip` from the [v0.2.2 Release asset](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip), or open the [v0.2.2 Release page](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v0.2.2) and choose that named file under **Assets**. Do not download GitHub's automatically generated **Source code (zip)**. Optional SHA-256 for the Transcript Extractor v0.2.2 ZIP:
 
@@ -51,7 +51,7 @@ Optional SHA-256 for the Creator Video Insights v1.0.2 ZIP:
 
 ### Instagram Media Links & Post Insights
 
-There is no named GitHub Release ZIP for this Skill, so this guide does not provide a package to upload to ChatGPT. Its ClawHub listing v1.0.1 is a separate OpenClaw distribution, not a ChatGPT upload ZIP. See the [Media Links & Post Insights user guide](../skills/instagram-media-links-and-post-insights.md) for its current scope and distribution details.
+There is no named GitHub Release ZIP for this Skill, so this guide does not provide a package to upload to ChatGPT. Its ClawHub listing v1.0.2 is a separate OpenClaw distribution, not a ChatGPT upload ZIP. See the [Media Links & Post Insights user guide](../skills/instagram-media-links-and-post-insights.md) for its current scope and distribution details.
 
 ## 3. Use a Skill in a new chat
 

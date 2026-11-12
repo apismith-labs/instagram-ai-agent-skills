@@ -50,7 +50,7 @@ Reports are based on posts and transcripts returned for the request; they do not
 
 ## Instagram Media Links & Post Insights
 
-The current [ClawHub listing is v1.0.1](https://clawhub.ai/apismith-labs/skills/instagram-media-links-and-post-insights). Install it in the environment used by your OpenClaw Gateway with:
+The current [ClawHub listing is v1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-media-links-and-post-insights) (latest and Moderate CLEAN when checked 2026-11-12). Install it in the environment used by your OpenClaw Gateway with:
 
 ```sh
 openclaw skills install @apismith-labs/instagram-media-links-and-post-insights
@@ -80,7 +80,7 @@ The plugin supports providing an API Key through its configuration or the `APIFY
 
 ## Instagram Transcript Extractor
 
-Instagram Transcript Extractor is available on [ClawHub](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) as v1.0.4 (latest when checked 2026-11-12). Its GitHub [v0.2.2 ZIP package](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) is a separate distribution for platforms that support Skill package uploads; it is not an OpenClaw installation route. ClawHub and GitHub use independent version numbers. Before installing from ClawHub, confirm the publisher is `apismith-labs` and review the [Skill's security audit](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor/security-audit). The Actor used by this Skill is the [Instagram Transcripts Scraper](https://apify.com/apple_yang/instagram-transcripts-scraper).
+Instagram Transcript Extractor is available on [ClawHub](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) as v1.0.5 (latest and Moderate CLEAN when checked 2026-11-12). Its GitHub [v0.2.2 ZIP package](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) is a separate distribution for platforms that support Skill package uploads; it is not an OpenClaw installation route. ClawHub and GitHub use independent version numbers. Before installing from ClawHub, confirm the publisher is `apismith-labs` and review the [Skill's security audit](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor/security-audit). The Actor used by this Skill is the [Instagram Transcripts Scraper](https://apify.com/apple_yang/instagram-transcripts-scraper).
 
 For Transcript Extractor, choose one source: Control UI, OpenClaw CLI from ClawHub, Vercel Skills CLI from GitHub, or the local repository directory. Do not install multiple copies of the same Skill, which can create duplicate entries or version confusion.
 

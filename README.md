@@ -8,13 +8,13 @@ Browse the [user guide and platform installation index](docs/README.md) for all 
 
 **Instagram Transcript Extractor** (`instagram-transcript-extractor`) retrieves the spoken transcript actually returned for a public Instagram video or Reel. Ask for a summary, translation, or analysis of that transcript; success is not guaranteed for every video. See the [Instagram Transcripts Scraper Actor](https://apify.com/apple_yang/instagram-transcripts-scraper).
 
-- **Available:** [GitHub Release ZIP v0.2.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) · [ClawHub listing v1.0.4](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) (latest and moderation-clean when checked 2026-11-12)
+- **Available:** [GitHub Release ZIP v0.2.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) · [ClawHub listing v1.0.5](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) (latest and Moderate CLEAN when checked 2026-11-12)
 - **Start here:** [Platform instructions](#install-by-platform) · [Installation entry](#install-instagram-transcript-extractor) · [User guide](docs/skills/instagram-transcript-extractor.md) · [Copy-ready prompts](#instagram-transcript-extractor)
 
 **Instagram Media Links & Post Insights** (`instagram-media-links-and-post-insights`) returns Actor-supplied video/audio links and post fields for public Instagram video posts and Reels. It only presents data the Actor actually returns; it does not download media or guarantee that every field is present. See the [Instagram Video Scraper API Actor](https://apify.com/apple_yang/instagram-video-scraper-api).
 
-- **Available:** [ClawHub listing v1.0.1](https://clawhub.ai/apismith-labs/skills/instagram-media-links-and-post-insights) (latest and moderation-clean when checked 2026-11-12). No named GitHub Release ZIP is available for this Skill.
-- **Start here:** [Platform instructions](#install-by-platform) · [Installation entry](#install-instagram-media-links-and-post-insights) · [User guide](docs/skills/instagram-media-links-and-post-insights.md)
+- **Available:** [ClawHub listing v1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-media-links-and-post-insights) (latest and Moderate CLEAN when checked 2026-11-12). No named GitHub Release ZIP is available for this Skill.
+- **Start here:** [Platform instructions](#install-by-platform) · [Installation entry](#install-instagram-media-links-and-post-insights) · [User guide](docs/skills/instagram-media-links-and-post-insights.md) · [Copy-ready prompts](#instagram-media-links-and-post-insights-prompts)
 
 **Instagram Creator Video Insights** (`instagram-creator-reels-insights`) is intended to review public Reels and regular video posts through returned transcripts. **Current workflow status: in development and unverified; this update does not publish or update Creator.** The earlier [GitHub Release ZIP v1.0.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.2/instagram-creator-reels-insights-v1.0.2.zip) and [ClawHub listing v1.0.2](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) are existing distributions of an earlier snapshot, not validation of the current workflow.
 
@@ -67,7 +67,7 @@ Choose the route for your platform. GitHub ZIP and ClawHub versions are separate
 | --- | --- |
 | ChatGPT | Upload [`instagram-transcript-extractor-v0.2.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) using the [ChatGPT steps](#chatgpt). |
 | Claude Web | Upload [`instagram-transcript-extractor-v0.2.2.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip) and separately connect Apify using the [Claude guide](docs/platforms/claude-web.md). |
-| OpenClaw | ClawHub 1.0.4: [`@apismith-labs/instagram-transcript-extractor`](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) · `openclaw skills install @apismith-labs/instagram-transcript-extractor`. [Guide](docs/platforms/openclaw.md#instagram-transcript-extractor). |
+| OpenClaw | ClawHub 1.0.5: [`@apismith-labs/instagram-transcript-extractor`](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) · `openclaw skills install @apismith-labs/instagram-transcript-extractor`. [Guide](docs/platforms/openclaw.md#instagram-transcript-extractor). |
 | Codex desktop app / CLI | Use the GitHub [`skills/instagram-transcript-extractor`](https://github.com/apismith-labs/instagram-ai-agent-skills/tree/main/skills/instagram-transcript-extractor) folder with [Codex install instructions](docs/platforms/codex.md#install-the-skill). |
 | Manus | Import the GitHub folder [`skills/instagram-transcript-extractor`](https://github.com/apismith-labs/instagram-ai-agent-skills/tree/main/skills/instagram-transcript-extractor) using [Transcript Extractor import steps](docs/platforms/manus.md#2-import-and-enable-the-skill). |
 | Claude Desktop regular chat | Sign into the same account; use the Chat tab, enable Apify through the connector menu, and choose the Skill with `/` if offered. See the [Claude guide](docs/platforms/claude-web.md). |
@@ -91,11 +91,11 @@ Choose the route for your platform. These install paths do not imply that the fu
 
 ### Install Instagram Media Links & Post Insights
 
-The current public distribution route is ClawHub for OpenClaw. ClawHub 1.0.1 and the GitHub Release ZIP channel are separate; no named GitHub Release ZIP is available for ChatGPT or other ZIP-upload platforms.
+The current public distribution route is ClawHub 1.0.2 for OpenClaw. This ClawHub version and the GitHub Release ZIP channel are separate; no named GitHub Release ZIP is available for ChatGPT or other ZIP-upload platforms.
 
 | Platform | Media Links & Post Insights entry |
 | --- | --- |
-| OpenClaw | ClawHub 1.0.1: [`@apismith-labs/instagram-media-links-and-post-insights`](https://clawhub.ai/apismith-labs/skills/instagram-media-links-and-post-insights) · `openclaw skills install @apismith-labs/instagram-media-links-and-post-insights`. [OpenClaw setup](docs/platforms/openclaw.md#media-links-post-insights-installation). |
+| OpenClaw | ClawHub 1.0.2 (latest and Moderate CLEAN when checked 2026-11-12): [`@apismith-labs/instagram-media-links-and-post-insights`](https://clawhub.ai/apismith-labs/skills/instagram-media-links-and-post-insights) · `openclaw skills install @apismith-labs/instagram-media-links-and-post-insights`. [OpenClaw setup](docs/platforms/openclaw.md#media-links-post-insights-installation). |
 | ChatGPT / Claude Web | No named GitHub Release ZIP is available. The ClawHub version is not an upload ZIP; do not treat it as one. |
 | Codex | The repository documents a general local Skill-directory installation route; see the [Codex guide](docs/platforms/codex.md). This is not a Media-specific end-to-end verification. |
 | Manus | No Media-specific Manus installation instructions are currently documented. The [Manus guide](docs/platforms/manus.md) covers only its documented platform setup; do not infer that this Skill's installation or workflow is supported there. |
@@ -148,6 +148,23 @@ For [CREATOR_1], [CREATOR_2], and [CREATOR_3], review the most recent 7 days usi
 ```
 
 `[VIDEO_LIMIT]` is the maximum number of discovered videos per creator sent for transcript analysis. It does not limit how many posts are discovered and is not a fee cap.
+
+### Instagram Media Links and Post Insights prompts
+
+**Get media links for one public video**
+
+```text
+Use Instagram Media Links & Post Insights for this public Instagram video or Reel. Return the video and audio links actually provided by the Actor, matching the result to my input by its returned `url`. If a link field is missing, mark it unavailable; do not infer that the media does not exist, and do not treat missing numeric fields as zero.
+[INSTAGRAM_URL]
+```
+
+**Organize post insights for multiple links**
+
+```text
+Use Instagram Media Links & Post Insights for exactly these public Instagram video or Reel links. Organize the author, publish time, like count, and comment count only when those fields are actually returned. Match each result by its returned `url`; never guess from result order. Mark missing fields unavailable, not zero, and do not infer views, impressions, follower counts, or complete coverage.
+[INSTAGRAM_URL_1]
+[INSTAGRAM_URL_2]
+```
 
 ## Scope and limitations
 

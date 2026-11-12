@@ -4,7 +4,7 @@ This guide covers Instagram Transcript Extractor only. For Instagram Creator Vid
 
 Instagram Transcript Extractor retrieves the spoken transcript actually returned for public Instagram video or Reel links. You can request a summary, translation, or analysis based on that text; a transcript is not guaranteed for every video. See the [Instagram Transcripts Scraper Actor on Apify](https://apify.com/apple_yang/instagram-transcripts-scraper).
 
-The current ClawHub listing is [v1.0.4](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) (latest and moderation-clean when checked 2026-11-12). The separate GitHub Release package is [ZIP v0.2.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip). ClawHub and GitHub ZIPs are separate distribution channels and use independent version numbers.
+The current ClawHub listing is [v1.0.5](https://clawhub.ai/apismith-labs/skills/instagram-transcript-extractor) (latest and Moderate CLEAN when checked 2026-11-12). The separate GitHub Release package is [ZIP v0.2.2](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.2/instagram-transcript-extractor-v0.2.2.zip). ClawHub and GitHub ZIPs are separate distribution channels and use independent version numbers.
 
 ## Before using it
 
