@@ -70,7 +70,7 @@ See Anthropic's [Skills guide](https://code.claude.com/docs/en/skills) and [MCP 
 
 ### Creator Video Insights in Claude Code
 
-The account-sync route applies to a Skill enabled in Claude Web when Claude Code is signed into the same `claude.ai` account. For a local installation instead, use the top-level `instagram-creator-reels-insights/` directory from the [Creator Video Insights v1.0.5 ZIP candidate](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.5/instagram-creator-video-insights-v1.0.5.zip) after publication in the personal skills directory documented above. After installation, use `/skills` to check visibility and invoke the displayed slash command. The project has not confirmed this Creator installation path or its full task workflow in Claude Code.
+The account-sync route applies to a Skill enabled in Claude Web when Claude Code is signed into the same `claude.ai` account. For a local installation instead, use the top-level `instagram-creator-reels-insights/` directory from the [Creator Video Insights v1.0.5 ZIP](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.5/instagram-creator-video-insights-v1.0.5.zip) in the personal skills directory documented above. After installation, use `/skills` to check visibility and invoke the displayed slash command. The project has not confirmed this Creator installation path or its full task workflow in Claude Code.
 
 ## Copyable requests for Claude Web and Desktop chat
 

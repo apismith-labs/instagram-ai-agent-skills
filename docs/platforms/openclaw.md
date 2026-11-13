@@ -1,12 +1,12 @@
 # Instagram Skills in OpenClaw
 
-This guide covers Instagram Transcript Extractor and Instagram Media Links & Post Insights, which have current ClawHub listings, and the planned Creator Video Insights v1.0.5 candidate, pending publication. Creator's current workflow remains in development and unverified. Install the Skill you need, then connect the Apify plugin separately using [Set up the Apify plugin](#set-up-the-apify-plugin).
+This guide covers Instagram Transcript Extractor and Instagram Media Links & Post Insights, which have current ClawHub listings, and the current Creator Video Insights v1.0.5 listing. Creator's current workflow remains in development and unverified. Install the Skill you need, then connect the Apify plugin separately using [Set up the Apify plugin](#set-up-the-apify-plugin).
 
 ## Instagram Creator Video Insights
 
 Use this Skill to review one or more public creator accounts through their returned transcripts and identify topics, opening hooks, and speaking structures. Daily Scan covers the most recent 24 hours; Weekly Review covers the most recent 7 days. Reports keep findings separate by creator.
 
-The planned [ClawHub listing v1.0.5](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) is a candidate pending publication; the stable slug remains `instagram-creator-reels-insights`. The current Creator workflow remains in development and unverified. After publication, the OpenClaw CLI install command will be:
+The current [ClawHub listing v1.0.5](https://clawhub.ai/apismith-labs/skills/instagram-creator-reels-insights) is available for installation; the stable slug is `instagram-creator-reels-insights`. The current Creator workflow remains in development and unverified. The OpenClaw CLI documents this ClawHub install command:
 
 ```sh
 openclaw skills install @apismith-labs/instagram-creator-reels-insights
@@ -26,7 +26,7 @@ openclaw skills check
 
 To check a specific Agent, use `openclaw skills check --agent YOUR_AGENT_ID`, replacing `YOUR_AGENT_ID` with its ID; if you do not know the ID, omit `--agent`. Then open a new session and select `$instagram-creator-reels-insights`.
 
-The command follows the [OpenClaw Skills CLI documentation](https://docs.openclaw.ai/cli/skills). The ClawHub installation itself and an end-to-end task using this route have not yet been confirmed in this project's Gateway environment. The currently published Creator ClawHub listing is v1.0.4; the v1.0.5 candidate has not been published.
+The command follows the [OpenClaw Skills CLI documentation](https://docs.openclaw.ai/cli/skills). The ClawHub installation itself and an end-to-end task using this route have not yet been confirmed in this project's Gateway environment. The currently published Creator ClawHub listing is v1.0.5.
 
 If the Skill is not listed, confirm you are checking the same Gateway where it was installed. You can inspect the active workspace setting with:
 
