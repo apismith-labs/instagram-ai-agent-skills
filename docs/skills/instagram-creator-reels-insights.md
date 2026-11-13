@@ -2,7 +2,7 @@
 
 Instagram Creator Video Insights reviews public videos—including Reels and regular video posts—for the creator accounts you name. Use Daily Scan for a recent-day review or Weekly Review to summarize the past week. Unlike [Instagram Transcript Extractor](instagram-transcript-extractor.md), which starts from video links you provide, this Skill starts from creator accounts and a time window, then analyzes transcripts returned for eligible videos.
 
-**Current workflow status: in development and unverified.** Existing GitHub Release ZIP v1.0.2 and ClawHub listing v1.0.2 are earlier distribution artifacts; they do not validate the current workflow, and Creator was not updated in this documentation change.
+**Current workflow status: in development and unverified.** A Creator Video Insights v1.0.5 GitHub ZIP and ClawHub update are prepared candidates pending publication. Distribution does not validate the current workflow.
 
 ## Before using it
 

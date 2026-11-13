@@ -5,7 +5,46 @@ description: Review public creators’ recent Instagram videos, including Reels 
 
 # Instagram Creator Video Insights
 
-Turn recent public Instagram videos—including Reels and regular video posts—from one or more creators into a source-linked report. Name the public accounts, choose Daily Scan or Weekly Review, and the Skill finds recent posts, transcribes the videos it can, and summarizes what was actually said, with a link to every source post.
+Turn recent public Instagram videos—including Reels and regular video posts—from one or more creators into a source-linked report. Name the public accounts, choose Daily Scan or Weekly Review, and the Skill finds recent posts, transcribes the videos it can, and summarizes what was actually said, with source links for each post cited in the report.
+
+## What you get
+
+- **Daily Scan** reviews the most recent 24 hours for each creator you name.
+- **Weekly Review** reviews the most recent 7 days and highlights recurring topics, hooks, and calls to action.
+
+Every report keeps each creator in a separate section, ties findings to source posts, and separates transcript evidence from interpretation. Cross-creator comparisons appear only when the available transcripts support them.
+
+## Typical use cases
+
+- Identify transcript-supported topics and hooks worth studying in a creator's recent videos.
+- Compare how specified creators discuss similar subjects when their returned transcripts support the comparison.
+- Turn recurring ideas in returned transcripts into source-linked angles for your own content planning.
+
+## Copy-ready requests
+
+Replace the placeholders with public accounts and your own brand.
+
+**Daily Scan**
+
+```text
+Run a Daily Scan for [CREATOR_1], [CREATOR_2], and [CREATOR_3]. Review their recent public Instagram videos—including Reels and regular video posts—from the last 24 hours. Give each creator a separate section with links to source posts and transcript-based observations.
+```
+
+**Weekly Review**
+
+```text
+Run a Weekly Review for [CREATOR_1], [CREATOR_2], and [CREATOR_3] for the last 7 days. Review their public Instagram videos, including Reels and regular video posts. Summarize each creator separately, then compare themes only where the available transcripts support a comparison. Link each finding to its source post.
+```
+
+**Content ideas**
+
+```text
+Based on the available transcripts from [CREATOR_1], [CREATOR_2], and [CREATOR_3], suggest content angles for [MY_BRAND]. Link observations to source posts and distinguish transcript-supported observations from your suggestions.
+```
+
+## Before you start
+
+This Skill needs an Apify connection exposed and authorized in your host; installing the Skill does not create that connection. If the current session cannot confirm usable Apify tools, authorization, or required run and result-reading conditions, the Skill stops before starting any Actor. It analyzes only posts and transcripts actually returned, so coverage can be partial or unknown. The per-creator video limit caps transcript processing, not discovery coverage or usage. Never provide credentials in chat.
 
 ## OpenClaw setup and first use
 
@@ -35,14 +74,7 @@ At the first real task, inspect only the Apify tools, live schemas, authorizatio
 
 Do not start an Actor until the user completes setup and a usable Apify tool is available. Never ask the user to send an API Key in chat. After setup, open a new OpenClaw conversation or refresh available tools before retrying. Check the default Agent with `openclaw skills check`; if needed, specify one with `openclaw skills check --agent YOUR_AGENT_ID`. In a new session, invoke `$instagram-creator-reels-insights`. For directory or Agent permission questions, follow the [project OpenClaw guide](https://github.com/apismith-labs/instagram-ai-agent-skills/blob/main/docs/platforms/openclaw.md).
 
-## What you get
-
-- **Daily Scan** reviews the most recent 24 hours for each creator you name.
-- **Weekly Review** reviews the most recent 7 days and highlights recurring topics, hooks, and calls to action.
-
-Every report keeps each creator in a separate section, ties findings to source posts, and separates transcript evidence from interpretation. Cross-creator comparisons appear only when the available transcripts support them.
-
-## Before you start
+## Readiness and usage safeguards
 
 - **Connect Apify in your host.** The Skill uses Apify Actors to read public posts and transcripts. Installing the Skill and connecting Apify are separate steps, and both are needed. Use only tools actually exposed in the current session or explicit connection status from the host. At the first actual analysis request, if Apify is unavailable, the host reports missing authorization, or readiness cannot be confirmed from host-visible status, stop without starting an Actor. Tell the user that no Actor was started and no results were received; explain what readiness condition could not be confirmed. If the host cannot expose connection status, say it cannot be confirmed; do not infer it from Skill metadata. For OpenClaw, show the setup guidance above only when the host is identified as OpenClaw; for ChatGPT, show the complete ChatGPT first-use instructions in the host-specific section below when its condition applies; for other identified hosts, use only the matching platform-specific guidance, without showing OpenClaw commands. Do not install plugins, change host configuration, or use shell, direct REST/API, tokens, cookies, or session IDs to bypass missing tools or authorization. After the user configures Apify, ask them to start a new session or refresh available tools and retry the request.
 - **Set a per-creator video limit.** It caps how many eligible videos are processed for transcripts in each report. It is a processing limit, not a full-account scan, and it does not cap usage or cost.
@@ -84,7 +116,7 @@ Be transparent that Profile Posts discovery and Transcript processing may involv
 
 ### Execution
 
-1. At the first actual analysis request, check the tools actually exposed by the selected host, their live input schemas, authorization, run-status query, and result/Dataset read capabilities for `apple_yang/instagram-post-scraper`. Tool names and argument shapes vary by host; do not assume every host exposes `call-actor` or the same contract. Before Profile Posts discovery, do not require an output enum or a Reel/non-Reel mapping; a string `type` field without an enum is not a blocker to retrieving raw records or processing records that meet the project rule below. If the Profile Posts Actor/tool, authorization, required input contract, run-status query, or ability to read raw results is unavailable or unconfirmed, stop before that Actor call and explain the specific blocker; do not try another Actor. Inspect returned output fields and preserve their raw values after discovery without guessing aliases. Verify the Transcript Actor's live contract only before any Transcript call. If the host cannot expose plugin or authorization status, say it cannot be confirmed rather than inferring it. For OpenClaw, show the first-time setup guidance above only when the host is identified as OpenClaw; for ChatGPT, use the complete ChatGPT first-use block above when its condition applies; for other identified hosts, use the corresponding platform guide without showing OpenClaw commands. Never install a plugin or change host configuration automatically. These conditions do not create a budget-parameter requirement.
+1. At the first actual analysis request, check the tools actually exposed by the selected host, their live input schemas, authorization, run-status query, and result/Dataset read capabilities for `apple_yang/instagram-post-scraper`. Tool names and argument shapes vary by host; do not assume every host exposes `call-actor` or the same contract. Before Profile Posts discovery, do not require an output enum or a Reel/non-Reel mapping; a string `type` field without an enum is not a blocker to retrieving raw records or processing records that meet the project rule below. If the Profile Posts Actor/tool, authorization, required input contract, run-status query, or ability to read raw results is unavailable or unconfirmed, stop before that Actor call and explain the specific blocker; do not try another Actor. Inspect returned output fields and preserve their raw values after discovery without guessing aliases. Verify the Transcript Actor's live contract only before any Transcript call. If the host cannot expose plugin or authorization status, say it cannot be confirmed rather than inferring it. For OpenClaw, show the first-time setup guidance above only when the host is identified as OpenClaw; for ChatGPT, use the complete ChatGPT first-use block below when its condition applies; for other identified hosts, use the corresponding platform guide without showing OpenClaw commands. Never install a plugin or change host configuration automatically. These conditions do not create a budget-parameter requirement.
 2. Run the helper `settings` operation using the accounts, positive integer per-creator video limit, and save consent. If the current request omits `per_creator_limit` and no existing user-authorized setting is available, ask the user to confirm that processing limit before discovery; do not save it without explicit consent. For Daily/Weekly boundaries, call `window` with the request timestamp and mode. Keep its `end_utc_exclusive` value through selection and pass the requested IANA timezone as `display_timezone` to `select` (use and label `UTC` when the request specifies none).
 3. Use the host's live-supported input to discover posts for the requested accounts and time window. For every `apple_yang/instagram-post-scraper` request, explicitly include the JSON field `"skipPinnedPosts": true`; do not omit it and rely on the Actor default. Before the call, verify the live input schema accepts this field as a boolean; if it is absent or conflicts, stop and report the schema mismatch rather than omitting or changing the value. This setting applies only to Profile Posts discovery and must never be passed to the Transcript Actor. There is no user override for this project default. A true value skips pinned posts, including ones that fall within the requested time window. Disclose that exclusion and do not claim all time-matching posts were covered; report an excluded-post count only if the Actor returns a verifiable count. Keep `resultsLimit` separate from the local `per_creator_limit`; never pass `per_creator_limit` as Actor input. When the live schema supports it, use `resultsLimit=50` as the project default. This default reflects the project owner's prior runtime observation of a per-Creator result/usage limit; the public schema describes a maximum result count but does not guarantee per-Creator semantics. Submit one username per run while scope behavior remains unverified. Preserve each run boundary, submitted account mapping, exact run status, all raw returned rows (including original `type` and `productType` values), and any explicit Dataset completeness evidence. Set `retrieval_complete` to `true` only with traceable host/Actor evidence that the Dataset was fully read; the helper checks only evidence-object shape and cannot authenticate its truth. Do not infer completeness from `SUCCEEDED`, a count below `resultsLimit`, an empty result, or no truncation marker. Missing pagination metadata or extra completeness flags do not block processing exact-Video records after retrieval, but do not claim a full time-window scan. If the run is `SUCCEEDED`, the Dataset has been fully read, and that Creator's raw returned row count is below `resultsLimit`, report in the user's language that the Actor-returned data was fully read and the configured result limit was not reached. This says only that the returned Dataset was read and the configured limit was not reached; it does not guarantee every post in the requested window was found. If the returned row count reaches the limit, say results may have been capped or truncated.
 4. Run helper operation `select` with the exact Profile Posts field map and every per-run result. The project processing rule is exact and case-sensitive: only a row whose `type` value is the string `"Video"` and whose `url` is a usable Instagram post URL is a transcription candidate. This is the project owner's confirmed handling rule, not an enum guaranteed by the Actor schema; the public schema currently types `type` as a string without enum values. `productType` is not a gate. Do not use `isReel`, `productType`, URL shape, or field names to infer media type. Any missing, null, non-string, or other `type` value stays unresolved as unknown and is never sent to the Transcript Actor. Retain the row and report the actual type field presence/value. The Transcript Actor can process Reels and regular video posts, so do not distinguish them or require Reel classification. The helper reports `returned_raw_rows` as the Dataset row count only when a run maps to one Creator; it is `null` if multiple creators share a run and cannot be apportioned. `discovered_returned_in_window` counts attributable raw rows with usable identity/URL and timestamps inside the requested window, including duplicates, regardless of media type. `type_video_candidates` counts deduplicated exact-Video rows with usable URLs before the processing cap. `unknown_media_type` counts attributable in-window raw rows whose type is missing, null, non-string, or not exactly `"Video"`, including duplicate rows and regardless of URL usability. This count reports unknown type rows, not interface errors; it does not by itself make the run `partial_interface_error`. A confirmed `"Video"` row without a usable URL is a structural interface error. Also report selected and actually processed counts, and each discovery run status. Preserve unresolved identity/interface rows with actual evidence. Valid, attributable exact-Video rows may proceed even when pagination or extra completeness metadata is unavailable; preserve run status and returned rows without claiming a full scan. Do not send rows with unresolved identity, invalid required fields/URL, or unknown type. A missing discovery run means no rows were returned for that Creator in this attempt, while coverage and additional candidates remain unknown. Report unknown type values, unverified publication-time values, selected/processed videos, omitted candidates, failures, and partial/unknown coverage. Never describe `per_creator_limit` as a discovery cap or complete account scan.
@@ -106,9 +138,9 @@ A separately tested isolated plugin copy exposed pagination fields and read a Da
 
 Use a natural equivalent of “Creator Video Insights” in the user's language as the report title. Analyze only Actor-returned transcript text. Keep that text distinct from generated summaries and analysis. Do not infer visuals, editing, product display, creator intent, audience reaction, or causation. Link each insight to its post URL and quote a short supporting transcript excerpt where useful.
 
-**Daily Scan:** show the exact UTC window and timezone. For each Creator label `returned_raw_rows` as raw Dataset rows read, `discovered_returned_in_window` as attributable in-window raw rows with usable URLs (duplicates included), `unknown_media_type` as attributable in-window unknown-type raw rows (duplicates included; URL not required), and `type_video_candidates` as deduplicated usable-URL rows with exact `type == "Video"` before the local limit. Then show selected/processed videos, those omitted by the user limit, each discovery run status, and coverage/failure status. Because `"skipPinnedPosts": true` excludes pinned posts, do not label returned rows as all posts in the time window; give an excluded count only if the Actor provides a verifiable count. For each selected video show its URL, `published_at_local` with the explicit `display_timezone`, the UTC instant if useful, transcript status and, when available, transcript highlights, opening Hook, core point, speaking structure, delivery and closing/CTA. If the helper marks the source timestamp `timestamp_unverified`, retain its raw value and say publication time could not be verified; do not guess. Give a concise interpretation based on transcript evidence. Preserve post details when transcription fails.
+**Daily Scan:** show the exact UTC window and timezone. For each Creator label `returned_raw_rows` as raw Dataset rows read, `discovered_returned_in_window` as attributable in-window raw rows with usable URLs (duplicates included), `unknown_media_type` as attributable in-window unknown-type raw rows (duplicates included; URL not required), and `type_video_candidates` as deduplicated usable-URL rows with exact `type == "Video"` before the local limit. Then show selected/processed videos, those omitted by the user limit, each discovery run status, and coverage/failure status. Because `"skipPinnedPosts": true` excludes pinned posts, do not label returned rows as all posts in the time window; give an excluded count only if the Actor provides a verifiable count. For each selected video show its URL, `published_at_local` with the explicit `display_timezone`, the UTC instant if useful, transcript status and, when available, transcript highlights, opening hook, core point, speaking structure, delivery and closing/CTA. If the helper marks the source timestamp `timestamp_unverified`, retain its raw value and say publication time could not be verified; do not guess. Give a concise interpretation based on transcript evidence. Preserve post details when transcription fails.
 
-**Weekly Review:** show the same coverage accounting. Summarize recurring topics, Hooks, speaking structures and CTAs only from successfully matched transcripts in this report. Link every pattern to representative posts and transcript evidence. Call out small samples and incomplete coverage; do not describe them as long-term trends.
+**Weekly Review:** show the same coverage accounting. Summarize recurring topics, hooks, speaking structures and CTAs only from successfully matched transcripts in this report. Link every pattern to representative posts and transcript evidence. Call out small samples and incomplete coverage; do not describe them as long-term trends.
 
 Keep the default report readable: show transcript highlights and source-linked analysis rather than every full transcript inline. If asked to expand a video, provide its actual returned transcript separately, link its post, and label the transcript as Actor-returned text.
 
@@ -119,27 +151,6 @@ At the end, include a short copyable request containing the accounts, report mod
 ### Privacy and safety
 
 Process only user-specified public accounts. Respect Instagram, Apify and host access controls; do not bypass login, rate limits, or restrictions. Never request or reveal tokens, cookies, session IDs, passwords, or authorization headers. Persist the account list and per-creator limit only after explicit consent and only through supported host storage. Never persist transcript libraries or report history.
-## Copy-ready requests
-
-Replace the placeholders with public accounts and your own brand.
-
-**Daily Scan**
-
-```text
-Run a Daily Scan for [CREATOR_1], [CREATOR_2], and [CREATOR_3]. Review their recent public Instagram videos—including Reels and regular video posts—from the last 24 hours. Give each creator a separate section with links to source posts and transcript-based observations.
-```
-
-**Weekly Review**
-
-```text
-Run a Weekly Review for [CREATOR_1], [CREATOR_2], and [CREATOR_3] for the last 7 days. Review their public Instagram videos, including Reels and regular video posts. Summarize each creator separately, then compare themes only where the available transcripts support a comparison. Link each finding to its source post.
-```
-
-**Content ideas**
-
-```text
-Based on the available transcripts from [CREATOR_1], [CREATOR_2], and [CREATOR_3], suggest content angles for [MY_BRAND]. Link observations to source posts and distinguish transcript-supported observations from your suggestions.
-```
 
 ## Other host setup
 
