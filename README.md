@@ -78,6 +78,8 @@ Choose the route for your platform. GitHub ZIP and ClawHub versions are separate
 
 Choose the route for your platform. The current named GitHub Release ZIP is v1.0.5; ClawHub is independently versioned and is also v1.0.5. Download the named Release asset shown below, not GitHub's automatic **Source code (zip)**. These install paths do not imply full task-workflow validation. Full time-window coverage remains unverified; the official OpenClaw Apify plugin v0.5.3 does not provide Dataset pagination and has a 50,000-character serialization truncation limitation. The isolated paginated copy's 24/24 result does not represent the official plugin, and 6/6 transcript URL reconciliation does not prove Discovery coverage is complete. The ClawHub route and full task flow remain unverified on the project Gateway. See the [Creator OpenClaw guide](docs/platforms/openclaw.md#instagram-creator-video-insights).
 
+This Skill uses the [Instagram Profile Posts & Reels Scraper](https://apify.com/apple_yang/instagram-post-scraper) for post discovery and the [Instagram Transcript API & Profile Scraper](https://apify.com/apple_yang/instagram-transcripts-scraper) for video transcripts.
+
 | Platform | Creator Video Insights entry |
 | --- | --- |
 | ChatGPT | Upload [`instagram-creator-video-insights-v1.0.5.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.5/instagram-creator-video-insights-v1.0.5.zip) using the [ChatGPT steps](#chatgpt). Choose the named Release asset, not GitHub's automatic **Source code (zip)**. |
