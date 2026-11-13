@@ -20,11 +20,21 @@ def post(code, creator="a", created=START, url=None, stable=None):
     return {"creator":creator,"url":url or f"https://www.instagram.com/reel/{code}/",
             "created":created,"kind":"Video","stable":stable or code}
 
+def complete_read_evidence(posts, source="synthetic_fixture", detail="synthetic fixture was fully read", **extra):
+    evidence = {"source":source, "detail":detail, "dataset_total":len(posts),
+                "result_count":len(posts), "returned_items":len(posts),
+                "model_visible_rows":len(posts), "truncated":False, "json_complete":True}
+    evidence.update(extra)
+    return evidence
+
 def synthetic_run(run_id, usernames, posts, results_limit, retrieval_complete=True, **extra):
     """Synthetic Profile Posts run envelope for offline tests; not Actor evidence."""
     if retrieval_complete is True and "retrieval_complete_evidence" not in extra:
+        extra["retrieval_complete_evidence"] = complete_read_evidence(posts)
+    elif retrieval_complete is False and "retrieval_complete_evidence" not in extra:
         extra["retrieval_complete_evidence"] = {
-            "source":"synthetic_fixture", "detail":"synthetic fixture includes all declared rows"}
+            "source":"synthetic_fixture", "detail":"synthetic fixture marks retrieval incomplete",
+            "truncated":True, "json_complete":True}
     return {"run_id":run_id,"usernames":usernames,"posts":posts,"results_limit":results_limit,
             "retrieval_complete":retrieval_complete,"run_status":"SUCCEEDED",**extra}
 
@@ -184,14 +194,14 @@ class CreatorWorkflowTests(unittest.TestCase):
         self.assertEqual(got["counts"]["a"]["coverage_status"], "unknown")
         self.assertEqual(got["run_coverage"][0]["retrieval_complete"], None)
 
-    def test_nonempty_evidence_source_and_detail_pass_structure_check_only(self):
+    def test_source_and_detail_alone_do_not_prove_complete_dataset(self):
         run = synthetic_run("synthetic-explicit-complete", ["a"], [post("candidate")], 5,
                             retrieval_complete=True,
                             retrieval_complete_evidence={"source":"x", "detail":"y"})
         got = wf.select_posts([run], ["a"], 3, START, END, POST_CONTRACT)
-        self.assertEqual(got["status"], "complete")
-        self.assertEqual(got["coverage_status"], "complete")
-        self.assertEqual(got["run_coverage"][0]["retrieval_complete"], True)
+        self.assertEqual(got["status"], "partial")
+        self.assertEqual(got["coverage_status"], "unknown")
+        self.assertIsNone(got["run_coverage"][0]["retrieval_complete"])
         self.assertEqual(got["run_coverage"][0]["retrieval_completeness_evidence"],
                          {"source":"x", "detail":"y"})
 
@@ -202,8 +212,188 @@ class CreatorWorkflowTests(unittest.TestCase):
         self.assertNotEqual(got["status"], "no_candidates")
         self.assertEqual(got["coverage_status"], "unknown")
         self.assertIsNone(got["run_coverage"][0]["retrieval_complete"])
-        self.assertEqual(got["run_coverage"][0]["retrieval_completeness_evidence"]["status"],
-                         "missing_or_unverifiable")
+        self.assertIsNone(got["run_coverage"][0]["retrieval_completeness_evidence"])
+
+    def test_old_plugin_truncation_markers_and_incomplete_json_are_incomplete(self):
+        for marker in ("[…truncated]", "... 17 more characters truncated"):
+            with self.subTest(marker=marker):
+                rows = [post(f"truncated-{len(marker)}")]
+                evidence = complete_read_evidence(rows, dataset_total=None,
+                    truncation_markers=[marker], all_pages_read=None, has_more=None)
+                run = synthetic_run("legacy-truncated", ["a"], rows, 50,
+                                    retrieval_complete=True, retrieval_complete_evidence=evidence)
+                got = wf.select_posts([run], ["a"], 5, START, END, POST_CONTRACT)
+                self.assertIs(got["run_coverage"][0]["retrieval_complete"], False)
+                self.assertEqual(got["run_coverage"][0]["retrieval_completeness_evidence"], evidence)
+
+        rows = [post("malformed-json")]
+        evidence = complete_read_evidence(rows, dataset_total=None, json_complete=False,
+                                          all_pages_read=None, has_more=None)
+        run = synthetic_run("legacy-incomplete-json", ["a"], rows, 50,
+                            retrieval_complete=True, retrieval_complete_evidence=evidence)
+        got = wf.select_posts([run], ["a"], 5, START, END, POST_CONTRACT)
+        self.assertIs(got["run_coverage"][0]["retrieval_complete"], False)
+
+    def test_model_visible_rows_fewer_than_result_count_are_incomplete(self):
+        rows = [post(f"visible-{index}") for index in range(4)]
+        evidence = complete_read_evidence(rows, dataset_total=None, result_count=5,
+            returned_items=None, model_visible_rows=4, all_pages_read=None, has_more=None)
+        run = synthetic_run("visible-less-than-result-count", ["a"], rows, 50,
+                            retrieval_complete=True, retrieval_complete_evidence=evidence)
+        got = wf.select_posts([run], ["a"], 5, START, END, POST_CONTRACT)
+        self.assertIs(got["run_coverage"][0]["retrieval_complete"], False)
+
+    def test_paginated_truncated_flag_marks_retrieval_incomplete(self):
+        rows = [post(f"page-{index}") for index in range(20)]
+        evidence = complete_read_evidence(rows, dataset_total=24, result_count=20,
+            returned_items=20, truncated=True, has_more=True, all_pages_read=False,
+            next_offset_kind="exact")
+        run = synthetic_run("paged-truncated", ["a"], rows, 50,
+                            retrieval_complete=True, retrieval_complete_evidence=evidence)
+        got = wf.select_posts([run], ["a"], 25, START, END, POST_CONTRACT)
+        self.assertIs(got["run_coverage"][0]["retrieval_complete"], False)
+
+    def test_speculative_cursor_on_terminal_page_conflicts_with_complete_claim(self):
+        rows = [post("speculative-terminal")]
+        scenarios = (
+            ("speculative", None, None),
+            ("Speculative", None, None),
+            (" speculative", None, None),
+            ("exact", 1, None),
+            ("exact", 1, len(rows)),
+        )
+        for kind, offset, total in scenarios:
+            with self.subTest(kind=kind, offset=offset, total=total):
+                evidence = complete_read_evidence(rows, dataset_total=total,
+                    all_pages_read=True, has_more=False, next_offset=offset,
+                    next_offset_kind=kind)
+                run = synthetic_run("speculative-terminal-conflict", ["a"], rows, 50,
+                                    retrieval_complete=True, retrieval_complete_evidence=evidence)
+                got = wf.select_posts([run], ["a"], 5, START, END, POST_CONTRACT)
+                coverage = got["run_coverage"][0]
+                self.assertIsNone(coverage["retrieval_complete"])
+                self.assertTrue(coverage["retrieval_completeness_conflict"])
+
+    def test_unknown_next_offset_kind_cannot_prove_complete(self):
+        rows = [post("unknown-cursor-kind")]
+        evidence = complete_read_evidence(rows, next_offset_kind="continuable")
+        run = synthetic_run("unknown-cursor-kind", ["a"], rows, 50,
+                            retrieval_complete=True, retrieval_complete_evidence=evidence)
+        got = wf.select_posts([run], ["a"], 5, START, END, POST_CONTRACT)
+        coverage = got["run_coverage"][0]
+        self.assertIsNone(coverage["retrieval_complete"])
+        self.assertTrue(coverage["retrieval_completeness_conflict"])
+
+    def test_explicit_incomplete_stays_false_without_terminal_proof(self):
+        rows = [post("explicit-incomplete")]
+        evidence = complete_read_evidence(rows, dataset_total=None, all_pages_read=None,
+                                          has_more=None, truncated=False)
+        run = synthetic_run("explicit-incomplete-no-proof", ["a"], rows, 50,
+                            retrieval_complete=False, retrieval_complete_evidence=evidence)
+        got = wf.select_posts([run], ["a"], 5, START, END, POST_CONTRACT)
+        coverage = got["run_coverage"][0]
+        self.assertIs(coverage["retrieval_complete"], False)
+        self.assertFalse(coverage["retrieval_completeness_conflict"])
+
+    def test_explicit_incomplete_conflicting_with_complete_evidence_stays_false(self):
+        rows = [post("false-vs-complete")]
+        evidence = complete_read_evidence(rows, all_pages_read=True, has_more=False)
+        run = synthetic_run("false-vs-complete-evidence", ["a"], rows, 50,
+                            retrieval_complete=False, retrieval_complete_evidence=evidence)
+        got = wf.select_posts([run], ["a"], 5, START, END, POST_CONTRACT)
+        coverage = got["run_coverage"][0]
+        self.assertIs(coverage["retrieval_complete"], False)
+        self.assertTrue(coverage["retrieval_completeness_conflict"])
+
+    def test_any_nonempty_observed_truncation_marker_is_incomplete(self):
+        rows = [post("unknown-truncation-marker")]
+        evidence = complete_read_evidence(rows, truncation_markers=["[cut]"])
+        run = synthetic_run("unknown-marker", ["a"], rows, 50,
+                            retrieval_complete=True, retrieval_complete_evidence=evidence)
+        got = wf.select_posts([run], ["a"], 5, START, END, POST_CONTRACT)
+        coverage = got["run_coverage"][0]
+        self.assertIs(coverage["retrieval_complete"], False)
+        self.assertTrue(coverage["retrieval_completeness_conflict"])
+        self.assertEqual(coverage["retrieval_completeness_evidence"], evidence)
+
+    def test_next_offset_accepts_only_null_or_nonnegative_non_boolean_integer(self):
+        rows = [post("offset-validation")]
+        for offset in (None, 0, 8):
+            with self.subTest(offset=offset):
+                evidence = complete_read_evidence(rows, all_pages_read=None, has_more=None,
+                                                  next_offset=offset, next_offset_kind=None)
+                run = synthetic_run("valid-offset", ["a"], rows, 50,
+                                    retrieval_complete=True, retrieval_complete_evidence=evidence)
+                got = wf.select_posts([run], ["a"], 5, START, END, POST_CONTRACT)
+                self.assertIs(got["run_coverage"][0]["retrieval_complete"], True)
+
+        for offset in ("8", {}, -1, True):
+            with self.subTest(offset=offset):
+                evidence = complete_read_evidence(rows, all_pages_read=True, has_more=False,
+                                                  next_offset=offset, next_offset_kind="exact")
+                run = synthetic_run("invalid-offset", ["a"], rows, 50,
+                                    retrieval_complete=True, retrieval_complete_evidence=evidence)
+                got = wf.select_posts([run], ["a"], 5, START, END, POST_CONTRACT)
+                coverage = got["run_coverage"][0]
+                self.assertIsNone(coverage["retrieval_complete"])
+                self.assertFalse(coverage["retrieval_completeness_conflict"])
+
+    def test_unknown_total_and_speculative_cursor_remain_unknown(self):
+        rows = [post(f"speculative-{index}") for index in range(4)]
+        evidence = complete_read_evidence(rows, dataset_total=None, result_count=4,
+            returned_items=4, truncated=False, has_more=None, all_pages_read=None,
+            next_offset_kind="speculative")
+        run = synthetic_run("speculative-cursor", ["a"], rows, 50,
+                            retrieval_complete=True, retrieval_complete_evidence=evidence)
+        got = wf.select_posts([run], ["a"], 5, START, END, POST_CONTRACT)
+        self.assertIsNone(got["run_coverage"][0]["retrieval_complete"])
+        self.assertEqual(got["counts"]["a"]["coverage_status"], "unknown")
+
+    def test_terminal_page_or_dataset_total_match_can_prove_retrieval_complete(self):
+        rows = [post(f"page-terminal-{index}") for index in range(3)]
+        terminal_evidence = complete_read_evidence(rows, dataset_total=None,
+            all_pages_read=True, has_more=False, next_offset=None, next_offset_kind=None,
+            prior_page_cursors=[{"next_offset": 3, "next_offset_kind": "speculative"}])
+        terminal_run = synthetic_run("terminal-page", ["a"], rows, 50,
+                                     retrieval_complete=True,
+                                     retrieval_complete_evidence=terminal_evidence)
+        terminal_result = wf.select_posts([terminal_run], ["a"], 5, START, END, POST_CONTRACT)
+        self.assertIs(terminal_result["run_coverage"][0]["retrieval_complete"], True)
+
+        total_evidence = complete_read_evidence(rows, all_pages_read=None, has_more=None)
+        total_run = synthetic_run("dataset-total-match", ["a"], rows, 50,
+                                  retrieval_complete=True,
+                                  retrieval_complete_evidence=total_evidence)
+        total_result = wf.select_posts([total_run], ["a"], 5, START, END, POST_CONTRACT)
+        self.assertIs(total_result["run_coverage"][0]["retrieval_complete"], True)
+
+    def test_result_count_below_actor_limit_alone_does_not_prove_complete(self):
+        rows = [post(f"below-limit-{index}") for index in range(4)]
+        evidence = {"source":"legacy plugin resultCount", "detail":"4 items read into plugin memory",
+                    "result_count":4, "model_visible_rows":4, "json_complete":True,
+                    "truncated":False}
+        run = synthetic_run("below-results-limit", ["a"], rows, 50,
+                            retrieval_complete=True, retrieval_complete_evidence=evidence)
+        got = wf.select_posts([run], ["a"], 5, START, END, POST_CONTRACT)
+        self.assertIsNone(got["run_coverage"][0]["retrieval_complete"])
+
+    def test_discovery_retrieval_and_transcript_dataset_completeness_are_independent(self):
+        row = post("independent-completeness")
+        unknown_discovery = synthetic_run("unknown-discovery", ["a"], [row], 50,
+                                          retrieval_complete=None, dataset_complete=True)
+        discovery = wf.select_posts([unknown_discovery], ["a"], 5, START, END, POST_CONTRACT)
+        self.assertIsNone(discovery["run_coverage"][0]["retrieval_complete"])
+        self.assertEqual(discovery["counts"]["a"]["coverage_status"], "unknown")
+        self.assertNotIn("dataset_complete", discovery["run_coverage"][0])
+
+        complete_discovery = synthetic_run("complete-discovery", ["a"], [row], 50)
+        selected = wf.select_posts([complete_discovery], ["a"], 5, START, END, POST_CONTRACT)
+        transcript = wf.reconcile_transcripts(
+            selected["selected"],
+            [{"url":row["url"], "pk":row["stable"], "userName":"a", "text":"matched"}],
+            "SUCCEEDED", None, POST_CONTRACT, TRANSCRIPT_CONTRACT)[0]
+        self.assertIs(transcript["dataset_complete"], None)
+        self.assertNotIn("retrieval_complete", transcript)
 
     def test_completeness_evidence_shape_requires_nonempty_source_and_detail(self):
         invalid_evidence = ["source/detail", {}, {"detail":"read all pages"},
@@ -217,26 +407,65 @@ class CreatorWorkflowTests(unittest.TestCase):
                 self.assertEqual(got["coverage_status"], "unknown")
                 self.assertNotEqual(got["status"], "no_candidates")
                 self.assertIsNone(got["run_coverage"][0]["retrieval_complete"])
+                self.assertIsNone(got["run_coverage"][0]["retrieval_completeness_evidence"])
 
     def test_unknown_completeness_for_one_creator_does_not_degrade_another(self):
         unknown = synthetic_run("synthetic-a-unknown", ["a"], [post("a-row")], 5,
                                 retrieval_complete=None)
         explicit = synthetic_run("synthetic-b-complete", ["b"], [post("b-row", creator="b")], 5,
                                  retrieval_complete=True,
-                                 retrieval_complete_evidence={"source":"synthetic page ledger",
-                                                              "detail":"all fixture pages supplied"})
+                                 retrieval_complete_evidence=complete_read_evidence(
+                                     [post("b-row", creator="b")], source="synthetic page ledger",
+                                     detail="all fixture pages supplied"))
         got = wf.select_posts([unknown, explicit], ["a", "b"], 2, START, END, POST_CONTRACT)
         self.assertEqual(got["coverage_status"], "unknown")
         self.assertEqual(got["counts"]["a"]["coverage_status"], "unknown")
         self.assertEqual(got["counts"]["b"]["coverage_status"], "complete")
         self.assertEqual({row["creator"] for row in got["selected"]}, {"a", "b"})
 
-    def test_workflow_reference_matches_tri_state_completeness_contract(self):
-        reference = (PATH.parent.parent / "references/workflow.md").read_text()
-        self.assertIn("retrieval_complete` is tri-state", reference)
-        self.assertIn("retrieval_complete_evidence", reference)
-        self.assertIn("never infer it from `SUCCEEDED`", reference)
-        self.assertIn("A `reconcile` row status of `success` means only", reference)
+    def test_static_documentation_contract_mentions_completeness_rules(self):
+        skill_dir = PATH.parent.parent
+        reference = (skill_dir / "references/workflow.md").read_text()
+        reference_text = " ".join(reference.split()).lower()
+        skill = (skill_dir / "SKILL.md").read_text()
+        skill_text = " ".join(skill.split()).lower()
+        for document_name, document in (("workflow reference", reference_text),
+                                        ("Skill instructions", skill_text)):
+            with self.subTest(document=document_name):
+                self.assertIn("retrieval_complete` is tri-state", document)
+                self.assertIn("retrieval_complete_evidence", document)
+                self.assertIn("succeeded", document)
+                self.assertIn("dataset_complete", document)
+                self.assertIn("false", document)
+                self.assertIn("null", document)
+                self.assertIn("unknown", document)
+                self.assertIn("incomplete", document)
+                self.assertIn("source", document)
+                self.assertIn("detail", document)
+                self.assertIn("json_complete", document)
+                self.assertIn("all_pages_read", document)
+                self.assertIn("has_more", document)
+                self.assertIn("`dataset_total`", document)
+                self.assertIn("`model_visible_rows`", document)
+                self.assertIn("`result_count`", document)
+                self.assertTrue("`nextoffsetkind`" in document or "`next_offset_kind`" in document)
+                self.assertIn("speculative", document)
+                self.assertIn("prior_page_cursors", document)
+                self.assertIn("truncation_markers", document)
+                self.assertIn("non-empty", document)
+                self.assertIn("retrieval_completeness_conflict", document)
+                self.assertIn("next_offset", document)
+                self.assertIn("non-negative integer", document)
+                self.assertIn("case-insensitively", document)
+                self.assertIn("unknown values cannot establish completeness", document)
+                self.assertIn("`next_offset` is non-null", document)
+                self.assertIn("a matching `dataset_total` cannot override", document)
+                self.assertIn("does not validate", document)
+                self.assertIn("v0.5.3", document)
+                self.assertIn("allDone".lower(), document)
+                self.assertIn("resultCount".lower(), document)
+                self.assertIn("…truncated", document)
+        self.assertIn("a `reconcile` row status of `success` means only", reference_text)
 
     def test_identity_conflicts_reduce_top_and_attributable_creator_coverage(self):
         stable_id_conflict = [post("one", stable="shared"), post("two", stable="shared")]
@@ -500,8 +729,11 @@ class CreatorWorkflowTests(unittest.TestCase):
     def test_fallback_run_is_included_in_only_its_row_attributed_creator_coverage(self):
         run_a = synthetic_run("r-ok", ["a"], [post("a-ok")], 5)
         run_b = synthetic_run("r-b", ["b"], [post("b-ok", creator="b")], 5)
-        fallback = synthetic_run("r-fb", ["a"],
-            [post("a-fb-1"), post("a-fb-2", created="2026-11-05T23:00:00Z")], 5)
+        fallback_posts = [post("a-fb-1"), post("a-fb-2", created="2026-11-05T23:00:00Z")]
+        fallback_evidence = complete_read_evidence(fallback_posts,
+            source="fixture pagination ledger", detail="all supplied rows were read")
+        fallback = synthetic_run("r-fb", ["a"], fallback_posts, 5,
+            retrieval_complete_evidence=fallback_evidence)
         del fallback["usernames"]
 
         got = wf.select_posts([run_a, run_b, fallback], ["a", "b"], 5,
@@ -513,9 +745,15 @@ class CreatorWorkflowTests(unittest.TestCase):
         self.assertTrue(got["counts"]["a"]["additional_candidates_unknown"])
         self.assertEqual([run["run_id"] for run in got["counts"]["a"]["run_coverage"]],
                          ["r-ok", "r-fb"])
-        self.assertEqual(got["counts"]["a"]["run_coverage"][1], {
-            "run_id":"r-fb", "status":"run_username_mapping_missing",
-            "run_status":"SUCCEEDED", "attributed_via":"row_creator_field"})
+        fallback_coverage = got["counts"]["a"]["run_coverage"][1]
+        self.assertEqual(fallback_coverage["status"], "run_username_mapping_missing")
+        self.assertEqual(fallback_coverage["run_status"], "SUCCEEDED")
+        self.assertEqual(fallback_coverage["results_limit"], 5)
+        self.assertEqual(fallback_coverage["raw_returned_rows"], 2)
+        self.assertFalse(fallback_coverage["possible_results_limit_reached"])
+        self.assertIs(fallback_coverage["retrieval_complete"], True)
+        self.assertEqual(fallback_coverage["retrieval_completeness_evidence"], fallback_evidence)
+        self.assertEqual(fallback_coverage["attributed_via"], "row_creator_field")
         self.assertEqual(got["counts"]["b"]["coverage_status"], "complete")
         self.assertFalse(got["counts"]["b"]["additional_candidates_unknown"])
         self.assertEqual([run["run_id"] for run in got["counts"]["b"]["run_coverage"]], ["r-b"])
@@ -545,7 +783,19 @@ class CreatorWorkflowTests(unittest.TestCase):
         self.assertEqual(got["unresolved"][0]["row"], invalid)
         self.assertEqual(got["unresolved"][0]["run_id"], "r-fb-invalid")
         self.assertEqual(got["unresolved"][0]["row_index"], 0)
-        self.assertIn("invalid", got["unresolved"][0]["reason"])
+        self.assertEqual(got["unresolved"][0]["status"], "interface_error")
+        self.assertEqual(got["unresolved"][0]["reason"],
+                         "confirmed Video row has no usable Instagram post URL")
+
+    def test_fallback_without_valid_retrieval_evidence_stays_unknown(self):
+        fallback = synthetic_run("r-fb-no-evidence", ["a"], [post("fallback-video")], 5)
+        del fallback["usernames"]
+        del fallback["retrieval_complete_evidence"]
+
+        got = wf.select_posts([fallback], ["a"], 5, START, END, POST_CONTRACT)
+        coverage = got["counts"]["a"]["run_coverage"][0]
+        self.assertIsNone(coverage["retrieval_complete"])
+        self.assertIsNone(coverage["retrieval_completeness_evidence"])
 
     def test_fallback_invalid_and_valid_rows_attribute_run_once_for_valid_candidate(self):
         invalid = post("invalid-url")
@@ -788,6 +1038,40 @@ class CreatorWorkflowTests(unittest.TestCase):
         self.assertEqual(wf.split_batches(["a","b","c","d","e"],2),[["a","b"],["c","d"],["e"]])
         with self.assertRaises(wf.ContractError):
             wf.split_batches(["a"],0)
+
+    def test_multi_batch_split_preserves_original_url_order(self):
+        urls = [f"https://www.instagram.com/reel/post-{index}/" for index in range(8)]
+        batches = wf.split_batches(urls, 3)
+        self.assertEqual([len(batch) for batch in batches], [3, 3, 2])
+        self.assertEqual([url for batch in batches for url in batch], urls)
+
+    def test_empty_selection_status_and_reconcile_guard(self):
+        selection = select([], ["a"], 5)
+        self.assertEqual(selection["status"], "no_candidates")
+        self.assertEqual(selection["selected"], [])
+
+        # This verifies the helper guard only; host call avoidance is instruction-level.
+        with self.assertRaisesRegex(wf.ContractError, "requires at least one submitted Video candidate"):
+            wf.reconcile_transcripts([], [], "SUCCEEDED", True, POST_CONTRACT,
+                                     TRANSCRIPT_CONTRACT)
+
+    def test_static_instruction_contract_skips_actor_and_reconcile_for_empty_selection(self):
+        # Static text check only; this does not observe host orchestration.
+        skill = (PATH.parent.parent / "SKILL.md").read_text()
+        reference = (PATH.parent.parent / "references/workflow.md").read_text()
+        self.assertIn("do not call the Transcript Actor or `reconcile`", skill)
+        self.assertIn("do not call it for an all-unknown or otherwise empty selection", reference)
+
+    def test_static_skill_instruction_contract_scopes_skip_pinned_posts_to_discovery(self):
+        skill = (PATH.parent.parent / "SKILL.md").read_text()
+        reference = (PATH.parent.parent / "references/workflow.md").read_text()
+        # This checks instruction text only; it does not execute a host Actor call.
+        self.assertIn('explicitly include the JSON field `"skipPinnedPosts": true`', skill)
+        self.assertIn("verify the live input schema accepts this field as a boolean", skill)
+        self.assertIn("applies only to Profile Posts discovery and must never be passed to the Transcript Actor", skill)
+        self.assertIn('discovery request must explicitly include the JSON field `"skipPinnedPosts": true`', reference)
+        self.assertIn("Confirm the live schema accepts this boolean before calling", reference)
+        self.assertIn("must not be passed to the Transcript Actor", reference)
 
     def test_reconcile_requires_compatible_stable_id_contracts(self):
         postrow = {"url":"https://www.instagram.com/reel/a/","stable_id":"a","creator":"a"}

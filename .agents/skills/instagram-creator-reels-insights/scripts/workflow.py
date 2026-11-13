@@ -131,15 +131,100 @@ def _selection_metadata_error(accounts, code, missing, detail):
 def _verified_retrieval_completeness(bundle):
     value = bundle.get("retrieval_complete")
     evidence = bundle.get("retrieval_complete_evidence")
-    if value is True:
-        if (isinstance(evidence, dict)
-                and isinstance(evidence.get("source"), str) and evidence["source"].strip()
-                and isinstance(evidence.get("detail"), str) and evidence["detail"].strip()):
-            return True, {"source": evidence["source"].strip(), "detail": evidence["detail"].strip()}
-        return None, {"status": "missing_or_unverifiable"}
+    preserved_evidence = dict(evidence) if isinstance(evidence, dict) else None
+
+    def insufficient_or_malformed(conflict=False, keep_evidence=False):
+        retained = preserved_evidence if value is False or keep_evidence else None
+        return (False if value is False else None, retained, conflict)
+
+    if not isinstance(evidence, dict):
+        return insufficient_or_malformed()
+    if (not isinstance(evidence.get("source"), str) or not evidence["source"].strip()
+            or not isinstance(evidence.get("detail"), str) or not evidence["detail"].strip()):
+        return insufficient_or_malformed()
+
+    count_fields = ("dataset_total", "result_count", "returned_items", "model_visible_rows")
+    if any(field in evidence and evidence[field] is not None
+           and (type(evidence[field]) is not int or evidence[field] < 0)
+           for field in count_fields):
+        return insufficient_or_malformed()
+    bool_fields = ("truncated", "truncation_marker_detected", "json_complete",
+                   "has_more", "all_pages_read")
+    if any(field in evidence and evidence[field] is not None
+           and type(evidence[field]) is not bool for field in bool_fields):
+        return insufficient_or_malformed()
+    markers = evidence.get("truncation_markers", [])
+    if (not isinstance(markers, list)
+            or any(not isinstance(marker, str) or not marker.strip() for marker in markers)):
+        return insufficient_or_malformed()
+    next_offset_kind = evidence.get("next_offset_kind")
+    if next_offset_kind is not None and not isinstance(next_offset_kind, str):
+        return insufficient_or_malformed()
+    normalized_next_offset_kind = (next_offset_kind.strip().casefold()
+                                   if isinstance(next_offset_kind, str) else None)
+    if next_offset_kind is not None and normalized_next_offset_kind not in {"exact", "speculative"}:
+        return (False if value is False else None, preserved_evidence, True)
+    next_offset = evidence.get("next_offset")
+    if next_offset is not None and (type(next_offset) is not int or next_offset < 0):
+        return insufficient_or_malformed()
+    terminal_cursor_conflict = (
+        evidence.get("has_more") is False
+        and (next_offset is not None or normalized_next_offset_kind == "speculative"))
+
+    # Keep the caller's evidence intact for audit; the helper cannot authenticate it.
+    visible_rows = len(bundle["posts"]) if isinstance(bundle.get("posts"), list) else None
+    model_visible_rows = evidence.get("model_visible_rows", visible_rows)
+    if visible_rows is None or model_visible_rows is None:
+        return insufficient_or_malformed()
+    if model_visible_rows > visible_rows:
+        return False, preserved_evidence, value is True
+    if model_visible_rows < visible_rows:
+        return insufficient_or_malformed(conflict=value is True, keep_evidence=True)
+
+    explicit_incomplete = (
+        evidence.get("truncated") is True
+        or evidence.get("truncation_marker_detected") is True
+        or bool(markers)
+        or evidence.get("json_complete") is False
+        or evidence.get("has_more") is True
+        or evidence.get("all_pages_read") is False
+    )
+    if explicit_incomplete:
+        return False, preserved_evidence, value is True or terminal_cursor_conflict
+
+    if terminal_cursor_conflict:
+        return (False if value is False else None), preserved_evidence, True
+
+    for field in ("dataset_total", "result_count", "returned_items"):
+        count = evidence.get(field)
+        if count is not None and count > model_visible_rows:
+            return False, preserved_evidence, value is True
+        if count is not None and count < model_visible_rows:
+            return insufficient_or_malformed(conflict=value is True, keep_evidence=True)
+
     if value is False:
-        return False, {"status": "explicitly_incomplete"}
-    return None, {"status": "not_provided"}
+        complete_claim = evidence.get("json_complete") is True and (
+            (evidence.get("dataset_total") is not None
+             and evidence["dataset_total"] == model_visible_rows)
+            or (evidence.get("all_pages_read") is True
+                and evidence.get("has_more") is False))
+        return False, preserved_evidence, complete_claim
+    if value is not True or evidence.get("json_complete") is not True:
+        return None, preserved_evidence, False
+
+    dataset_total_matches = (evidence.get("dataset_total") is not None
+                             and evidence["dataset_total"] == model_visible_rows)
+    terminal_page_verified = (evidence.get("all_pages_read") is True
+                              and evidence.get("has_more") is False)
+    # next_offset_kind describes the cursor emitted by the page represented here.
+    # A speculative cursor on that same page conflicts with either terminal proof.
+    speculative_terminal_conflict = (
+        normalized_next_offset_kind == "speculative" and (dataset_total_matches or terminal_page_verified))
+    if speculative_terminal_conflict:
+        return None, preserved_evidence, True
+    if dataset_total_matches or terminal_page_verified:
+        return True, preserved_evidence, False
+    return None, preserved_evidence, False
 
 def select_posts(runs, accounts, cap, start, end, contract, display_timezone="UTC"):
     """Select posts from per-run bundles; limit checks always use pre-filter run rows."""
@@ -206,6 +291,8 @@ def select_posts(runs, accounts, cap, start, end, contract, display_timezone="UT
                 "raw_returned_rows": run_record["raw_returned_rows"],
                 "possible_results_limit_reached": run_record["possible_results_limit_reached"],
                 "retrieval_complete": run_record["retrieval_complete"],
+                "retrieval_completeness_evidence": run_record["retrieval_completeness_evidence"],
+                "retrieval_completeness_conflict": run_record["retrieval_completeness_conflict"],
                 "attributed_via": "row_creator_field"})
             classifications[creator]["returned_raw_rows"] = None
         classifications[creator]["additional_candidates_unknown"] = True
@@ -232,7 +319,8 @@ def select_posts(runs, accounts, cap, start, end, contract, display_timezone="UT
                 raw_posts = bundle["posts"]
                 normalized_status = (bundle.get("run_status").upper().replace("_", "-")
                                      if isinstance(bundle.get("run_status"), str) else None)
-                retrieval_complete, completeness_evidence = _verified_retrieval_completeness(bundle)
+                (retrieval_complete, completeness_evidence,
+                 completeness_conflict) = _verified_retrieval_completeness(bundle)
                 run_record = {"run_id": run_id, "usernames": [],
                               "results_limit": bundle["results_limit"],
                               "raw_returned_rows": len(raw_posts),
@@ -240,6 +328,7 @@ def select_posts(runs, accounts, cap, start, end, contract, display_timezone="UT
                               "coverage_status": "run_username_mapping_missing",
                               "retrieval_complete": retrieval_complete,
                               "retrieval_completeness_evidence": completeness_evidence,
+                              "retrieval_completeness_conflict": completeness_conflict,
                               "limit_scope_unknown": True,
                               "run_status": normalized_status,
                               "status_message": bundle.get("status_message"),
@@ -260,7 +349,8 @@ def select_posts(runs, accounts, cap, start, end, contract, display_timezone="UT
             continue
         run_id, usernames = bundle["run_id"], bundle["usernames"]
         limit, raw_posts = bundle["results_limit"], bundle["posts"]
-        retrieval_complete, completeness_evidence = _verified_retrieval_completeness(bundle)
+        (retrieval_complete, completeness_evidence,
+         completeness_conflict) = _verified_retrieval_completeness(bundle)
         if (not isinstance(run_id, str) or not run_id or run_id in used_run_ids
                 or not isinstance(usernames, list) or not usernames
                 or any(not isinstance(name, str) or not name for name in usernames)
@@ -309,6 +399,7 @@ def select_posts(runs, accounts, cap, start, end, contract, display_timezone="UT
                       "raw_returned_rows": len(raw_posts), "possible_results_limit_reached": reached,
                       "coverage_status": coverage, "retrieval_complete": retrieval_complete,
                       "retrieval_completeness_evidence": completeness_evidence,
+                      "retrieval_completeness_conflict": completeness_conflict,
                       "limit_scope_unknown": multi_scope_unknown, "run_status": normalized_status,
                       "status_message": bundle.get("status_message"),
                       "error": bundle.get("run_error"), "run_index": index}
@@ -326,7 +417,8 @@ def select_posts(runs, accounts, cap, start, end, contract, display_timezone="UT
                 "results_limit": limit, "raw_returned_rows": len(raw_posts),
                 "possible_results_limit_reached": reached,
                 "retrieval_complete": retrieval_complete,
-                "retrieval_completeness_evidence": completeness_evidence})
+                "retrieval_completeness_evidence": completeness_evidence,
+                "retrieval_completeness_conflict": completeness_conflict})
             if len(mapped) == 1 and classifications[creator]["returned_raw_rows"] is not None:
                 classifications[creator]["returned_raw_rows"] += len(raw_posts)
             else:
