@@ -25,7 +25,7 @@ These steps follow the current [OpenAI custom MCP server guide](https://help.ope
 
 ## 2. Upload a Skill package
 
-GitHub Release ZIPs and ClawHub listings are separate distribution channels with independent version numbers. The Transcript Extractor GitHub ZIP is v0.2.3; its ClawHub listing is v1.0.5. The Media Links & Post Insights GitHub ZIP is v1.0.0; its ClawHub listing is v1.0.2. Creator's GitHub ZIP and ClawHub listing are both v1.0.5; its current workflow remains in development and unverified.
+GitHub Release ZIPs and ClawHub listings are separate distribution channels with independent version numbers. The Transcript Extractor GitHub ZIP is v0.2.3; its ClawHub listing is v1.0.5. The Media Links & Post Insights GitHub ZIP is v1.0.0; its ClawHub listing is v1.0.2. Creator's GitHub ZIP and ClawHub listing are both v1.0.6; its current workflow remains in development and unverified.
 
 Download `instagram-transcript-extractor-release-v0.2.3.zip` from the [v0.2.3 Release asset](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v0.2.3/instagram-transcript-extractor-release-v0.2.3.zip), or open the [v0.2.3 Release page](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v0.2.3) and choose that named file under **Assets**. Do not download GitHub's automatically generated **Source code (zip)**. Optional SHA-256 for the Transcript Extractor v0.2.3 ZIP:
 
@@ -41,12 +41,12 @@ Keep the downloaded ZIP intact; do not unzip it before upload. In ChatGPT, open 
 
 ### Upload Creator Video Insights
 
-Download [`instagram-creator-video-insights-v1.0.5.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.5/instagram-creator-video-insights-v1.0.5.zip) from the [v1.0.5 Release asset](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v1.0.5), then upload it using **Plugins → Plugin Directory → Skills → Create → Upload from your computer**; choose the named asset, not GitHub's automatically generated **Source code (zip)**. The current Creator workflow remains in development and unverified, and its ChatGPT report workflow has not been confirmed in this project.
+Download [`instagram-creator-video-insights-v1.0.6.zip`](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/download/v1.0.6/instagram-creator-video-insights-v1.0.6.zip) from the [v1.0.6 Release asset](https://github.com/apismith-labs/instagram-ai-agent-skills/releases/tag/v1.0.6), then upload it using **Plugins → Plugin Directory → Skills → Create → Upload from your computer**; choose the named asset, not GitHub's automatically generated **Source code (zip)**. The current Creator workflow remains in development and unverified, and its ChatGPT report workflow has not been confirmed in this project.
 
-SHA-256 for the Creator Video Insights v1.0.5 ZIP:
+SHA-256 for the Creator Video Insights v1.0.6 ZIP:
 
 ```text
-81c2e5afae4f68d2e576dcc40e05ace9c2be7838df24be43ca7bc94f46e28c51
+463cff98c7902025bdc12be69af7be13a5acd518b904d78faab33d8ab70db1dd
 ```
 
 Historical SHA-256 for the earlier Creator Video Insights v1.0.2 ZIP:
